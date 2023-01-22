@@ -1,2 +1,2 @@
 # Euphemia
-Qt based pixel editor.
+A pixel editor.

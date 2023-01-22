@@ -1,2 +1,2 @@
 # Euphemia
-Qt based paint program. Light, easy to use and with fully implemented features.
+Qt based pixel editor.

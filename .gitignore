@@ -1,0 +1,8 @@
+*.vpwhistu
+*.vtg
+.qmake.stash
+.tmp
+qrc_*
+Makefile
+
+

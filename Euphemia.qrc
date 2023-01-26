@@ -1,0 +1,24 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource prefix="/E">
+	<file alias="SelectRectangle">images/SelectRectangle.xpm</file>
+	<file alias="SelectEllipse">images/SelectEllipse.xpm</file>
+	<file alias="SelectPolygon">images/SelectPolygon.xpm</file>
+	<file alias="FreeHand">images/FreeHand.xpm</file>
+	<file alias="Spray">images/Spray.xpm</file>
+	<file alias="Line">images/Line.xpm</file>
+	<file alias="Rectangle">images/Rectangle.xpm</file>
+	<file alias="Ellipse">images/Ellipse.xpm</file>
+	<file alias="Polygon">images/Polygon.xpm</file>
+	<file alias="Text">images/Text.xpm</file>
+	<file alias="RectangleFilled">images/RectangleFilled.xpm</file>
+	<file alias="EllipseFilled">images/EllipseFilled.xpm</file>
+	<file alias="PolygonFilled">images/PolygonFilled.xpm</file>
+	<file alias="FillFlood">images/FillFlood.xpm</file>
+	<file alias="FillGradient">images/FillGradient.xpm</file>
+	<file alias="Feedback">images/Feedback.png</file>
+	<file alias="Euphemia">images/Euphemia.png</file>
+</qresource>
+</RCC>
+
+

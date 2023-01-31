@@ -2,5 +2,7 @@
 <Workspace Version="10.0" VendorName="SlickEdit">
     <Projects>
         <Project File="Euphemia.vpj"/>
+        <Project File="../Euphemia-SDK/P/P.vpj"/>
+        <Project File="../Classic-SDK/W/W.vpj"/>
     </Projects>
 </Workspace>

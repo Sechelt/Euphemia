@@ -4,11 +4,21 @@
 #include <WPaletteColor.h>
 #include <WIconLayout.h>
 #include <WSizeDialog.h>
-#include <PPenToolBar.h>
-#include <PBrushToolBar.h>
-#include <PFontToolBar.h>
 
 #include <PCanvasView.h>
+
+// we want the toolbar widgets in these
+#include <PDrawFreeHand.h>
+#include <PDrawLine.h>
+#include <PDrawPolygon.h>
+#include <PDrawPolygonFilled.h>
+#include <PDrawRectangle.h>
+#include <PDrawRectangleFilled.h>
+#include <PDrawEllipse.h>
+#include <PDrawEllipseFilled.h>
+#include <PDrawSpray.h>
+#include <PDrawText.h>
+#include <PFillFlood.h>
 
 #define PMAX_RECENT_FILES 5
 
@@ -231,6 +241,12 @@ void EMainWindow::doInitActions()
         pActionGroupTools->addAction( pActionDrawSpray );  
         connect( pActionDrawSpray, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
+        pActionDrawText = new QAction( QIcon( ":E/Text" ), tr(""), this );
+        pActionDrawText->setToolTip( tr("Text") );
+        pActionDrawText->setCheckable( true );
+        pActionGroupTools->addAction( pActionDrawText );  
+        connect( pActionDrawText, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
+
         pActionDrawLine = new QAction( QIcon( ":E/Line" ), tr(""), this );
         pActionDrawLine->setToolTip( tr("straight line") );
         pActionDrawLine->setCheckable( true );
@@ -286,6 +302,7 @@ void EMainWindow::doInitActions()
         connect( pActionFillGradient, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
     }
     // REGION
+
     {
         pActionRegionFlipX      = new  QAction( tr("Flip X Axis"), this );
         pActionRegionFlipY      = new  QAction( tr("Flip Y Axis"), this );
@@ -303,7 +320,6 @@ void EMainWindow::doInitActions()
         pActionRegionDelimit    = new  QAction( tr("Delimit Region"), this );
         pActionRegionOCR        = new  QAction( tr("OCR"), this );
     }
-
     // FILTERS
     {
         pActionFiltersInvert            = new QAction( tr("Invert"), this );
@@ -492,17 +508,8 @@ void EMainWindow::doInitToolbar()
     pToolBar->addAction( pActionUndo );
     pToolBar->addAction( pActionRedo );
 
-    pToolBar = addToolBar( tr("Pen") );
-    pToolBar->setObjectName( "Pen" );
-    pToolBar->addWidget( new PPenToolBar( pToolBar ) );
-
-    pToolBar = addToolBar( tr("Brush") );
-    pToolBar->setObjectName( "Brush" );
-    pToolBar->addWidget( new PBrushToolBar( pToolBar ) );
-
-    pToolBar = addToolBar( tr("Font") );
-    pToolBar->setObjectName( "Font" );
-    pToolBar->addWidget( new PFontToolBar( pToolBar ) );
+    pToolBarToolConfig = addToolBar( tr("Tool Config") );
+    pToolBarToolConfig->setObjectName( "ToolConfig" );
 }
 
 void EMainWindow::doInitStatusBar()
@@ -568,6 +575,10 @@ void EMainWindow::doInitDockTools()
 
     pButton = new QToolButton( pWidgetTools );
     pButton->setDefaultAction( pActionDrawSpray );
+    pIconLayout->addWidget( pButton );
+
+    pButton = new QToolButton( pWidgetTools );
+    pButton->setDefaultAction( pActionDrawText );
     pIconLayout->addWidget( pButton );
 
     pButton = new QToolButton( pWidgetTools );
@@ -1132,35 +1143,96 @@ void EMainWindow::slotToolTriggered()
     if ( pCanvas && pCanvas->isDrawing() )
         pCanvas->doDrawCancel();
 
+    // remove any tool config widget from the tool bar
+    if ( pWidgetToolConfig )
+    {
+        delete pWidgetToolConfig;
+        pWidgetToolConfig = nullptr;
+    }
+
     // update our nTool
     if ( pActionSelectRectangle->isChecked() )     
+    {
         nTool = PCanvas::ToolSelectRectangle;
+    }
     else if ( pActionSelectEllipse->isChecked() )       
+    {
         nTool = PCanvas::ToolSelectEllipse;
+    }
     else if ( pActionSelectPolygon->isChecked() )       
+    {
         nTool = PCanvas::ToolSelectPolygon;
+    }
     else if ( pActionDrawFreeHand->isChecked() )        
+    {
         nTool = PCanvas::ToolDrawFreeHand;
+        pWidgetToolConfig = new PFreeHandToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
     else if ( pActionDrawSpray->isChecked() )           
+    {
         nTool = PCanvas::ToolDrawSpray;
+        pWidgetToolConfig = new PSprayToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
+    else if ( pActionDrawText->isChecked() )           
+    {
+        nTool = PCanvas::ToolDrawText;
+        pWidgetToolConfig = new PTextToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
     else if ( pActionDrawLine->isChecked() )            
+    {
         nTool = PCanvas::ToolDrawLine;
+        pWidgetToolConfig = new PLineToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
     else if ( pActionDrawRectangle->isChecked() )       
+    {
         nTool = PCanvas::ToolDrawRectangle;
+        pWidgetToolConfig = new PRectangleToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
     else if ( pActionDrawEllipse->isChecked() )         
+    {
         nTool = PCanvas::ToolDrawEllipse;
+        pWidgetToolConfig = new PEllipseToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
     else if ( pActionDrawPolygon->isChecked() )         
+    {
         nTool = PCanvas::ToolDrawPolygon;
+        pWidgetToolConfig = new PPolygonToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
     else if ( pActionDrawRectangleFilled->isChecked() ) 
+    {
         nTool = PCanvas::ToolDrawRectangleFilled;
+        pWidgetToolConfig = new PRectangleFilledToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
     else if ( pActionDrawEllipseFilled->isChecked() )   
+    {
         nTool = PCanvas::ToolDrawEllipseFilled;
+        pWidgetToolConfig = new PEllipseFilledToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
     else if ( pActionDrawPolygonFilled->isChecked() )   
+    {
         nTool = PCanvas::ToolDrawPolygonFilled;
+        pWidgetToolConfig = new PPolygonFilledToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
     else if ( pActionFillFlood->isChecked() )           
+    {
         nTool = PCanvas::ToolFillFlood;
+        pWidgetToolConfig = new PFillFloodToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
     else if ( pActionFillGradient->isChecked() )        
+    {
         nTool = PCanvas::ToolFillGradient;
+    }
     else
     {
         Q_ASSERT( 1==2 );

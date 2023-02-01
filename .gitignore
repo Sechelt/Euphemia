@@ -4,5 +4,5 @@
 .tmp
 qrc_*
 Makefile
-
+bin
 

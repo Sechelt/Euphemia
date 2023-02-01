@@ -25,6 +25,10 @@ private:
     PCanvas *       pCanvas = nullptr;
     PCanvas::Tools  nTool   = PCanvas::ToolSelectRectangle;
 
+    // tool bar
+    QToolBar *  pToolBarToolConfig  = nullptr;              /*!< container for pWidgetToolConfig            */
+    QWidget *   pWidgetToolConfig   = nullptr;              /*!< tool config widget (if any)                */
+
     // main widgets
     QTabWidget *    pTabWidget; 
     QToolButton *   pTabCloseButton;
@@ -99,6 +103,7 @@ private:
     QAction *pActionSelectPolygon;
     QAction *pActionDrawFreeHand;
     QAction *pActionDrawSpray;
+    QAction *pActionDrawText;
     QAction *pActionDrawLine;
     QAction *pActionDrawRectangle;
     QAction *pActionDrawEllipse;

@@ -6,18 +6,6 @@
 #include <WSizeDialog.h>
 
 #include <PCanvasView.h>
-
-// we want the toolbar widgets in these
-#include <PDrawFreeHand.h>
-#include <PDrawLine.h>
-#include <PDrawPolygon.h>
-#include <PDrawPolygonFilled.h>
-#include <PDrawRectangle.h>
-#include <PDrawRectangleFilled.h>
-#include <PDrawEllipse.h>
-#include <PDrawEllipseFilled.h>
-#include <PDrawSpray.h>
-#include <PDrawText.h>
 #include <PFillFlood.h>
 
 #define PMAX_RECENT_FILES 5
@@ -134,12 +122,15 @@ void EMainWindow::doInitActions()
         pActionSelectAll    = new QAction( tr("Select &All"), this );
         pActionSelectNone   = new QAction( tr("Select &None"), this );
         pActionAutoCommit   = new QAction( tr("Auto Commit"), this );
+        pActionCommit       = new QAction( QIcon( ":E/Commit" ), tr("Commit"), this );
+        pActionCancel       = new QAction( QIcon( ":E/Cancel" ), tr("Cancel"), this );
 
         pActionCut->setShortcut( QKeySequence::Cut );
         pActionCopy->setShortcut( QKeySequence::Copy );
         pActionPaste->setShortcut( QKeySequence::Paste );
         pActionUndo->setShortcut( QKeySequence::Undo );
         pActionRedo->setShortcut( QKeySequence::Redo );
+        pActionCancel->setShortcut( QKeySequence::Cancel );
 
         pActionAutoCommit->setToolTip( tr("auto commit changes to canvas else allow manipulation before commit when possible") );
 
@@ -155,6 +146,8 @@ void EMainWindow::doInitActions()
         pActionSelectAll->setEnabled( false );
         pActionSelectNone->setEnabled( false );
         pActionAutoCommit->setEnabled( true );
+        pActionCommit->setEnabled( false );
+        pActionCancel->setEnabled( false );
 
         connect( pActionCut, &QAction::triggered, this, &EMainWindow::slotCut );
         connect( pActionCopy, &QAction::triggered, this, &EMainWindow::slotCopy );
@@ -165,6 +158,8 @@ void EMainWindow::doInitActions()
         connect( pActionSelectAll, &QAction::triggered, this, &EMainWindow::slotSelectAll );
         connect( pActionSelectNone, &QAction::triggered, this, &EMainWindow::slotSelectNone );
         connect( pActionAutoCommit, &QAction::toggled, this, &EMainWindow::slotAutoCommit );
+        connect( pActionCommit, &QAction::triggered, this, &EMainWindow::slotCommit );
+        connect( pActionCancel, &QAction::triggered, this, &EMainWindow::slotCancel );
     }
 
     // VIEW
@@ -270,6 +265,12 @@ void EMainWindow::doInitActions()
         pActionDrawPolygon->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawPolygon );  
         connect( pActionDrawPolygon, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
+
+        pActionDrawPolyline = new QAction( QIcon( ":E/Polyline" ), tr(""), this );
+        pActionDrawPolyline->setToolTip( tr("polyline") );
+        pActionDrawPolyline->setCheckable( true );
+        pActionGroupTools->addAction( pActionDrawPolyline );  
+        connect( pActionDrawPolyline, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
         pActionDrawRectangleFilled = new QAction( QIcon( ":E/RectangleFilled" ), tr(""), this );
         pActionDrawRectangleFilled->setToolTip( tr("rectangle filled") );
@@ -403,6 +404,8 @@ void EMainWindow::doInitMenus()
     pMenuEdit->addAction( pActionSelectNone );
     pMenuEdit->addSeparator();
     pMenuEdit->addAction( pActionAutoCommit );
+    pMenuEdit->addAction( pActionCommit );
+    pMenuEdit->addAction( pActionCancel );
 
     // VIEW
     pMenuView = menuBar()->addMenu( tr("View") );
@@ -507,6 +510,8 @@ void EMainWindow::doInitToolbar()
     pToolBar->addAction( pActionPaste );
     pToolBar->addAction( pActionUndo );
     pToolBar->addAction( pActionRedo );
+    pToolBar->addAction( pActionCommit );
+    pToolBar->addAction( pActionCancel );
 
     pToolBarToolConfig = addToolBar( tr("Tool Config") );
     pToolBarToolConfig->setObjectName( "ToolConfig" );
@@ -595,6 +600,10 @@ void EMainWindow::doInitDockTools()
 
     pButton = new QToolButton( pWidgetTools );
     pButton->setDefaultAction( pActionDrawPolygon );
+    pIconLayout->addWidget( pButton );
+
+    pButton = new QToolButton( pWidgetTools );
+    pButton->setDefaultAction( pActionDrawPolyline );
     pIconLayout->addWidget( pButton );
 
     pButton = new QToolButton( pWidgetTools );
@@ -1000,6 +1009,24 @@ void EMainWindow::slotAutoCommit( bool b )
     }
 }
 
+void EMainWindow::slotCommit()
+{
+    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
+    Q_ASSERT( pCanvasView );
+    PCanvas *pCanvas = pCanvasView->getCanvas();
+    Q_ASSERT( pCanvas );
+    pCanvas->doCommit();
+}
+
+void EMainWindow::slotCancel()
+{
+    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
+    Q_ASSERT( pCanvasView );
+    PCanvas *pCanvas = pCanvasView->getCanvas();
+    Q_ASSERT( pCanvas );
+    pCanvas->doCancel();
+}
+
 void EMainWindow::slotAbout()
 {
     QMessageBox::about( this, 
@@ -1039,10 +1066,10 @@ void EMainWindow::slotFeedback()
 /*!
  * \brief Disconnects from previous current canvas and connects to new current canvas. 
  *  
- * Disocnnects from previous current canvas and then calls slotCanvasStateChanged to sync 
+ * Disocnnects from previous current canvas and then calls slotCanvasChangedState to sync 
  * to a new current canvas. 
  *  
- * \sa slotCanvasStateChanged
+ * \sa slotCanvasChangedState
  * 
  * \author pharvey (1/20/23)
  * 
@@ -1053,13 +1080,13 @@ void EMainWindow::slotCanvasFocused( int nIndex )
     PCanvasView *pCanvasView = (PCanvasView *)pTabWidget->widget( nIndex );
 
     // cancel any drawing that may have been happening
-    if ( pCanvas && pCanvas->isDrawing() ) pCanvas->doDrawCancel();
+    if ( pCanvas && pCanvas->isDrawing() ) pCanvas->doCancel();
     // no canvas - so disable a bunch of controls
     if ( nIndex < 0 )
     {
         if ( pCanvas  )
         {
-            disconnect( pCanvas, SIGNAL(signalStateChanged()), this, SLOT(slotCanvasStateChanged()) );
+            disconnect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
             pCanvas = nullptr;
         }
 
@@ -1076,6 +1103,8 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         pActionPaste->setEnabled( false ); 
         pActionUndo->setEnabled( false ); 
         pActionRedo->setEnabled( false ); 
+        pActionCommit->setEnabled( false ); 
+        pActionCancel->setEnabled( false ); 
 
         // view
 
@@ -1086,23 +1115,23 @@ void EMainWindow::slotCanvasFocused( int nIndex )
     }
 
     // canvas - so sync
-    if ( pCanvas ) disconnect( pCanvas, SIGNAL(signalStateChanged()), this, SLOT(slotCanvasStateChanged()) );
+    if ( pCanvas ) disconnect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
     pCanvas = pCanvasView->getCanvas();
-    connect( pCanvas, SIGNAL(signalStateChanged()), this, SLOT(slotCanvasStateChanged()) );
-    slotCanvasStateChanged();
+    connect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
+    slotCanvasChangedState();
 }
 
 /*!
  * \brief Sync the controls to reflect the state of the current canvas. 
  *  
- * This is connected to PCanvas::signalStateChanged but may also be invoked directly 
+ * This is connected to PCanvas::signalChangedState but may also be invoked directly 
  * by EMainWindow::slotCanvasFocused. 
  *  
  * \sa slotCanvasFocused 
  * 
  * \author pharvey (1/20/23)
  */
-void EMainWindow::slotCanvasStateChanged()
+void EMainWindow::slotCanvasChangedState()
 {
     // we can be called without a current canvas
     // ie when current selection in palette has changed
@@ -1130,6 +1159,8 @@ void EMainWindow::slotCanvasStateChanged()
     pActionPaste->setEnabled( pCanvas->canPaste() ); 
     pActionUndo->setEnabled( pCanvas->canUndo() ); 
     pActionRedo->setEnabled( pCanvas->canRedo() ); 
+    pActionCommit->setEnabled( pCanvas->canCommit() ); 
+    pActionCancel->setEnabled( pCanvas->canCancel() ); 
 
     // status bar
     pZoom->setEnabled( true );
@@ -1141,7 +1172,7 @@ void EMainWindow::slotToolTriggered()
 {
     // cancel any drawing that may have been happening
     if ( pCanvas && pCanvas->isDrawing() )
-        pCanvas->doDrawCancel();
+        pCanvas->doCancel();
 
     // remove any tool config widget from the tool bar
     if ( pWidgetToolConfig )
@@ -1203,6 +1234,12 @@ void EMainWindow::slotToolTriggered()
     {
         nTool = PCanvas::ToolDrawPolygon;
         pWidgetToolConfig = new PPolygonToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
+    else if ( pActionDrawPolyline->isChecked() )         
+    {
+        nTool = PCanvas::ToolDrawPolyline;
+        pWidgetToolConfig = new PPolylineToolBar( pToolBarToolConfig );
         pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawRectangleFilled->isChecked() ) 

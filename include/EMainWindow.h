@@ -70,6 +70,8 @@ private:
     QAction *pActionSelectAll;
     QAction *pActionSelectNone;
     QAction *pActionAutoCommit;
+    QAction *pActionCommit;
+    QAction *pActionCancel;
     // view
     QMenu *pMenuView;
     QAction *pActionZoomIn;
@@ -108,6 +110,7 @@ private:
     QAction *pActionDrawRectangle;
     QAction *pActionDrawEllipse;
     QAction *pActionDrawPolygon;
+    QAction *pActionDrawPolyline;
     QAction *pActionDrawRectangleFilled;
     QAction *pActionDrawEllipseFilled;
     QAction *pActionDrawPolygonFilled;
@@ -212,13 +215,15 @@ private slots:
     void slotSelectAll();
     void slotSelectNone();
     void slotAutoCommit( bool );
+    void slotCommit();
+    void slotCancel();
 
     void slotAbout();
     void slotAboutCBD();
     void slotFeedback();
 
     void slotCanvasFocused( int nIndex );
-    void slotCanvasStateChanged();
+    void slotCanvasChangedState();
 
     // these are applied to all canvas'
     void slotToolTriggered();

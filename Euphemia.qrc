@@ -10,6 +10,7 @@
 	<file alias="Rectangle">images/Rectangle.xpm</file>
 	<file alias="Ellipse">images/Ellipse.xpm</file>
 	<file alias="Polygon">images/Polygon.xpm</file>
+	<file alias="Polyline">images/Polyline.png</file>
 	<file alias="Text">images/Text.xpm</file>
 	<file alias="RectangleFilled">images/RectangleFilled.xpm</file>
 	<file alias="EllipseFilled">images/EllipseFilled.xpm</file>
@@ -18,6 +19,8 @@
 	<file alias="FillGradient">images/FillGradient.xpm</file>
 	<file alias="Feedback">images/Feedback.png</file>
 	<file alias="Euphemia">images/Euphemia.png</file>
+	<file alias="Commit">images/Commit.png</file>
+	<file alias="Cancel">images/Cancel.png</file>
 </qresource>
 </RCC>
 

@@ -31,6 +31,9 @@ EMainWindow::EMainWindow( QWidget *pWidget )
 // Qt does not fully support Wayland at this time. This means that moving dock windows around
 // will be problematic for those running Wayland (on some platforms - not all). May not want to restore a messed up state.
     doLoadState();
+
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    connect( clipboard, SIGNAL(dataChanged()), SLOT(slotCanvasChangedState()) );
 }
 
 EMainWindow::~EMainWindow()
@@ -796,6 +799,8 @@ bool EMainWindow::slotNewFromPaste()
         } 
         image = qvariant_cast<QImage>( pMimeData->imageData() );
     }
+
+    image = image.convertToFormat( QImage::Format_ARGB32 );
 
     PCanvas *pCanvas = new PCanvas( pTabWidget, image );
     pCanvas->setTool( nTool );

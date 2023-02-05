@@ -239,6 +239,12 @@ void EMainWindow::doInitActions()
         pActionGroupTools->addAction( pActionDrawSpray );  
         connect( pActionDrawSpray, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
+        pActionDrawErase = new QAction( QIcon( ":E/Erase" ), tr(""), this );
+        pActionDrawErase->setToolTip( tr("Erase") );
+        pActionDrawErase->setCheckable( true );
+        pActionGroupTools->addAction( pActionDrawErase );  
+        connect( pActionDrawErase, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
+
         pActionDrawText = new QAction( QIcon( ":E/Text" ), tr(""), this );
         pActionDrawText->setToolTip( tr("Text") );
         pActionDrawText->setCheckable( true );
@@ -583,6 +589,10 @@ void EMainWindow::doInitDockTools()
 
     pButton = new QToolButton( pWidgetTools );
     pButton->setDefaultAction( pActionDrawSpray );
+    pIconLayout->addWidget( pButton );
+
+    pButton = new QToolButton( pWidgetTools );
+    pButton->setDefaultAction( pActionDrawErase );
     pIconLayout->addWidget( pButton );
 
     pButton = new QToolButton( pWidgetTools );
@@ -1210,6 +1220,10 @@ void EMainWindow::slotToolTriggered()
         nTool = PCanvas::ToolDrawSpray;
         pWidgetToolConfig = new PSprayToolBar( pToolBarToolConfig );
         pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+    }
+    else if ( pActionDrawErase->isChecked() )           
+    {
+        nTool = PCanvas::ToolDrawErase;
     }
     else if ( pActionDrawText->isChecked() )           
     {

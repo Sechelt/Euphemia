@@ -105,6 +105,7 @@ private:
     QAction *pActionSelectPolygon;
     QAction *pActionDrawFreeHand;
     QAction *pActionDrawSpray;
+    QAction *pActionDrawErase;
     QAction *pActionDrawText;
     QAction *pActionDrawLine;
     QAction *pActionDrawRectangle;

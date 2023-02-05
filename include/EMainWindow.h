@@ -8,7 +8,7 @@
 #include <WCoordWidget.h>
 #include <WZoomWidget.h>
 
-#include <PCanvas.h>
+#include <PLayers.h>
 
 class EMainWindow : public QMainWindow
 {
@@ -191,6 +191,9 @@ private:
     void doSaveState();
     void doLoadState();
 
+    PLayers *getLayersCurrent();
+    PCanvas *getCanvasCurrent();
+
 private slots:
     // workspace
     bool slotNew();             
@@ -201,7 +204,7 @@ private slots:
     bool slotSaveAs();          
     bool slotExport();          
     bool slotPrint();          
-    bool slotClose();  
+    bool slotClose( bool bPrompt = true );  
     bool slotRecent( QAction *p );  
     
     // for app

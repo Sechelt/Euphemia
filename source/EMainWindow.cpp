@@ -5,7 +5,6 @@
 #include <WIconLayout.h>
 #include <WSizeDialog.h>
 
-#include <PCanvasView.h>
 #include <PFillFlood.h>
 
 #define PMAX_RECENT_FILES 5
@@ -16,7 +15,11 @@ EMainWindow::EMainWindow( QWidget *pWidget )
     vectorRecentStrings.resize( PMAX_RECENT_FILES );
     vectorRecentActions.resize( PMAX_RECENT_FILES );
 
-    setWindowIcon( QIcon( ":E/IconLarge" ) );
+    // all possible ways to set app icon for a running app - probably all end up in the same place
+    QApplication::setWindowIcon( QIcon( ":E/Euphemia" ) );
+    if ( windowHandle() ) windowHandle()->setIcon( QIcon( ":E/Euphemia" ) );
+    setWindowIcon( QIcon( ":E/Euphemia" ) );
+
     setWindowTitle( APP_NAME );
 
     doInitActions();
@@ -45,8 +48,8 @@ void EMainWindow::closeEvent( QCloseEvent *pEvent )
     int nCount = pTabWidget->count();
     for ( int n = 0; n < nCount; n++ )
     {
-        PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->widget( n );
-        PCanvas *pCanvas = pCanvasView->getCanvas();
+        PLayersScrollArea *pLayersScrollArea = (PLayersScrollArea*)pTabWidget->widget( n );
+        PCanvas *pCanvas = pLayersScrollArea->getLayers()->getCanvas();
 
         if ( pCanvas->isModified() )
         {
@@ -745,6 +748,23 @@ void EMainWindow::doLoadState()
     restoreState( settings.value( "windowState" ).toByteArray() );
 }
 
+PLayers *EMainWindow::getLayersCurrent()
+{
+    PLayersScrollArea *pLayersScrollArea = (PLayersScrollArea*)pTabWidget->currentWidget(); 
+
+    // DO NOT call here if there is no current widget
+    // - most actions will be disabled when no current widget so this is just to make sure
+    Q_ASSERT( pLayersScrollArea );
+
+    return pLayersScrollArea->getLayers();
+}
+
+PCanvas *EMainWindow::getCanvasCurrent()
+{
+    // There will always be a current canvas as layers has 1-n.
+    return getLayersCurrent()->getCanvas();
+}
+
 /*!
  * \brief New Canvas.
  *  
@@ -754,13 +774,12 @@ void EMainWindow::doLoadState()
  */
 bool EMainWindow::slotNew()
 {
-    PCanvas *pCanvas = new PCanvas( pTabWidget );
+    PLayersScrollArea *pScrollArea = new PLayersScrollArea( pTabWidget );
+    pScrollArea->setBackgroundRole( QPalette::Dark );
+
+    PCanvas *pCanvas = pScrollArea->getLayers()->getCanvas();
     pCanvas->setTool( nTool );
     pCanvas->setAutoCommit( pActionAutoCommit->isChecked() );
-
-    PCanvasView *pScrollArea = new PCanvasView( pTabWidget, pCanvas );
-    pScrollArea->setBackgroundRole( QPalette::Dark );
-    pScrollArea->setWidget( pCanvas );
 
     pTabWidget->addTab( pScrollArea, tr("unnamed") );
     pTabWidget->setCurrentWidget( pScrollArea );
@@ -772,58 +791,41 @@ bool EMainWindow::slotNew()
 
 bool EMainWindow::slotNewWithSize()
 {
-    QSize size( 1024, 768 );
-    {
-        bool bOk = false;
-        size = WSizeDialogI::getSize( &bOk, size, this );
-        if ( !bOk ) return false;
-    }
-
-    PCanvas *pCanvas = new PCanvas( pTabWidget, size );
-    pCanvas->setTool( nTool );
-    pCanvas->setAutoCommit( pActionAutoCommit->isChecked() );
-
-    PCanvasView *pScrollArea = new PCanvasView( pTabWidget, pCanvas );
-    pScrollArea->setBackgroundRole( QPalette::Dark );
-    pScrollArea->setWidget( pCanvas );
-
-    pTabWidget->addTab( pScrollArea, tr("unnamed") );
-    pTabWidget->setCurrentWidget( pScrollArea );
-
-    connect( pCanvas, SIGNAL(signalPos(const QPoint &)), pCoord, SLOT(slotCoord(const QPoint &)) );
+    QSize size( 1024, 768 );                                                                       
+    {                                                                                              
+        bool bOk = false;                                                                          
+        size = WSizeDialogI::getSize( &bOk, size, this );                                          
+        if ( !bOk ) return false;                                                                  
+    }                                                                                              
+                                                                                                   
+    slotNew();
+    getLayersCurrent()->resize( size );
 
     return true;
 }
 
 bool EMainWindow::slotNewFromPaste()
 {
-    QImage image;
-    {
-        const QClipboard *pClipboard = QApplication::clipboard();
-        const QMimeData *pMimeData = pClipboard->mimeData();
-
-        if ( !pMimeData->hasImage() ) 
-        {
+    QImage image;                                                                                                  
+    {                                                                                                              
+        const QClipboard *pClipboard = QApplication::clipboard();                                                  
+        const QMimeData *pMimeData = pClipboard->mimeData();                                                       
+                                                                                                                   
+        if ( !pMimeData->hasImage() )                                                                              
+        {                                                                                                          
             QMessageBox::information( this, tr("New From Paste"), tr("The clipboard does not contain an image.") );
-            return false;
-        } 
-        image = qvariant_cast<QImage>( pMimeData->imageData() );
-    }
-
-    image = image.convertToFormat( QImage::Format_ARGB32 );
-
-    PCanvas *pCanvas = new PCanvas( pTabWidget, image );
-    pCanvas->setTool( nTool );
-    pCanvas->setAutoCommit( pActionAutoCommit->isChecked() );
-
-    PCanvasView *pScrollArea = new PCanvasView( pTabWidget, pCanvas );
-    pScrollArea->setBackgroundRole( QPalette::Dark );
-    pScrollArea->setWidget( pCanvas );
-
-    pTabWidget->addTab( pScrollArea, tr("unnamed") );
-    pTabWidget->setCurrentWidget( pScrollArea );
-
-    connect( pCanvas, SIGNAL(signalPos(const QPoint &)), pCoord, SLOT(slotCoord(const QPoint &)) );
+            return false;                                                                                          
+        }                                                                                                          
+        image = qvariant_cast<QImage>( pMimeData->imageData() );                                                   
+    }                                                                                                              
+                                                                                                                   
+    image = image.convertToFormat( QImage::Format_ARGB32 );                                                        
+                                                                                                                   
+    slotNew();
+    PLayers *pLayer = getLayersCurrent();
+    pLayer->resize( image.size() );
+    pLayer->getCanvas()->doPaste();
+    pLayer->getCanvas()->doCommit();
 
     return true;
 }
@@ -837,26 +839,17 @@ bool EMainWindow::slotNewFromPaste()
  */
 bool EMainWindow::slotOpen()
 {
-    PCanvas *pCanvas = new PCanvas( pTabWidget );
-    if ( !pCanvas->doOpen() )
-    {
-        delete pCanvas;
-        return false;
-    }
+    slotNew();
+    PLayers *pLayers = getLayersCurrent();
+    PCanvas *pCanvas = pLayers->getCanvas();
 
-    pCanvas->setTool( nTool );
-    pCanvas->setAutoCommit( pActionAutoCommit->isChecked() );
-    // pCanvas->setPen( getPen() );
-    // pCanvas->setBrush( getBrush() );
-
-    PCanvasView *pScrollArea = new PCanvasView( pTabWidget, pCanvas );
-    pScrollArea->setBackgroundRole( QPalette::Dark );
-    pScrollArea->setWidget( pCanvas );
-
-    pTabWidget->addTab( pScrollArea, pCanvas->getFileName() );
-    pTabWidget->setCurrentWidget( pScrollArea );
-
-    connect( pCanvas, SIGNAL(signalPos(const QPoint &)), pCoord, SLOT(slotCoord(const QPoint &)) );
+    if ( !pCanvas->doOpen() )                                                                      
+    {                                                                                              
+        slotClose( false );
+        return false;                                                                              
+    }                                                                                              
+                                                                                                   
+    pLayers->resize( pCanvas->size() );
 
     return true;
 }
@@ -870,10 +863,7 @@ bool EMainWindow::slotOpen()
  */
 bool EMainWindow::slotSave()
 {
-    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
-    Q_ASSERT( pCanvasView );
-
-    return pCanvasView->getCanvas()->doSave();
+    return getCanvasCurrent()->doSave();
 }
   
 /*!
@@ -885,10 +875,7 @@ bool EMainWindow::slotSave()
  */
 bool EMainWindow::slotSaveAs()
 {
-    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
-    Q_ASSERT( pCanvasView );
-
-    return pCanvasView->getCanvas()->doSaveAs();
+    return getCanvasCurrent()->doSaveAs();
 }
 
 bool EMainWindow::slotExport()
@@ -908,18 +895,16 @@ bool EMainWindow::slotPrint()
  * 
  * \return bool 
  */
-bool EMainWindow::slotClose()
+bool EMainWindow::slotClose( bool bPrompt )
 {
+    PLayersScrollArea *pLayersScrollArea = (PLayersScrollArea*)pTabWidget->currentWidget(); 
     int nIndex = pTabWidget->currentIndex(); 
     Q_ASSERT( nIndex >= 0 );
 
-    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->widget( nIndex );
-    Q_ASSERT( pCanvasView );
-
-    if ( !pCanvasView->getCanvas()->doClose() ) return false;
+    if ( bPrompt && !getCanvasCurrent()->doClose() ) return false;
 
     pTabWidget->removeTab( nIndex );
-    delete pCanvasView; // canvas deleted by canvasview
+    delete pLayersScrollArea; // canvas deleted by canvasview
     pCanvas = nullptr;
 
     return true;
@@ -958,47 +943,27 @@ void EMainWindow::slotExit()
 
 void EMainWindow::slotCut()
 {
-    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
-    Q_ASSERT( pCanvasView );
-    PCanvas *pCanvas = pCanvasView->getCanvas();
-    Q_ASSERT( pCanvas );
-    pCanvas->doCut();
+    getCanvasCurrent()->doCut();
 }
 
 void EMainWindow::slotCopy()
 {
-    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
-    Q_ASSERT( pCanvasView );
-    PCanvas *pCanvas = pCanvasView->getCanvas();
-    Q_ASSERT( pCanvas );
-    pCanvas->doCopy();
+    getCanvasCurrent()->doCopy();
 }
 
 void EMainWindow::slotPaste()
 {
-    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
-    Q_ASSERT( pCanvasView );
-    PCanvas *pCanvas = pCanvasView->getCanvas();
-    Q_ASSERT( pCanvas );
-    pCanvas->doPaste();
+    getCanvasCurrent()->doPaste();
 }
 
 void EMainWindow::slotUndo()
 {
-    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
-    Q_ASSERT( pCanvasView );
-    PCanvas *pCanvas = pCanvasView->getCanvas();
-    Q_ASSERT( pCanvas );
-    pCanvas->doUndo();
+    getCanvasCurrent()->doUndo();
 }
 
 void EMainWindow::slotRedo()
 {
-    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
-    Q_ASSERT( pCanvasView );
-    PCanvas *pCanvas = pCanvasView->getCanvas();
-    Q_ASSERT( pCanvas );
-    pCanvas->doRedo();
+    getCanvasCurrent()->doRedo();
 }
 
 void EMainWindow::slotUndoLevels()
@@ -1018,28 +983,20 @@ void EMainWindow::slotAutoCommit( bool b )
     int nCount = pTabWidget->count();
     for ( int n = 0; n < nCount; n++ )
     {
-        PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->widget( n );
-        PCanvas *pCanvas = pCanvasView->getCanvas();
+        PLayersScrollArea *pLayersScrollArea = (PLayersScrollArea*)pTabWidget->widget( n );
+        PCanvas *pCanvas = pLayersScrollArea->getLayers()->getCanvas();
         pCanvas->setAutoCommit( b );
     }
 }
 
 void EMainWindow::slotCommit()
 {
-    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
-    Q_ASSERT( pCanvasView );
-    PCanvas *pCanvas = pCanvasView->getCanvas();
-    Q_ASSERT( pCanvas );
-    pCanvas->doCommit();
+    getCanvasCurrent()->doCommit();
 }
 
 void EMainWindow::slotCancel()
 {
-    PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->currentWidget(); 
-    Q_ASSERT( pCanvasView );
-    PCanvas *pCanvas = pCanvasView->getCanvas();
-    Q_ASSERT( pCanvas );
-    pCanvas->doCancel();
+    getCanvasCurrent()->doCancel();
 }
 
 void EMainWindow::slotAbout()
@@ -1092,7 +1049,7 @@ void EMainWindow::slotFeedback()
  */
 void EMainWindow::slotCanvasFocused( int nIndex )
 {
-    PCanvasView *pCanvasView = (PCanvasView *)pTabWidget->widget( nIndex );
+    PLayersScrollArea *pLayersScrollArea = (PLayersScrollArea *)pTabWidget->widget( nIndex );
 
     // cancel any drawing that may have been happening
     if ( pCanvas && pCanvas->isDrawing() ) pCanvas->doCancel();
@@ -1131,7 +1088,7 @@ void EMainWindow::slotCanvasFocused( int nIndex )
 
     // canvas - so sync
     if ( pCanvas ) disconnect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
-    pCanvas = pCanvasView->getCanvas();
+    pCanvas = pLayersScrollArea->getLayers()->getCanvas();
     connect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
     slotCanvasChangedState();
 }
@@ -1298,20 +1255,15 @@ void EMainWindow::slotToolTriggered()
     int nCount = pTabWidget->count();
     for ( int n = 0; n < nCount; n++ )
     {
-        PCanvasView *pCanvasView = (PCanvasView*)pTabWidget->widget( n );
-        PCanvas *pCanvas = pCanvasView->getCanvas();
+        PLayersScrollArea *pLayersScrollArea = (PLayersScrollArea*)pTabWidget->widget( n );
+        PCanvas *pCanvas = pLayersScrollArea->getLayers()->getCanvas();
         pCanvas->setTool( nTool );
     }
 }
 
 void EMainWindow::slotZoom( int nFit, int nZoom )
 {
-    int nIndex = pTabWidget->currentIndex();
-    Q_ASSERT( nIndex >= 0 );
-
-    PCanvasView *pCanvasView = (PCanvasView *)pTabWidget->widget( nIndex );
-    PCanvas *pCanvas = pCanvasView->getCanvas();
-    pCanvas->setZoom( (WZoomWidget::FitTypes)nFit, nZoom );
+    getCanvasCurrent()->setZoom( (WZoomWidget::FitTypes)nFit, nZoom );
 }
 
 void EMainWindow::slotPaletteColorWindowTitle()

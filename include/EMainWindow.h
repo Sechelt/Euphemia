@@ -229,6 +229,9 @@ private slots:
     void slotCanvasFocused( int nIndex );
     void slotCanvasChangedState();
 
+    void slotScratch();
+    void slotScratch( const QImage & );
+
     // these are applied to all canvas'
     void slotToolTriggered();
 

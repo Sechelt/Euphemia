@@ -678,6 +678,16 @@ void EMainWindow::doInitDockScratch()
     pDock->setWidget( pScratchTool );
     addDockWidget( Qt::LeftDockWidgetArea, pDock );
     // viewMenu->addAction(dock->toggleViewAction());
+
+    // enable when;
+    // - when canvas has selection (selection only)     
+    // - clipboard has image (clipboard image)          
+    // - when canvas (all canvas)                       
+    //
+    // Prompt will decide (or cancel).
+    pScratchTool->doEnableAdd(); 
+    connect( pScratchTool, SIGNAL(signalAdd()), SLOT(slotScratch()) );
+    connect( pScratchTool, SIGNAL(signalPaste(const QImage &)), SLOT(slotScratch(const QImage &)) );
 }
 
 void EMainWindow::doInitCentralArea()
@@ -1138,6 +1148,34 @@ void EMainWindow::slotCanvasChangedState()
     pZoom->setEnabled( true );
     pZoom->setFit( pCanvas->getFit() );
     pZoom->setZoom( pCanvas->getZoom() );
+}
+
+void EMainWindow::slotScratch()
+{
+    // clipboard
+    QImage image;                                                                                                  
+    {                                                                                                              
+        const QClipboard *pClipboard = QApplication::clipboard();                                                  
+        const QMimeData *pMimeData = pClipboard->mimeData();                                                       
+
+        if ( !pMimeData->hasImage() )                                                                              
+        {                                                                                                          
+            QMessageBox::information( this, tr("New From Paste"), tr("The clipboard does not contain an image.") );
+            return;                                                                                          
+        }                                                                                                          
+        image = qvariant_cast<QImage>( pMimeData->imageData() );                                                   
+    }                                                                                                              
+
+    image = image.convertToFormat( QImage::Format_ARGB32 );                                                        
+
+    pScratchTool->doAppend( image );
+}
+
+void EMainWindow::slotScratch( const QImage &image )
+{
+    if ( !pTabWidget->currentWidget() ) return;
+    PCanvas *pCanvas = getCanvasCurrent();
+    pCanvas->doPaste( image );
 }
 
 void EMainWindow::slotToolTriggered()

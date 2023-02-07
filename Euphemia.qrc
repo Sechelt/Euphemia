@@ -22,6 +22,9 @@
 	<file alias="Euphemia">images/Euphemia.svg</file>
 	<file alias="Commit">images/Commit.png</file>
 	<file alias="Cancel">images/Cancel.png</file>
+	<file alias="PeterHarvey">images/PeterHarvey.jpg</file>
+	<file alias="Qt">images/Qt.png</file>
+	<file alias="SlickEdit">images/vs.xpm</file>
 </qresource>
 </RCC>
 

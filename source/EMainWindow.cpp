@@ -365,12 +365,18 @@ void EMainWindow::doInitActions()
     {
         pActionAbout            = new QAction( QIcon( ":E/Euphemia" ), tr("&About Euphemia..."), this );
         pActionAboutCBD         = new QAction( QIcon( ":W/CodeByDesign32x32" ), tr("About CodeByDesign..."), this );
+        pActionAboutPeterHarvey = new QAction( QIcon( ":E/PeterHarvey" ), tr("About Peter Harvey..."), this );
+        pActionAboutQt          = new QAction( QIcon( ":E/Qt" ), tr("About Qt..."), this );
+        pActionAboutSlickEdit   = new QAction( QIcon( ":E/SlickEdit" ), tr("About SlickEdit..."), this );
         pActionFeedback         = new QAction( QIcon( ":E/Feedback" ), tr("Feedback..."), this );
 
         pActionFeedback->setToolTip( tr("report an issue or request a feature") );
 
         connect( pActionAbout, &QAction::triggered, this, &EMainWindow::slotAbout );
         connect( pActionAboutCBD, &QAction::triggered, this, &EMainWindow::slotAboutCBD );
+        connect( pActionAboutPeterHarvey, &QAction::triggered, this, &EMainWindow::slotAboutPeterHarvey );
+        connect( pActionAboutQt, &QAction::triggered, this, &EMainWindow::slotAboutQt );
+        connect( pActionAboutSlickEdit, &QAction::triggered, this, &EMainWindow::slotAboutSlickEdit );
         connect( pActionFeedback, SIGNAL(triggered()), SLOT(slotFeedback()) );
     }
 
@@ -501,6 +507,9 @@ void EMainWindow::doInitMenus()
     pMenuHelp = new QMenu( tr("&Help") );
     pMenuHelp->addAction( pActionAbout );
     pMenuHelp->addAction( pActionAboutCBD );
+    pMenuHelp->addAction( pActionAboutPeterHarvey );
+    pMenuHelp->addAction( pActionAboutQt );
+    pMenuHelp->addAction( pActionAboutSlickEdit );
     pMenuHelp->addAction( pActionFeedback );
     pActionHelpMenu = menuBar()->addMenu( pMenuHelp );
 }
@@ -537,6 +546,7 @@ void EMainWindow::doInitStatusBar()
 
     pModified  = new QLabel( statusBar() );
     pModified->setToolTip( tr("edit status") );
+    pModified->setFixedSize( 16, 16 );
     statusBar()->addPermanentWidget( pModified, 0 );
 
     pCoord= new WCoordWidget( statusBar() );
@@ -756,6 +766,79 @@ void EMainWindow::doLoadState()
     QSettings settings;
     restoreGeometry( settings.value( "geometry" ).toByteArray() );
     restoreState( settings.value( "windowState" ).toByteArray() );
+}
+
+void EMainWindow::doCreateToolConfig()
+{
+    // remove current one
+    if ( pWidgetToolConfig )
+    {
+        delete pWidgetToolConfig;
+        pWidgetToolConfig = nullptr;
+    }
+
+    // add new one
+     
+    // paste 
+    // - this is a special case as it is not a tool but does have a config tool bar
+    if ( bPaste )
+    {
+        pWidgetToolConfig = new PPasteToolBar( pToolBarToolConfig );
+        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
+        return;
+    }
+    // tool
+    // - not all tools will have a config tool bar
+    switch ( nTool )
+    {
+        case PCanvas::ToolSelectRectangle:
+            break;
+        case PCanvas::ToolSelectEllipse:
+            break;
+        case PCanvas::ToolSelectPolygon:
+            break;
+        case PCanvas::ToolDrawFreeHand:
+            pWidgetToolConfig = new PFreeHandToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolDrawSpray:
+            pWidgetToolConfig = new PSprayToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolDrawErase:
+            break;
+        case PCanvas::ToolDrawLine:
+            pWidgetToolConfig = new PLineToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolDrawRectangle:
+            pWidgetToolConfig = new PRectangleToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolDrawEllipse:
+            pWidgetToolConfig = new PEllipseToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolDrawPolygon:
+            pWidgetToolConfig = new PPolygonToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolDrawPolyline:
+            pWidgetToolConfig = new PPolylineToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolDrawRectangleFilled:
+            pWidgetToolConfig = new PRectangleFilledToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolDrawEllipseFilled:
+            pWidgetToolConfig = new PEllipseFilledToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolDrawPolygonFilled:
+            pWidgetToolConfig = new PPolygonFilledToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolDrawText:
+            pWidgetToolConfig = new PTextToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolFillFlood:
+            pWidgetToolConfig = new PFillFloodToolBar( pToolBarToolConfig );
+            break;
+        case PCanvas::ToolFillGradient:
+            break;
+    }
+    if ( pWidgetToolConfig ) pToolBarToolConfig->addWidget( pWidgetToolConfig );  
 }
 
 PLayers *EMainWindow::getLayersCurrent()
@@ -982,10 +1065,12 @@ void EMainWindow::slotUndoLevels()
 
 void EMainWindow::slotSelectAll()
 {
+    getCanvasCurrent()->doSelectAll();
 }
 
 void EMainWindow::slotSelectNone()
 {
+    getCanvasCurrent()->doSelectNone();
 }
 
 void EMainWindow::slotAutoCommit( bool b )
@@ -1016,21 +1101,49 @@ void EMainWindow::slotAbout()
                         tr( "<b>" APP_NAME "</b><br><br>" ) +
                         tr( "Description: " APP_DESC "</b><br>" ) +
                         tr( "Version: v" APP_VER "<br>" ) +
+                        tr( "Sponsor: " CBD_COMPANY "<br>" ) +
                         tr( "Credits: Peter Harvey<br>" ) +
-                        tr( "License: " CBD_COPYRIGHT "<br>" ) +
-                        tr( "Web: https://www.codebydesign.com/<br>" )
-                      );
+                        tr( "License: " APP_LICENSE "<br>" ) + 
+                        tr( "Copyright: " APP_COPYRIGHT "<br>" ) 
+                        );
 }
 
 void EMainWindow::slotAboutCBD()
 {
-    // seems app icon gets in there automagically
-    QMessageBox::about( this, 
-                        tr( "About " CBD_COMPANY "..." ),
-                        tr( "<b>Sponsor of QPaint development.<br>" ) + 
-                        tr( "Description: " CBD_COMPANY " is a software company which specializes in tools for; System Architects, Developers, and Consultants.<br><br>" ) +
-                        tr( "Web: http://www.codebydesign.com<br>" )
-                      );
+    QMessageBox msg( this );
+    msg.setTextFormat( Qt::RichText );
+    msg.setWindowTitle( tr( "About " CBD_COMPANY "..." ) );
+    msg.setText(    "<TABLE><TR><TD><img src=':W/CodeByDesign32x32'></TD><TD>" 
+                    "<A HREF='http://www.codebydesign.com'>" CBD_COMPANY "</A>" + 
+                    tr( "<BR><BR>A software company which specializes in tools for; System Architects, Developers, and Consultants.</TD></TR></TABLE>" ) );
+    msg.exec();
+}
+
+void EMainWindow::slotAboutPeterHarvey()
+{
+    QMessageBox msg( this );
+    msg.setTextFormat( Qt::RichText );
+    msg.setWindowTitle( tr( "About Peter Harvey..." ) );
+    msg.setText(    "<TABLE><TR><TD><img src=':E/PeterHarvey' width=64 height=64></TD><TD>"
+                    "<B>Peter Harvey</B>" +
+                    tr( "<BR><BR>Experienced cross-platform software developer. Slinging code since 1985.</TD></TR></TABLE>" ) );
+    msg.exec();
+}
+
+void EMainWindow::slotAboutQt()
+{
+    QMessageBox::aboutQt( this, tr( "About Qt..." ) );
+}
+
+void EMainWindow::slotAboutSlickEdit()
+{
+    QMessageBox msg( this );
+    msg.setTextFormat( Qt::RichText );
+    msg.setWindowTitle( tr( "About SlickEdit..." ) );
+    msg.setText(    "<TABLE><TR><TD><img src=':E/SlickEdit' width=64 height=64></TD><TD>"
+                    "<A HREF='https://www.slickedit.com/'>SlickEdit</A>" + 
+                    tr( "<BR><BR>World's Most Powerful Code Editor.</TD></TR></TABLE>" ) );
+    msg.exec();
 }
 
 /*!
@@ -1042,7 +1155,7 @@ void EMainWindow::slotAboutCBD()
  */
 void EMainWindow::slotFeedback()
 {
-    QDesktopServices::openUrl( QUrl( "https://www.codebydesign.com/mantisbt" ) );
+    QDesktopServices::openUrl( QUrl( "https://github.com/Sechelt/Euphemia/issues" ) ); // https://www.codebydesign.com/mantisbt
 }
 
 /*!
@@ -1085,6 +1198,8 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         pActionPaste->setEnabled( false ); 
         pActionUndo->setEnabled( false ); 
         pActionRedo->setEnabled( false ); 
+        pActionSelectAll->setEnabled( false ); 
+        pActionSelectNone->setEnabled( false ); 
         pActionCommit->setEnabled( false ); 
         pActionCancel->setEnabled( false ); 
 
@@ -1124,8 +1239,8 @@ void EMainWindow::slotCanvasChangedState()
     {
         QString stringTabText = pCanvas->getFileName();
         if ( stringTabText.isEmpty() ) stringTabText = tr( "unnamed" );
-        if ( pCanvas->isModified() ) stringTabText += " *";
-        pTabWidget->setTabText( pTabWidget->indexOf( pCanvas ), stringTabText );
+        if ( pCanvas->isModified() ) stringTabText = stringTabText + " *";
+        pTabWidget->setTabText( pTabWidget->currentIndex(), stringTabText );
     }
 
     // file
@@ -1141,34 +1256,40 @@ void EMainWindow::slotCanvasChangedState()
     pActionPaste->setEnabled( pCanvas->canPaste() ); 
     pActionUndo->setEnabled( pCanvas->canUndo() ); 
     pActionRedo->setEnabled( pCanvas->canRedo() ); 
+    pActionSelectAll->setEnabled( true ); 
+    pActionSelectNone->setEnabled( pCanvas->hasSelection() ); 
     pActionCommit->setEnabled( pCanvas->canCommit() ); 
     pActionCancel->setEnabled( pCanvas->canCancel() ); 
 
     // status bar
+    pModified->setPixmap( pCanvas->isModified() ? QPixmap( ":W/Draw16x16" ) : QPixmap() );
     pZoom->setEnabled( true );
     pZoom->setFit( pCanvas->getFit() );
     pZoom->setZoom( pCanvas->getZoom() );
+
+    // paste
+    // have we changed paste state
+    if ( pCanvas->hasPaste() != bPaste )
+    {
+        bPaste = (!bPaste);
+        doCreateToolConfig();
+    }
 }
 
 void EMainWindow::slotScratch()
 {
-    // clipboard
-    QImage image;                                                                                                  
-    {                                                                                                              
-        const QClipboard *pClipboard = QApplication::clipboard();                                                  
-        const QMimeData *pMimeData = pClipboard->mimeData();                                                       
+    if ( !pCanvas ) 
+    {
+        QMessageBox::information( this, tr("Scratch..."), tr("No active canvas.") );
+        return;
+    }
+    if ( !pCanvas->canCopy() )
+    {
+        QMessageBox::information( this, tr("Scratch..."), tr("Nothing selected.") );
+        return;
+    }
 
-        if ( !pMimeData->hasImage() )                                                                              
-        {                                                                                                          
-            QMessageBox::information( this, tr("New From Paste"), tr("The clipboard does not contain an image.") );
-            return;                                                                                          
-        }                                                                                                          
-        image = qvariant_cast<QImage>( pMimeData->imageData() );                                                   
-    }                                                                                                              
-
-    image = image.convertToFormat( QImage::Format_ARGB32 );                                                        
-
-    pScratchTool->doAppend( image );
+    pScratchTool->doAppend( pCanvas->getCopy() );
 }
 
 void EMainWindow::slotScratch( const QImage &image )
@@ -1180,18 +1301,6 @@ void EMainWindow::slotScratch( const QImage &image )
 
 void EMainWindow::slotToolTriggered()
 {
-    // cancel any drawing that may have been happening
-    if ( pCanvas && pCanvas->isDrawing() )
-        pCanvas->doCancel();
-
-    // remove any tool config widget from the tool bar
-    if ( pWidgetToolConfig )
-    {
-        delete pWidgetToolConfig;
-        pWidgetToolConfig = nullptr;
-    }
-
-    // update our nTool
     if ( pActionSelectRectangle->isChecked() )     
     {
         nTool = PCanvas::ToolSelectRectangle;
@@ -1207,14 +1316,10 @@ void EMainWindow::slotToolTriggered()
     else if ( pActionDrawFreeHand->isChecked() )        
     {
         nTool = PCanvas::ToolDrawFreeHand;
-        pWidgetToolConfig = new PFreeHandToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawSpray->isChecked() )           
     {
         nTool = PCanvas::ToolDrawSpray;
-        pWidgetToolConfig = new PSprayToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawErase->isChecked() )           
     {
@@ -1223,62 +1328,42 @@ void EMainWindow::slotToolTriggered()
     else if ( pActionDrawText->isChecked() )           
     {
         nTool = PCanvas::ToolDrawText;
-        pWidgetToolConfig = new PTextToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawLine->isChecked() )            
     {
         nTool = PCanvas::ToolDrawLine;
-        pWidgetToolConfig = new PLineToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawRectangle->isChecked() )       
     {
         nTool = PCanvas::ToolDrawRectangle;
-        pWidgetToolConfig = new PRectangleToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawEllipse->isChecked() )         
     {
         nTool = PCanvas::ToolDrawEllipse;
-        pWidgetToolConfig = new PEllipseToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawPolygon->isChecked() )         
     {
         nTool = PCanvas::ToolDrawPolygon;
-        pWidgetToolConfig = new PPolygonToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawPolyline->isChecked() )         
     {
         nTool = PCanvas::ToolDrawPolyline;
-        pWidgetToolConfig = new PPolylineToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawRectangleFilled->isChecked() ) 
     {
         nTool = PCanvas::ToolDrawRectangleFilled;
-        pWidgetToolConfig = new PRectangleFilledToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawEllipseFilled->isChecked() )   
     {
         nTool = PCanvas::ToolDrawEllipseFilled;
-        pWidgetToolConfig = new PEllipseFilledToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionDrawPolygonFilled->isChecked() )   
     {
         nTool = PCanvas::ToolDrawPolygonFilled;
-        pWidgetToolConfig = new PPolygonFilledToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionFillFlood->isChecked() )           
     {
         nTool = PCanvas::ToolFillFlood;
-        pWidgetToolConfig = new PFillFloodToolBar( pToolBarToolConfig );
-        pToolBarToolConfig->addWidget( pWidgetToolConfig );  
     }
     else if ( pActionFillGradient->isChecked() )        
     {
@@ -1289,13 +1374,16 @@ void EMainWindow::slotToolTriggered()
         Q_ASSERT( 1==2 );
     }
 
+    //
+    doCreateToolConfig();
+
     // set for all canvas's
     int nCount = pTabWidget->count();
     for ( int n = 0; n < nCount; n++ )
     {
         PLayersScrollArea *pLayersScrollArea = (PLayersScrollArea*)pTabWidget->widget( n );
         PCanvas *pCanvas = pLayersScrollArea->getLayers()->getCanvas();
-        pCanvas->setTool( nTool );
+        pCanvas->setTool( nTool ); // canvas will cancel any drawing in this call
     }
 }
 

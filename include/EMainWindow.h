@@ -26,8 +26,9 @@ private:
     PCanvas::Tools  nTool   = PCanvas::ToolSelectRectangle;
 
     // tool bar
-    QToolBar *  pToolBarToolConfig  = nullptr;              /*!< container for pWidgetToolConfig            */
-    QWidget *   pWidgetToolConfig   = nullptr;              /*!< tool config widget (if any)                */
+    QToolBar *  pToolBarToolConfig  = nullptr;              /*!< container for pWidgetToolConfig                                */
+    QWidget *   pWidgetToolConfig   = nullptr;              /*!< tool config widget (if any)                                    */
+    bool        bPaste              = false;                /*!< true if we are in paste mode - pWidgetToolConfig is for paste  */
 
     // main widgets
     QTabWidget *    pTabWidget; 
@@ -165,6 +166,9 @@ private:
     QMenu *pMenuHelp;
     QAction *pActionAbout;      
     QAction *pActionAboutCBD;
+    QAction *pActionAboutPeterHarvey;
+    QAction *pActionAboutQt;
+    QAction *pActionAboutSlickEdit;
     QAction *pActionFeedback;
 
     QAction *pActionHelpMenu;
@@ -190,6 +194,9 @@ private:
     void doUpdateRecentFiles( const QString &s );
     void doSaveState();
     void doLoadState();
+
+    //
+    void doCreateToolConfig();
 
     PLayers *getLayersCurrent();
     PCanvas *getCanvasCurrent();
@@ -224,6 +231,9 @@ private slots:
 
     void slotAbout();
     void slotAboutCBD();
+    void slotAboutPeterHarvey();
+    void slotAboutQt();
+    void slotAboutSlickEdit();
     void slotFeedback();
 
     void slotCanvasFocused( int nIndex );

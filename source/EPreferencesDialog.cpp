@@ -1,20 +1,14 @@
 #include "AppInfo.h"
 #include "EPreferencesDialog.h"
 
+#include <PPenToolBar.h>
+#include <PBrushToolBar.h>
 #include <PDrawFreeHand.h>
-#include <PDrawErase.h>
+// #include <PDrawErase.h>
 #include <PDrawSpray.h>
-#include <PDrawLine.h>
-#include <PDrawPolygon.h>
-#include <PDrawPolygonFilled.h>
-#include <PDrawPolyline.h>
-#include <PDrawRectangle.h>
-#include <PDrawRectangleFilled.h>
-#include <PDrawEllipse.h>
-#include <PDrawEllipseFilled.h>
 #include <PDrawText.h>
-#include <PFillFlood.h>
 #include <PPasteRectangle.h>
+// #include <PFillFlood.h>
 
 EPreferencesDialog::EPreferencesDialog( QWidget *pParent )
     : QDialog( pParent )
@@ -32,10 +26,11 @@ EPreferencesDialog::EPreferencesDialog( QWidget *pParent )
             QFormLayout *pLayout = new QFormLayout();
 
             pLayout->addRow( tr("General"), new PGeneralConfig( p ) );
+            pLayout->addRow( tr("Pen"), new PPenToolBar( p ) );
+            pLayout->addRow( tr("Brush"), new PBrushToolBar( p ) );
             pLayout->addRow( tr("Free Hand"), new PFreeHandToolBar( p ) );
             pLayout->addRow( tr("Spray"), new PSprayToolBar( p ) );
-            pLayout->addRow( tr("Text"), new PTextToolBar( p ) );
-            pLayout->addRow( tr("Flood Fill"), new PFillFloodToolBar( p ) );
+            pLayout->addRow( tr("Text"), new PTextToolBar( p, false ) );
             pLayout->addRow( tr("Paste"), new PPasteToolBar( p ) );
 
             pLayoutTop->addLayout( pLayout );
@@ -71,18 +66,23 @@ PGeneralConfig::PGeneralConfig( QWidget *pParent )
 
     PContextGeneral general = g_Context->getGeneral();
 
-    pColor = new WColorButton( general.brushTransparency.color(), this, WColorButton::Fill );
+    QBrush brush = general.brushTransparency;
+    if ( brush.style() == Qt::NoBrush ) brush.setTextureImage( QImage(":P/Transparent") );
+
+    pColor = new WColorButton( brush.color(), this, WColorButton::Fill );
+    pColor->setToolTip( tr("brush color to represent transparency") );
     pLayout->addWidget( pColor );
     connect( pColor, SIGNAL(signalChanged(const QColor &)), SLOT(slotColor(const QColor &)) );
 
-    pStyle = new WBrushStyleComboBox( this, general.brushTransparency.style() );
-    pStyle->setToolTip( tr("brush style") );
+    pStyle = new WBrushStyleComboBox( this, brush.style() );
+    pStyle->setToolTip( tr("brush style to represent transparency") );
     pLayout->addWidget( pStyle );
     connect( pStyle, SIGNAL(signalChanged(Qt::BrushStyle)), SLOT(slotStyle(Qt::BrushStyle)) );
 
-    pImage = new WImageButton( general.brushTransparency.textureImage(), this );
-    pLayout->addWidget( pImage, 10 );
-    connect( pImage, SIGNAL(signalClick()), SLOT(slotImage()) );
+    pImage = new WImageButton( brush.textureImage(), this );
+    pImage->setToolTip( tr("brush texture to represent transparency") );
+    pLayout->addWidget( pImage );
+    connect( pImage, SIGNAL(signalClick()), this, SLOT(slotImage()) );
 
     pRestoreState = new QCheckBox( tr("Restore Window State"), this );
     pRestoreState->setChecked( general.bRestoreState );
@@ -96,9 +96,12 @@ PGeneralConfig::PGeneralConfig( QWidget *pParent )
 
 void PGeneralConfig::slotRefresh( const PContextGeneral &t )
 {
-    pColor->setValue( t.brushTransparency.color() );
-    pStyle->setValue( t.brushTransparency.style() );
-    pImage->setImage( t.brushTransparency.textureImage() );
+    QBrush brush = t.brushTransparency;
+    if ( brush.style() == Qt::NoBrush ) brush.setTextureImage( QImage(":P/Transparent") );
+
+    pColor->setValue( brush.color() );
+    pStyle->setValue( brush.style() );
+    pImage->setImage( brush.textureImage() );
     pRestoreState->setChecked( t.bRestoreState );
 }
 

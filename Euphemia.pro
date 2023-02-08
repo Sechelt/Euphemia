@@ -16,12 +16,14 @@ LIBS += -lz
 RESOURCES   = Euphemia.qrc
 
 HEADERS += \
-        include/EMainWindow.h
+        include/EMainWindow.h \
+        include/EPreferencesDialog.h
 
 SOURCES += \
         Euphemia.h \
         source/AppInfo.h \
         source/main.cpp \
-        source/EMainWindow.cpp
+        source/EMainWindow.cpp \
+        source/EPreferencesDialog.cpp
 
 

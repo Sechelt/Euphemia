@@ -56,6 +56,7 @@
             GUID="{D21EE2C7-5F2D-4949-8F8D-3F0BF9C6FA16}">
             <F N="source/AppInfo.h"/>
             <F N="source/EMainWindow.cpp"/>
+            <F N="source/EPreferencesDialog.cpp"/>
             <F N="source/main.cpp"/>
         </Folder>
         <Folder
@@ -63,6 +64,7 @@
             Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
             GUID="{8431892C-966B-4C41-8356-5D2A4D571233}">
             <F N="include/EMainWindow.h"/>
+            <F N="include/EPreferencesDialog.h"/>
             <F N="Euphemia.h"/>
         </Folder>
         <Folder

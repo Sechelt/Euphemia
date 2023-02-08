@@ -73,6 +73,7 @@ private:
     QAction *pActionAutoCommit;
     QAction *pActionCommit;
     QAction *pActionCancel;
+    QAction *pActionPreferences;
     // view
     QMenu *pMenuView;
     QAction *pActionZoomIn;
@@ -228,6 +229,7 @@ private slots:
     void slotAutoCommit( bool );
     void slotCommit();
     void slotCancel();
+    void slotPreferences();
 
     void slotAbout();
     void slotAboutCBD();

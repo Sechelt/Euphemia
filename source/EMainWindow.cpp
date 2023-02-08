@@ -5,7 +5,12 @@
 #include <WIconLayout.h>
 #include <WSizeDialog.h>
 
+#include <PPenToolBar.h>
+#include <PBrushToolBar.h>
+
 #include <PFillFlood.h>
+
+#include "EPreferencesDialog.h"
 
 #define PMAX_RECENT_FILES 5
 
@@ -33,7 +38,7 @@ EMainWindow::EMainWindow( QWidget *pWidget )
 
 // Qt does not fully support Wayland at this time. This means that moving dock windows around
 // will be problematic for those running Wayland (on some platforms - not all). May not want to restore a messed up state.
-    doLoadState();
+    if ( g_Context->getGeneral().bRestoreState ) doLoadState();
 
     QClipboard *clipboard = QGuiApplication::clipboard();
     connect( clipboard, SIGNAL(dataChanged()), SLOT(slotCanvasChangedState()) );
@@ -130,6 +135,7 @@ void EMainWindow::doInitActions()
         pActionAutoCommit   = new QAction( tr("Auto Commit"), this );
         pActionCommit       = new QAction( QIcon( ":E/Commit" ), tr("Commit"), this );
         pActionCancel       = new QAction( QIcon( ":E/Cancel" ), tr("Cancel"), this );
+        pActionPreferences  = new QAction( QIcon( ":W/Properties16x16" ), tr("Preferences"), this );
 
         pActionCut->setShortcut( QKeySequence::Cut );
         pActionCopy->setShortcut( QKeySequence::Copy );
@@ -154,6 +160,7 @@ void EMainWindow::doInitActions()
         pActionAutoCommit->setEnabled( true );
         pActionCommit->setEnabled( false );
         pActionCancel->setEnabled( false );
+        pActionPreferences->setEnabled( true );
 
         connect( pActionCut, &QAction::triggered, this, &EMainWindow::slotCut );
         connect( pActionCopy, &QAction::triggered, this, &EMainWindow::slotCopy );
@@ -166,6 +173,7 @@ void EMainWindow::doInitActions()
         connect( pActionAutoCommit, &QAction::toggled, this, &EMainWindow::slotAutoCommit );
         connect( pActionCommit, &QAction::triggered, this, &EMainWindow::slotCommit );
         connect( pActionCancel, &QAction::triggered, this, &EMainWindow::slotCancel );
+        connect( pActionPreferences, &QAction::triggered, this, &EMainWindow::slotPreferences );
     }
 
     // VIEW
@@ -424,6 +432,8 @@ void EMainWindow::doInitMenus()
     pMenuEdit->addAction( pActionAutoCommit );
     pMenuEdit->addAction( pActionCommit );
     pMenuEdit->addAction( pActionCancel );
+    pMenuEdit->addSeparator();
+    pMenuEdit->addAction( pActionPreferences );
 
     // VIEW
     pMenuView = menuBar()->addMenu( tr("View") );
@@ -533,6 +543,14 @@ void EMainWindow::doInitToolbar()
     pToolBar->addAction( pActionRedo );
     pToolBar->addAction( pActionCommit );
     pToolBar->addAction( pActionCancel );
+
+    // pen and brush (fill)
+    pToolBar = addToolBar( tr("Pen") );
+    pToolBar->setObjectName( "Pen" );
+    pToolBar->addWidget( new PPenToolBar( this ) );
+    pToolBar = addToolBar( tr("Brush") );
+    pToolBar->setObjectName( "Brush" );
+    pToolBar->addWidget( new PBrushToolBar( this ) );
 
     pToolBarToolConfig = addToolBar( tr("Tool Config") );
     pToolBarToolConfig->setObjectName( "ToolConfig" );
@@ -806,28 +824,20 @@ void EMainWindow::doCreateToolConfig()
         case PCanvas::ToolDrawErase:
             break;
         case PCanvas::ToolDrawLine:
-            pWidgetToolConfig = new PLineToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolDrawRectangle:
-            pWidgetToolConfig = new PRectangleToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolDrawEllipse:
-            pWidgetToolConfig = new PEllipseToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolDrawPolygon:
-            pWidgetToolConfig = new PPolygonToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolDrawPolyline:
-            pWidgetToolConfig = new PPolylineToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolDrawRectangleFilled:
-            pWidgetToolConfig = new PRectangleFilledToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolDrawEllipseFilled:
-            pWidgetToolConfig = new PEllipseFilledToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolDrawPolygonFilled:
-            pWidgetToolConfig = new PPolygonFilledToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolDrawText:
             pWidgetToolConfig = new PTextToolBar( pToolBarToolConfig );
@@ -1094,8 +1104,14 @@ void EMainWindow::slotCancel()
     getCanvasCurrent()->doCancel();
 }
 
+void EMainWindow::slotPreferences()
+{
+    EPreferencesDialog::doPreferences( this );
+}
+
 void EMainWindow::slotAbout()
 {
+    // this automagically gets app icon
     QMessageBox::about( this, 
                         tr( "About..." ),
                         tr( "<b>" APP_NAME "</b><br><br>" ) +
@@ -1104,7 +1120,9 @@ void EMainWindow::slotAbout()
                         tr( "Sponsor: " CBD_COMPANY "<br>" ) +
                         tr( "Credits: Peter Harvey<br>" ) +
                         tr( "License: " APP_LICENSE "<br>" ) + 
-                        tr( "Copyright: " APP_COPYRIGHT "<br>" ) 
+                        tr( "Copyright: " APP_COPYRIGHT "<br>" ) +
+                        tr( "Code: all code is original from CodeByDesign<br>" ) + 
+                        tr( "Icons: CodeByDesign, xpaint, and free sources - thanks!<br>" ) 
                         );
 }
 
@@ -1113,7 +1131,7 @@ void EMainWindow::slotAboutCBD()
     QMessageBox msg( this );
     msg.setTextFormat( Qt::RichText );
     msg.setWindowTitle( tr( "About " CBD_COMPANY "..." ) );
-    msg.setText(    "<TABLE><TR><TD><img src=':W/CodeByDesign32x32'></TD><TD>" 
+    msg.setText(    "<TABLE cellpadding=10><TR><TD><img src=':W/CodeByDesign64' width=64 height=64></TD><TD>" 
                     "<A HREF='http://www.codebydesign.com'>" CBD_COMPANY "</A>" + 
                     tr( "<BR><BR>A software company which specializes in tools for; System Architects, Developers, and Consultants.</TD></TR></TABLE>" ) );
     msg.exec();
@@ -1124,8 +1142,8 @@ void EMainWindow::slotAboutPeterHarvey()
     QMessageBox msg( this );
     msg.setTextFormat( Qt::RichText );
     msg.setWindowTitle( tr( "About Peter Harvey..." ) );
-    msg.setText(    "<TABLE><TR><TD><img src=':E/PeterHarvey' width=64 height=64></TD><TD>"
-                    "<B>Peter Harvey</B>" +
+    msg.setText(    "<TABLE cellpadding=10><TR><TD><img src=':E/PeterHarvey' width=64 height=64></TD><TD>"
+                    "<A HREF='http://www.peterharvey.org/'>Peter Harvey</A>" + 
                     tr( "<BR><BR>Experienced cross-platform software developer. Slinging code since 1985.</TD></TR></TABLE>" ) );
     msg.exec();
 }
@@ -1140,7 +1158,7 @@ void EMainWindow::slotAboutSlickEdit()
     QMessageBox msg( this );
     msg.setTextFormat( Qt::RichText );
     msg.setWindowTitle( tr( "About SlickEdit..." ) );
-    msg.setText(    "<TABLE><TR><TD><img src=':E/SlickEdit' width=64 height=64></TD><TD>"
+    msg.setText(    "<TABLE cellpadding=10><TR><TD><img src=':E/SlickEdit' width=64 height=64></TD><TD>"
                     "<A HREF='https://www.slickedit.com/'>SlickEdit</A>" + 
                     tr( "<BR><BR>World's Most Powerful Code Editor.</TD></TR></TABLE>" ) );
     msg.exec();

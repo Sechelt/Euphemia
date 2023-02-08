@@ -94,6 +94,12 @@ int main( int argc, char *argv[] )
     g_PaletteColors = new WPaletteColor();
     g_PaletteColors->doInit();
 
+    /*
+     * Load default context. 
+     * - needs to be done before creating main window as one of the options is whether or not to restore window state 
+     */
+    g_Context->doLoad();
+
     /* Create the main window and start the app event loop.
      * 
      * We use 'new' so we can use 'delete' before we get rid 

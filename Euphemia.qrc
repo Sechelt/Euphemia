@@ -6,7 +6,7 @@
 	<file alias="SelectPolygon">images/SelectPolygon.svg</file>
 	<file alias="FreeHand">images/FreeHand.svg</file>
 	<file alias="Spray">images/Spray.svg</file>
-	<file alias="Line">images/Line.svg</file>
+	<file alias="Line">images/Line.png</file>
 	<file alias="Erase">images/Erase.svg</file>
 	<file alias="Rectangle">images/Rectangle.svg</file>
 	<file alias="Ellipse">images/Ellipse.svg</file>

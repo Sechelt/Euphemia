@@ -8,7 +8,7 @@
 #include <WCoordWidget.h>
 #include <WZoomWidget.h>
 
-#include <PLayers.h>
+#include <PGraphicsView.h>
 
 class EMainWindow : public QMainWindow
 {
@@ -22,7 +22,7 @@ protected:
 
 private:
     // current canvas or null
-    PCanvas *       pCanvas = nullptr;
+    PLayers *       pLayers = nullptr;
     PCanvas::Tools  nTool   = PCanvas::ToolSelectRectangle;
 
     // tool bar
@@ -199,8 +199,11 @@ private:
     //
     void doCreateToolConfig();
 
-    PLayers *getLayersCurrent();
-    PCanvas *getCanvasCurrent();
+    // get current (or n) from tab widget
+    PGraphicsView *     getView( int n = -1 );
+    PGraphicsScene *    getScene( int n = -1 );
+    PLayers *           getLayers( int n = -1 );
+    PCanvas *           getCanvas( int n = -1 );
 
 private slots:
     // workspace

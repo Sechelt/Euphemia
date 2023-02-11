@@ -67,7 +67,7 @@ PGeneralConfig::PGeneralConfig( QWidget *pParent )
     PContextGeneral general = g_Context->getGeneral();
 
     QBrush brush = general.brushTransparency;
-    if ( brush.style() == Qt::NoBrush ) brush.setTextureImage( QImage(":P/Transparent") );
+    if ( brush.style() == Qt::NoBrush ) brush.setTextureImage( QImage(":W/Transparent") );
 
     pColor = new WColorButton( brush.color(), this, WColorButton::Fill );
     pColor->setToolTip( tr("brush color to represent transparency") );
@@ -97,7 +97,7 @@ PGeneralConfig::PGeneralConfig( QWidget *pParent )
 void PGeneralConfig::slotRefresh( const PContextGeneral &t )
 {
     QBrush brush = t.brushTransparency;
-    if ( brush.style() == Qt::NoBrush ) brush.setTextureImage( QImage(":P/Transparent") );
+    if ( brush.style() == Qt::NoBrush ) brush.setTextureImage( QImage(":W/Transparent") );
 
     pColor->setValue( brush.color() );
     pStyle->setValue( brush.style() );

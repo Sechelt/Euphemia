@@ -22,7 +22,7 @@ protected:
 
 private:
     // current canvas or null
-    PLayers *       pLayers = nullptr;
+    PCanvas *       pCanvas = nullptr;
     PCanvas::Tools  nTool   = PCanvas::ToolSelectRectangle;
 
     // tool bar
@@ -202,7 +202,6 @@ private:
     // get current (or n) from tab widget
     PGraphicsView *     getView( int n = -1 );
     PGraphicsScene *    getScene( int n = -1 );
-    PLayers *           getLayers( int n = -1 );
     PCanvas *           getCanvas( int n = -1 );
 
 private slots:
@@ -251,7 +250,7 @@ private slots:
     void slotToolTriggered();
 
     // these are applied to current canvas
-    void slotZoom( int nFit, int nZoom );
+    void slotZoom( WZoomWidget::FitTypes nFit, int nZoom );
 
     // update dock window titles
     void slotPaletteColorWindowTitle();

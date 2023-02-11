@@ -39,6 +39,7 @@ EMainWindow::EMainWindow( QWidget *pWidget )
 // Qt does not fully support Wayland at this time. This means that moving dock windows around
 // will be problematic for those running Wayland (on some platforms - not all). May not want to restore a messed up state.
     if ( g_Context->getGeneral().bRestoreState ) doLoadState();
+    connect( g_Context, SIGNAL(signalModified(const PContextGeneral &)), SLOT(slotRefresh(const PContextGeneral &)) );
 
     QClipboard *clipboard = QGuiApplication::clipboard();
     connect( clipboard, SIGNAL(dataChanged()), SLOT(slotCanvasChangedState()) );
@@ -145,7 +146,7 @@ void EMainWindow::doInitActions()
         pActionAutoCommit->setToolTip( tr("auto commit changes to canvas else allow manipulation before commit when possible") );
 
         pActionAutoCommit->setCheckable( true );
-        pActionAutoCommit->setChecked( true );
+        pActionAutoCommit->setChecked( g_Context->getGeneral().bAutoCommit );
 
         pActionCut->setEnabled( false );
         pActionCopy->setEnabled( false );
@@ -1464,4 +1465,8 @@ void EMainWindow::slotPaletteColorWindowTitle()
     }
 }
 
+void EMainWindow::slotRefresh( const PContextGeneral &t )
+{
+    pActionAutoCommit->setChecked( t.bAutoCommit );
+}
 

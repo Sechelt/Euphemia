@@ -30,14 +30,16 @@ protected:
     WColorButton *          pColor;         /*!< a transparent color (alpha==0) and no texture will implicitly indicate block pattern  */
     WBrushStyleComboBox *   pStyle;
     WImageButton *          pImage;
-    // bRestoreState
-    QCheckBox *             pRestoreState;
+
+    QCheckBox *             pRestoreState;      
+    QCheckBox *             pAutoCommit;      
 
 protected slots:
     void slotColor( const QColor &color );
     void slotStyle( Qt::BrushStyle n );
     void slotImage();
     void slotRestoreState( int );
+    void slotAutoCommit( int );
 };
 
 #endif

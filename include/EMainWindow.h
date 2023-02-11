@@ -254,6 +254,8 @@ private slots:
 
     // update dock window titles
     void slotPaletteColorWindowTitle();
+
+    void slotRefresh( const PContextGeneral & );
 };
 
 #endif

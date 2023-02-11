@@ -89,6 +89,11 @@ PGeneralConfig::PGeneralConfig( QWidget *pParent )
     pLayout->addWidget( pRestoreState );
     connect( pRestoreState, SIGNAL(stateChanged(int)), SLOT(slotRestoreState(int)) );
 
+    pAutoCommit = new QCheckBox( tr("Auto Commit Shapes"), this );
+    pAutoCommit->setChecked( general.bAutoCommit );
+    pLayout->addWidget( pAutoCommit );
+    connect( pAutoCommit, SIGNAL(stateChanged(int)), SLOT(slotAutoCommit(int)) );
+
     pLayout->addStretch( 10 );
 
     connect( g_Context, SIGNAL(signalModified(const PContextGeneral &)), SLOT(slotRefresh(const PContextGeneral &)) );
@@ -103,6 +108,7 @@ void PGeneralConfig::slotRefresh( const PContextGeneral &t )
     pStyle->setValue( brush.style() );
     pImage->setImage( brush.textureImage() );
     pRestoreState->setChecked( t.bRestoreState );
+    pAutoCommit->setChecked( t.bAutoCommit );
 }
 
 void PGeneralConfig::slotColor( const QColor &color )
@@ -139,6 +145,13 @@ void PGeneralConfig::slotRestoreState( int n )
 {
     PContextGeneral t = g_Context->getGeneral();
     t.bRestoreState = n;
+    g_Context->setGeneral( t );
+}
+
+void PGeneralConfig::slotAutoCommit( int n )
+{
+    PContextGeneral t = g_Context->getGeneral();
+    t.bAutoCommit = n;
     g_Context->setGeneral( t );
 }
 

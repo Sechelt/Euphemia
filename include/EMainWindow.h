@@ -189,20 +189,29 @@ private:
     void doInitDockColors();
     void doInitDockScratch();
 
-    // state
+    // recent file names
     void doSaveRecentFiles();
     void doLoadRecentFiles();
-    void doUpdateRecentFiles( const QString &s );
+    void doAddRecentFile( const QString &s );
+
+    // state
     void doSaveState();
     void doLoadState();
 
     //
     void doCreateToolConfig();
+    void doUpdateTabText();
 
     // get current (or n) from tab widget
     PGraphicsView *     getView( int n = -1 );
     PGraphicsScene *    getScene( int n = -1 );
     PCanvas *           getCanvas( int n = -1 );
+
+    // file names
+    QString getFileNameUserFriendly( const QString &stringFileName, int nMaxPath = 50 );
+    QString getFileBaseName( const QString &stringFileName );
+    QString getFilePathShort( const QString &stringFileName, int nMaxPath );
+    QString getFilePath( const QString &stringFileName );
 
 private slots:
     // workspace
@@ -242,6 +251,7 @@ private slots:
 
     void slotCanvasFocused( int nIndex );
     void slotCanvasChangedState();
+    void slotChangedFileName( const QString & );
 
     void slotScratch();
     void slotScratch( const QImage & );

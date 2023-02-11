@@ -12,14 +12,13 @@
 
 #include "EPreferencesDialog.h"
 
+// max number of recent files in file menu
+// - must be > 0
 #define PMAX_RECENT_FILES 5
 
 EMainWindow::EMainWindow( QWidget *pWidget ) 
     : QMainWindow( pWidget )
 {
-    vectorRecentStrings.resize( PMAX_RECENT_FILES );
-    vectorRecentActions.resize( PMAX_RECENT_FILES );
-
     // all possible ways to set app icon for a running app - probably all end up in the same place
     QApplication::setWindowIcon( QIcon( ":E/Euphemia" ) );
     if ( windowHandle() ) windowHandle()->setIcon( QIcon( ":E/Euphemia" ) );
@@ -408,11 +407,6 @@ void EMainWindow::doInitMenus()
     pMenuFile->addSeparator();
 
     // recent files - just blank for now
-    for ( int n = 0; n < PMAX_RECENT_FILES; n++ )
-    {
-        vectorRecentStrings[n] = "";
-        vectorRecentActions[n] = pMenuFile->addAction( QString("%1 -").arg( n + 1 ) );
-    }
     connect( pMenuFile, SIGNAL(triggered(QAction*)), this, SLOT(slotRecent(QAction*)) );
 
     // EDIT
@@ -735,7 +729,7 @@ void EMainWindow::doSaveRecentFiles()
 {
     QSettings settings;
     settings.beginGroup( "Recent" );
-    for ( int n = 0; n < PMAX_RECENT_FILES; n++ )
+    for ( int n = 0; n < vectorRecentStrings.count(); n++ )
     {
         settings.setValue( QString::number( n ), vectorRecentStrings.at( n ) );
     }
@@ -749,25 +743,56 @@ void EMainWindow::doLoadRecentFiles()
     for ( int n = 0; n < PMAX_RECENT_FILES; n++ )
     {
         QString s = settings.value( QString::number( n ), "" ).toString();
-        vectorRecentStrings[ n ] = s;
-        vectorRecentActions[ n ]->setText( QString( "%1 - %2" ).arg( n + 1 ).arg( s ) );
+        if ( s.isEmpty() ) break;
+        vectorRecentStrings.append( s );
+        vectorRecentActions.append( pMenuFile->addAction( QString("%1 - %2").arg( n ).arg( s ) ) );
     }
     settings.endGroup();
 }
 
-void EMainWindow::doUpdateRecentFiles( const QString &stringFileName )
+/*!
+ * \brief Add the given file name to FileMenu->Recent list. 
+ *  
+ * \todo When already in list bring to front 
+ * \todo Set short cut where index is underlined 
+ * \todo Add PMAX_RECENT_FILES to PContextGeneral 
+ * 
+ * \author pharvey (2/11/23)
+ * 
+ * \param s      
+ */
+void EMainWindow::doAddRecentFile( const QString &s )
 {
-    if ( vectorRecentStrings.contains( stringFileName ) ) return;
-
-    for ( int n = PMAX_RECENT_FILES - 1; n > 0; n-- )
+    if ( vectorRecentStrings.contains( s ) )
     {
-        vectorRecentStrings[n] = vectorRecentStrings[n - 1];
+        // bring to the front
+        return;
     }
-    vectorRecentStrings[0] = stringFileName;
 
-    for ( int n = 0; n < PMAX_RECENT_FILES; n++ )
+    // remove actions from menu (order is changing)
+    for ( int n = 0; n < vectorRecentActions.count(); n++ )
     {
-        vectorRecentActions[n]->setText( QString( "%1 - %2" ).arg( n + 1 ).arg( vectorRecentStrings[n] ) );
+        pMenuFile->removeAction( vectorRecentActions[n] );
+    }
+    
+    // insert at front
+    vectorRecentStrings.insert( 0, s );
+    vectorRecentActions.insert( 0, pMenuFile->addAction( QString("1 %2").arg( getFileNameUserFriendly( s ) ) ) );
+
+    // delete oldest as needed
+    if ( vectorRecentStrings.count() > PMAX_RECENT_FILES )
+    {
+        delete vectorRecentActions.last();
+        vectorRecentStrings.removeLast();
+        vectorRecentActions.removeLast();
+    }
+
+    // update all action texts to indicate new index position
+    // add back to menu
+    for ( int n = 0; n < vectorRecentActions.count(); n++ )
+    {
+        vectorRecentActions[n]->setText( QString("%1 %2").arg( n + 1 ).arg( getFileNameUserFriendly( vectorRecentStrings[n] ) ) );
+        pMenuFile->addAction( vectorRecentActions[n] );
     }
 }
 
@@ -851,6 +876,25 @@ void EMainWindow::doCreateToolConfig()
     if ( pWidgetToolConfig ) pToolBarToolConfig->addWidget( pWidgetToolConfig );  
 }
 
+void EMainWindow::doUpdateTabText()
+{
+    Q_ASSERT( pCanvas );
+    Q_ASSERT( pTabWidget->currentIndex() >= 0 );
+
+    int nIndex = pTabWidget->currentIndex();
+    QString stringFileName = pCanvas->getFileName();
+    QString stringTabText;
+
+    if ( stringFileName.isEmpty() )
+        stringTabText = tr( "unnamed" );
+    else
+        stringTabText = getFileBaseName( stringFileName );
+
+    if ( pCanvas->isModified() ) stringTabText = stringTabText + " *";
+    pTabWidget->setTabText( nIndex, stringTabText );
+    pTabWidget->setTabToolTip( nIndex, getFilePath( stringFileName ) );
+}
+
 PGraphicsView *EMainWindow::getView( int n )
 {
     if ( n < 0 ) return (PGraphicsView *)pTabWidget->currentWidget();
@@ -869,6 +913,63 @@ PCanvas *EMainWindow::getCanvas( int n )
     PGraphicsScene *p = getScene( n );
     if ( !p ) return nullptr;
     return p->getCanvas();
+}
+
+/*!
+ * \brief Get a file name (including path) in User friendly format. 
+ *  
+ * The format is [base name] - [path] where a long path is reduced as requested. 
+ *  
+ * \author pharvey (2/11/23)
+ * 
+ * \param stringFileName 
+ * \param nMaxPath       max path length 0 = no limit otherwise must be >= 10 default:50
+ * 
+ * \return QString 
+ */
+QString EMainWindow::getFileNameUserFriendly( const QString &stringFileName, int nMaxPath )
+{
+    return getFileBaseName( stringFileName ) + " - " + getFilePathShort( stringFileName, nMaxPath );
+}
+
+QString EMainWindow::getFileBaseName( const QString &stringFileName )
+{
+    QFileInfo fileInfo( stringFileName );
+    return fileInfo.fileName();
+}
+
+/*!
+ * \brief Cut left end of path if path too long. 
+ *  
+ * The path will start with "... " if reduced. 
+ * 
+ * \author pharvey (2/11/23)
+ * 
+ * \param stringFileName 
+ * \param nMaxPath       
+ * 
+ * \return QString 
+ */
+QString EMainWindow::getFilePathShort( const QString &stringFileName, int nMaxPath )
+{
+    if ( nMaxPath == 0 ) return getFilePath( stringFileName );
+
+    if ( nMaxPath < 10 )
+    {
+        qWarning( "Path can only be reduced to 10 or more." );
+        nMaxPath = 10;
+    }
+
+    QString s = getFilePath( stringFileName );
+    if ( s.length() <= nMaxPath ) return s;
+
+    return "... " + s.right( nMaxPath - 4 );
+}
+
+QString EMainWindow::getFilePath( const QString &stringFileName )
+{
+    // return QDir::cleanPath( stringFileName );
+    return QFileInfo( stringFileName ).absolutePath();
 }
 
 /*!
@@ -1051,6 +1152,14 @@ bool EMainWindow::slotRecent( QAction *p )
     if ( nIndex < 0 ) return false;
     QString s = vectorRecentStrings.at( nIndex );
     if ( s.isEmpty() ) return false;
+    // do it
+    slotNew();
+    Q_ASSERT( pCanvas );
+    if ( !getCanvas()->doOpen( s ) )                                                                      
+    {                                                                                              
+        slotClose( false );
+        return false;                                                                              
+    }                                                                                              
 
     return true;
 }
@@ -1218,6 +1327,7 @@ void EMainWindow::slotCanvasFocused( int nIndex )
     if ( pCanvas  )
     {
         if ( pCanvas->isDrawing() ) pCanvas->doCancel();
+        disconnect( pCanvas, SIGNAL(signalChangedFileName(const QString &)), this, SLOT(slotChangedFileName(const QString &)) );
         disconnect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
         pCanvas = nullptr;
     }
@@ -1256,6 +1366,7 @@ void EMainWindow::slotCanvasFocused( int nIndex )
     // - set pCanvas and connect it
     {
         pCanvas = getCanvas( nIndex );
+        connect( pCanvas, SIGNAL(signalChangedFileName(const QString &)), this, SLOT(slotChangedFileName(const QString &)) );
         connect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
         slotCanvasChangedState();
     }
@@ -1279,12 +1390,7 @@ void EMainWindow::slotCanvasChangedState()
     if ( !pCanvas ) return;
 
     // update tab text (file name with * when modified)
-    {
-        QString stringTabText = pCanvas->getFileName();
-        if ( stringTabText.isEmpty() ) stringTabText = tr( "unnamed" );
-        if ( pCanvas->isModified() ) stringTabText = stringTabText + " *";
-        pTabWidget->setTabText( pTabWidget->currentIndex(), stringTabText );
-    }
+    doUpdateTabText();
 
     // file
     pActionSave->setEnabled( pCanvas->isModified() ); 
@@ -1317,6 +1423,17 @@ void EMainWindow::slotCanvasChangedState()
         bPaste = (!bPaste);
         doCreateToolConfig();
     }
+}
+
+void EMainWindow::slotChangedFileName( const QString &s )
+{
+    // update tab title
+    doUpdateTabText();
+
+    if ( s.isEmpty() ) return;      // canvas cleared
+
+    // update recent file list
+    doAddRecentFile( s );       // loaded or saved as
 }
 
 void EMainWindow::slotScratch()

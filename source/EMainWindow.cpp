@@ -1255,7 +1255,7 @@ void EMainWindow::slotCanvasFocused( int nIndex )
     // new current tab
     // - set pCanvas and connect it
     {
-        PCanvas *pCanvas = getCanvas( nIndex );
+        pCanvas = getCanvas( nIndex );
         connect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
         slotCanvasChangedState();
     }
@@ -1321,7 +1321,6 @@ void EMainWindow::slotCanvasChangedState()
 
 void EMainWindow::slotScratch()
 {
-qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "]" << pCanvas;
     if ( !pCanvas ) 
     {
         QMessageBox::information( this, tr("Scratch..."), tr("No active canvas.") );

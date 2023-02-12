@@ -9,6 +9,7 @@
 #include <WZoomWidget.h>
 
 #include <PGraphicsView.h>
+#include <PCanvas.h>
 
 class EMainWindow : public QMainWindow
 {
@@ -240,6 +241,7 @@ private slots:
     void slotAutoCommit( bool );
     void slotCommit();
     void slotCancel();
+    void slotZoom( WZoomWidget::FitTypes nFit, int nZoom );
     void slotPreferences();
 
     void slotAbout();
@@ -258,9 +260,6 @@ private slots:
 
     // these are applied to all canvas'
     void slotToolTriggered();
-
-    // these are applied to current canvas
-    void slotZoom( WZoomWidget::FitTypes nFit, int nZoom );
 
     // update dock window titles
     void slotPaletteColorWindowTitle();

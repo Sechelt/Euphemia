@@ -16,6 +16,10 @@
 // - must be > 0
 #define PMAX_RECENT_FILES 5
 
+#define PZOOM_MIN 10
+#define PZOOM_MAX 300
+#define PZOOM_INC 10
+
 EMainWindow::EMainWindow( QWidget *pWidget ) 
     : QMainWindow( pWidget )
 {
@@ -566,6 +570,9 @@ void EMainWindow::doInitStatusBar()
     statusBar()->addPermanentWidget( pCoord, 0 );
 
     pZoom = new WZoomWidget( statusBar() );
+    pZoom->setMin( PZOOM_MIN );
+    pZoom->setMax( PZOOM_MAX );
+    pZoom->setInc( PZOOM_INC );
     statusBar()->addPermanentWidget( pZoom, 0 );
     pZoom->setEnabled( false );
     connect( pZoom, SIGNAL(signalZoom(WZoomWidget::FitTypes,int)), this, SLOT(slotZoom(WZoomWidget::FitTypes,int)) );
@@ -744,8 +751,10 @@ void EMainWindow::doLoadRecentFiles()
     {
         QString s = settings.value( QString::number( n ), "" ).toString();
         if ( s.isEmpty() ) break;
+
         vectorRecentStrings.append( s );
-        vectorRecentActions.append( pMenuFile->addAction( QString("%1 - %2").arg( n ).arg( s ) ) );
+        vectorRecentActions.append( pMenuFile->addAction( QString("%1 %2").arg( n + 1 ).arg( getFileNameUserFriendly( s ) ) ) );
+
     }
     settings.endGroup();
 }
@@ -1236,6 +1245,34 @@ void EMainWindow::slotCancel()
     getCanvas()->doCancel();
 }
 
+void EMainWindow::slotZoom( WZoomWidget::FitTypes nFit, int nZoom )
+{
+    Q_ASSERT( pCanvas );
+
+    PGraphicsView *pView = getView();
+    if ( !pView ) return;
+
+    // get scale
+    qreal nScale;
+    switch ( nFit )
+    {
+    case WZoomWidget::FitWidth:
+    case WZoomWidget::FitHeight:
+    case WZoomWidget::FitAll:
+        // pView->fitInView( pView->getScene()->sceneRect() );
+    case WZoomWidget::FitIgnore:
+        nScale = qreal(nZoom) / 100;
+        break;
+    }
+
+    // apply scale
+    pView->setScale( nScale );
+
+    // let canvas know
+    // - this is one-way as a canvas does not change the zoom
+    pCanvas->setZoom( nZoom );
+}
+
 void EMainWindow::slotPreferences()
 {
     EPreferencesDialog::doPreferences( this );
@@ -1413,7 +1450,6 @@ void EMainWindow::slotCanvasChangedState()
     // status bar
     pModified->setPixmap( pCanvas->isModified() ? QPixmap( ":W/Draw16x16" ) : QPixmap() );
     pZoom->setEnabled( true );
-    pZoom->setFit( pCanvas->getFit() );
     pZoom->setZoom( pCanvas->getZoom() );
 
     // paste
@@ -1543,28 +1579,6 @@ void EMainWindow::slotToolTriggered()
     {
         getCanvas( n )->setTool( nTool ); // canvas will cancel any drawing in this call
     }
-}
-
-void EMainWindow::slotZoom( WZoomWidget::FitTypes nFit, int nZoom )
-{
-    PGraphicsView *pView = getView();
-    if ( !pView ) return;
-
-qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ <<"]sceneRect: " << pView->getScene()->sceneRect() << " nZoom:" << nZoom;
-qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ <<"]viewport: " << pView->viewport()->geometry();
-    switch ( nFit )
-    {
-    case WZoomWidget::FitWidth:
-    case WZoomWidget::FitHeight:
-        return;
-    case WZoomWidget::FitAll:
-        pView->fitInView( pView->getScene()->sceneRect() );
-        return;
-    case WZoomWidget::FitIgnore:
-        break;
-    }
-
-    pView->setScale( qreal(nZoom) / 100 );
 }
 
 void EMainWindow::slotPaletteColorWindowTitle()

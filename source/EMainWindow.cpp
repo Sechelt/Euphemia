@@ -57,7 +57,7 @@ void EMainWindow::closeEvent( QCloseEvent *pEvent )
     int nCount = pTabWidget->count();
     for ( int n = 0; n < nCount; n++ )
     {
-        PCanvas *pCanvas = getCanvas( n );
+        PCanvas *pCanvas = getView( n )->getCanvas();
         if ( pCanvas->isModified() )
         {
             pTabWidget->setCurrentIndex( n );
@@ -569,13 +569,14 @@ void EMainWindow::doInitStatusBar()
     pCoord->slotCoord( 0.0, 0.0 );
     statusBar()->addPermanentWidget( pCoord, 0 );
 
+    // Zoom (scale) is managed in the view
+    // - here we add a tool bar widget which will get connect/disconnected to the view
     pZoom = new WZoomWidget( statusBar() );
     pZoom->setMin( PZOOM_MIN );
     pZoom->setMax( PZOOM_MAX );
     pZoom->setInc( PZOOM_INC );
     statusBar()->addPermanentWidget( pZoom, 0 );
     pZoom->setEnabled( false );
-    connect( pZoom, SIGNAL(signalZoom(WZoomWidget::FitTypes,int)), this, SLOT(slotZoom(WZoomWidget::FitTypes,int)) );
 }
 
 void EMainWindow::doInitDockWindows()
@@ -887,11 +888,11 @@ void EMainWindow::doCreateToolConfig()
 
 void EMainWindow::doUpdateTabText()
 {
-    Q_ASSERT( pCanvas );
+    Q_ASSERT( pView );
     Q_ASSERT( pTabWidget->currentIndex() >= 0 );
 
     int nIndex = pTabWidget->currentIndex();
-    QString stringFileName = pCanvas->getFileName();
+    QString stringFileName = pView->getCanvas()->getFileName();
     QString stringTabText;
 
     if ( stringFileName.isEmpty() )
@@ -899,29 +900,14 @@ void EMainWindow::doUpdateTabText()
     else
         stringTabText = getFileBaseName( stringFileName );
 
-    if ( pCanvas->isModified() ) stringTabText = stringTabText + " *";
+    if ( pView->getCanvas()->isModified() ) stringTabText = stringTabText + " *";
     pTabWidget->setTabText( nIndex, stringTabText );
     pTabWidget->setTabToolTip( nIndex, getFilePath( stringFileName ) );
 }
 
 PGraphicsView *EMainWindow::getView( int n )
 {
-    if ( n < 0 ) return (PGraphicsView *)pTabWidget->currentWidget();
     return (PGraphicsView *)pTabWidget->widget( n );
-}
-
-PGraphicsScene *EMainWindow::getScene( int n )
-{
-    PGraphicsView *p = getView( n );
-    if ( !p ) return nullptr;
-    return p->getScene();
-}
-
-PCanvas *EMainWindow::getCanvas( int n )
-{
-    PGraphicsScene *p = getScene( n );
-    if ( !p ) return nullptr;
-    return p->getCanvas();
 }
 
 /*!
@@ -1015,8 +1001,8 @@ bool EMainWindow::slotNewWithSize()
     }                                                                                              
                                                                                                    
     slotNew();
-    Q_ASSERT( pCanvas );
-    getScene()->setSceneRect( QRectF( 0, 0, size.width(), size.height() ) );
+    Q_ASSERT( pView );
+    pView->getScene()->setSceneRect( QRectF( 0, 0, size.width(), size.height() ) );
 
     return true;
 }
@@ -1039,10 +1025,10 @@ bool EMainWindow::slotNewFromPaste()
     image = image.convertToFormat( QImage::Format_ARGB32 );                                                        
                                                                                                                    
     slotNew();
-    Q_ASSERT( pCanvas );
-    getScene()->setSceneRect( QRectF( 0, 0, image.size().width(), image.size().height() ) );
-    pCanvas->doPaste();
-    pCanvas->doCommit();
+    Q_ASSERT( pView );
+    pView->getScene()->setSceneRect( QRectF( 0, 0, image.size().width(), image.size().height() ) );
+    pView->getCanvas()->doPaste();
+    pView->getCanvas()->doCommit();
 
     return true;
 }
@@ -1057,8 +1043,8 @@ bool EMainWindow::slotNewFromPaste()
 bool EMainWindow::slotOpen()
 {
     slotNew();
-    Q_ASSERT( pCanvas );
-    if ( !getCanvas()->doOpen() )                                                                      
+    Q_ASSERT( pView );
+    if ( !pView->getCanvas()->doOpen() )                                                                      
     {                                                                                              
         slotClose( false );
         return false;                                                                              
@@ -1076,8 +1062,8 @@ bool EMainWindow::slotOpen()
  */
 bool EMainWindow::slotSave()
 {
-    Q_ASSERT( pCanvas );
-    return getCanvas()->doSave();
+    Q_ASSERT( pView );
+    return pView->getCanvas()->doSave();
 }
   
 /*!
@@ -1089,8 +1075,8 @@ bool EMainWindow::slotSave()
  */
 bool EMainWindow::slotSaveAs()
 {
-    Q_ASSERT( pCanvas );
-    return getCanvas()->doSaveAs();
+    Q_ASSERT( pView );
+    return pView->getCanvas()->doSaveAs();
 }
 
 bool EMainWindow::slotExport()
@@ -1112,30 +1098,24 @@ bool EMainWindow::slotPrint()
  */
 bool EMainWindow::slotClose( bool bPrompt )
 {
-    // must have a current tab for the rest work
-    int nIndex = pTabWidget->currentIndex(); 
-    Q_ASSERT( nIndex >= 0 );
-
-    PGraphicsView *     pView   = getView();
-    PGraphicsScene *    pScene  = pView->getScene();
-    PCanvas *           pCanvas = pScene->getCanvas();
+    Q_ASSERT( pView );
 
     // Get rid of any temp shapes and any handles.
-    if ( pCanvas->isDrawing() ) pCanvas->doCancel();
+    if ( pView->getCanvas()->isDrawing() ) pView->getCanvas()->doCancel();
 
     // Give canvas a chance to close gracefully.
-    if ( bPrompt && !pCanvas->doClose() ) return false;
+    if ( bPrompt && !pView->getCanvas()->doClose() ) return false;
 
     // this does NOT delete widget
-    pTabWidget->removeTab( nIndex );
+    pTabWidget->removeTab( pTabWidget->currentIndex() );
 
     // At this point the scene just has just a background and a canvas (no temp shapes and no handles).
     // So its ok for the scene to silently delete the background and scene.
 
     // delete widget
-    delete pScene; // will delete pLayers
+    delete pView->getScene(); 
     delete pView;
-    pCanvas = nullptr;
+    pView = nullptr;
 
     return true;
 }
@@ -1163,8 +1143,8 @@ bool EMainWindow::slotRecent( QAction *p )
     if ( s.isEmpty() ) return false;
     // do it
     slotNew();
-    Q_ASSERT( pCanvas );
-    if ( !getCanvas()->doOpen( s ) )                                                                      
+    Q_ASSERT( pView );
+    if ( !pView->getCanvas()->doOpen( s ) )                                                                      
     {                                                                                              
         slotClose( false );
         return false;                                                                              
@@ -1180,32 +1160,32 @@ void EMainWindow::slotExit()
 
 void EMainWindow::slotCut()
 {
-    Q_ASSERT( pCanvas );
-    getCanvas()->doCut();
+    Q_ASSERT( pView );
+    pView->getCanvas()->doCut();
 }
 
 void EMainWindow::slotCopy()
 {
-    Q_ASSERT( pCanvas );
-    getCanvas()->doCopy();
+    Q_ASSERT( pView );
+    pView->getCanvas()->doCopy();
 }
 
 void EMainWindow::slotPaste()
 {
-    Q_ASSERT( pCanvas );
-    getCanvas()->doPaste();
+    Q_ASSERT( pView );
+    pView->getCanvas()->doPaste();
 }
 
 void EMainWindow::slotUndo()
 {
-    Q_ASSERT( pCanvas );
-    getCanvas()->doUndo();
+    Q_ASSERT( pView );
+    pView->getCanvas()->doUndo();
 }
 
 void EMainWindow::slotRedo()
 {
-    Q_ASSERT( pCanvas );
-    getCanvas()->doRedo();
+    Q_ASSERT( pView );
+    pView->getCanvas()->doRedo();
 }
 
 void EMainWindow::slotUndoLevels()
@@ -1214,14 +1194,14 @@ void EMainWindow::slotUndoLevels()
 
 void EMainWindow::slotSelectAll()
 {
-    Q_ASSERT( pCanvas );
-    getCanvas()->doSelectAll();
+    Q_ASSERT( pView );
+    pView->getCanvas()->doSelectAll();
 }
 
 void EMainWindow::slotSelectNone()
 {
-    Q_ASSERT( pCanvas );
-    getCanvas()->doSelectNone();
+    Q_ASSERT( pView );
+    pView->getCanvas()->doSelectNone();
 }
 
 void EMainWindow::slotAutoCommit( bool b )
@@ -1229,48 +1209,20 @@ void EMainWindow::slotAutoCommit( bool b )
     int nCount = pTabWidget->count();
     for ( int n = 0; n < nCount; n++ )
     {
-        getCanvas( n )->setAutoCommit( b );
+        getView( n )->getCanvas()->setAutoCommit( b );
     }
 }
 
 void EMainWindow::slotCommit()
 {
-    Q_ASSERT( pCanvas );
-    getCanvas()->doCommit();
+    Q_ASSERT( pView );
+    pView->getCanvas()->doCommit();
 }
 
 void EMainWindow::slotCancel()
 {
-    Q_ASSERT( pCanvas );
-    getCanvas()->doCancel();
-}
-
-void EMainWindow::slotZoom( WZoomWidget::FitTypes nFit, int nZoom )
-{
-    Q_ASSERT( pCanvas );
-
-    PGraphicsView *pView = getView();
-    if ( !pView ) return;
-
-    // get scale
-    qreal nScale;
-    switch ( nFit )
-    {
-    case WZoomWidget::FitWidth:
-    case WZoomWidget::FitHeight:
-    case WZoomWidget::FitAll:
-        // pView->fitInView( pView->getScene()->sceneRect() );
-    case WZoomWidget::FitIgnore:
-        nScale = qreal(nZoom) / 100;
-        break;
-    }
-
-    // apply scale
-    pView->setScale( nScale );
-
-    // let canvas know
-    // - this is one-way as a canvas does not change the zoom
-    pCanvas->setZoom( nZoom );
+    Q_ASSERT( pView );
+    pView->getCanvas()->doCancel();
 }
 
 void EMainWindow::slotPreferences()
@@ -1359,14 +1311,17 @@ void EMainWindow::slotFeedback()
  */
 void EMainWindow::slotCanvasFocused( int nIndex )
 {
-    // was a canvas active? 
-    // - disconnect canvas
-    if ( pCanvas  )
+    // was a view active? 
+    // - disconnect view
+    if ( pView  )
     {
+        PCanvas *pCanvas = pView->getCanvas();
         if ( pCanvas->isDrawing() ) pCanvas->doCancel();
+        disconnect( pZoom, SIGNAL(signalZoom(WZoomWidget::FitTypes,int)), pView, SLOT(slotZoomChanged(WZoomWidget::FitTypes,int)) );
+        disconnect( pView, SIGNAL(signalScaleChanged()), pCanvas, SLOT(slotZoomChanged()) );
         disconnect( pCanvas, SIGNAL(signalChangedFileName(const QString &)), this, SLOT(slotChangedFileName(const QString &)) );
         disconnect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
-        pCanvas = nullptr;
+        pView = nullptr;
     }
 
     // no tabs?
@@ -1400,9 +1355,15 @@ void EMainWindow::slotCanvasFocused( int nIndex )
     }
 
     // new current tab
-    // - set pCanvas and connect it
+    // - set view and connect it
     {
-        pCanvas = getCanvas( nIndex );
+        pView = getView( nIndex );
+        PCanvas *pCanvas = pView->getCanvas();
+        // zoom
+        connect( pZoom, SIGNAL(signalZoom(WZoomWidget::FitTypes,int)), pView, SLOT(slotZoomChanged(WZoomWidget::FitTypes,int)) );
+        connect( pView, SIGNAL(signalScaleChanged()), pCanvas, SLOT(slotZoomChanged()) );
+        pZoom->setEnabled( true );
+        // canvas
         connect( pCanvas, SIGNAL(signalChangedFileName(const QString &)), this, SLOT(slotChangedFileName(const QString &)) );
         connect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
         slotCanvasChangedState();
@@ -1424,7 +1385,9 @@ void EMainWindow::slotCanvasChangedState()
     // we can be called without a current canvas
     // ie when current selection in palette has changed
     // just ignore
-    if ( !pCanvas ) return;
+    if ( !pView ) return;
+
+    PCanvas *pCanvas = pView->getCanvas();
 
     // update tab text (file name with * when modified)
     doUpdateTabText();
@@ -1449,8 +1412,6 @@ void EMainWindow::slotCanvasChangedState()
 
     // status bar
     pModified->setPixmap( pCanvas->isModified() ? QPixmap( ":W/Draw16x16" ) : QPixmap() );
-    pZoom->setEnabled( true );
-    pZoom->setZoom( pCanvas->getZoom() );
 
     // paste
     // have we changed paste state
@@ -1474,25 +1435,25 @@ void EMainWindow::slotChangedFileName( const QString &s )
 
 void EMainWindow::slotScratch()
 {
-    if ( !pCanvas ) 
+    if ( !pView ) 
     {
         QMessageBox::information( this, tr("Scratch..."), tr("No active canvas.") );
         return;
     }
 
-    if ( !pCanvas->canCopy() )
+    if ( !pView->getCanvas()->canCopy() )
     {
         QMessageBox::information( this, tr("Scratch..."), tr("Nothing selected.") );
         return;
     }
 
-    pScratchTool->doAppend( pCanvas->getCopy() );
+    pScratchTool->doAppend( pView->getCanvas()->getCopy() );
 }
 
 void EMainWindow::slotScratch( const QImage &image )
 {
-    if ( !pCanvas ) return;
-    getCanvas()->doPaste( image );
+    if ( !pView ) return;
+    pView->getCanvas()->doPaste( image );
 }
 
 void EMainWindow::slotToolTriggered()
@@ -1577,7 +1538,7 @@ void EMainWindow::slotToolTriggered()
     int nCount = pTabWidget->count();
     for ( int n = 0; n < nCount; n++ )
     {
-        getCanvas( n )->setTool( nTool ); // canvas will cancel any drawing in this call
+        getView( n )->getCanvas()->setTool( nTool ); // canvas will cancel any drawing in this call
     }
 }
 

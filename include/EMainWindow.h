@@ -22,8 +22,8 @@ protected:
     void closeEvent( QCloseEvent *pEvent );
 
 private:
-    // current canvas or null
-    PCanvas *       pCanvas = nullptr;
+    // current view or null
+    PGraphicsView * pView = nullptr;
     PCanvas::Tools  nTool   = PCanvas::ToolSelectRectangle;
 
     // tool bar
@@ -203,10 +203,8 @@ private:
     void doCreateToolConfig();
     void doUpdateTabText();
 
-    // get current (or n) from tab widget
-    PGraphicsView *     getView( int n = -1 );
-    PGraphicsScene *    getScene( int n = -1 );
-    PCanvas *           getCanvas( int n = -1 );
+    // get view from tab widget
+    PGraphicsView *     getView( int n );
 
     // file names
     QString getFileNameUserFriendly( const QString &stringFileName, int nMaxPath = 50 );
@@ -241,7 +239,6 @@ private slots:
     void slotAutoCommit( bool );
     void slotCommit();
     void slotCancel();
-    void slotZoom( WZoomWidget::FitTypes nFit, int nZoom );
     void slotPreferences();
 
     void slotAbout();

@@ -9,6 +9,7 @@
 #include <PBrushToolBar.h>
 
 #include <PFillFlood.h>
+#include <PFillGradient.h>
 
 #include "EPreferencesDialog.h"
 
@@ -857,6 +858,7 @@ void EMainWindow::doCreateToolConfig()
             pWidgetToolConfig = new PSprayToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolDrawErase:
+            pWidgetToolConfig = new PEraseToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolDrawLine:
             break;
@@ -881,6 +883,7 @@ void EMainWindow::doCreateToolConfig()
             pWidgetToolConfig = new PFillFloodToolBar( pToolBarToolConfig );
             break;
         case PCanvas::ToolFillGradient:
+            pWidgetToolConfig = new PFillGradientToolBar( pToolBarToolConfig );
             break;
     }
     if ( pWidgetToolConfig ) pToolBarToolConfig->addWidget( pWidgetToolConfig );  

@@ -23,7 +23,7 @@ protected:
 
 private:
     // current view or null
-    PGraphicsView * pView = nullptr;
+    PGraphicsView * pView   = nullptr;
     PCanvas::Tools  nTool   = PCanvas::ToolSelectRectangle;
 
     // tool bar

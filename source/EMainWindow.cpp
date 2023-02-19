@@ -136,7 +136,6 @@ void EMainWindow::doInitActions()
         pActionSelectAll    = new QAction( tr("Select &All"), this );
         pActionSelectNone   = new QAction( tr("Select &None"), this );
         pActionAutoCommit   = new QAction( tr("Auto Commit"), this );
-        pActionCrop         = new QAction( QIcon( ":E/Crop" ), tr("Crop"), this );
         pActionCommit       = new QAction( QIcon( ":E/Commit" ), tr("Commit"), this );
         pActionCancel       = new QAction( QIcon( ":E/Cancel" ), tr("Cancel"), this );
         pActionPreferences  = new QAction( QIcon( ":W/Properties16x16" ), tr("Preferences"), this );
@@ -148,7 +147,6 @@ void EMainWindow::doInitActions()
         pActionRedo->setShortcut( QKeySequence::Redo );
         pActionCancel->setShortcut( QKeySequence::Cancel );
 
-        pActionCrop->setToolTip( tr("crop image to current selection") );
         pActionAutoCommit->setToolTip( tr("auto commit changes to canvas else allow manipulation before commit when possible") );
 
         pActionAutoCommit->setCheckable( true );
@@ -162,7 +160,6 @@ void EMainWindow::doInitActions()
         pActionUndoLevels->setEnabled( true );
         pActionSelectAll->setEnabled( false );
         pActionSelectNone->setEnabled( false );
-        pActionCrop->setEnabled( false );
         pActionAutoCommit->setEnabled( true );
         pActionCommit->setEnabled( false );
         pActionCancel->setEnabled( false );
@@ -176,7 +173,6 @@ void EMainWindow::doInitActions()
         connect( pActionUndoLevels, &QAction::triggered, this, &EMainWindow::slotUndoLevels );
         connect( pActionSelectAll, &QAction::triggered, this, &EMainWindow::slotSelectAll );
         connect( pActionSelectNone, &QAction::triggered, this, &EMainWindow::slotSelectNone );
-        connect( pActionCrop, &QAction::triggered, this, &EMainWindow::slotCrop );
         connect( pActionAutoCommit, &QAction::toggled, this, &EMainWindow::slotAutoCommit );
         connect( pActionCommit, &QAction::triggered, this, &EMainWindow::slotCommit );
         connect( pActionCancel, &QAction::triggered, this, &EMainWindow::slotCancel );
@@ -189,165 +185,152 @@ void EMainWindow::doInitActions()
         pActionZoomOut         = new QAction( QIcon( ":W/ZoomOut48x48" ), tr("Zoom &Out"), this );
         pActionZoomIn->setShortcut( QKeySequence::ZoomIn );
         pActionZoomOut->setShortcut( QKeySequence::ZoomOut );
-
-        // view -> tool bars
-        pActionToolFile     = new QAction( tr("File"), this );
-        pActionToolEdit     = new QAction( tr("Edit"), this );
-        pActionToolPen      = new QAction( tr("Pen"), this );
-        pActionToolBrush    = new QAction( tr("Brush"), this );
-        pActionToolFont     = new QAction( tr("Font"), this );
-
-        pActionToolFile->setCheckable( true );
-        pActionToolEdit->setCheckable( true );
-        pActionToolPen->setCheckable( true );
-        pActionToolBrush->setCheckable( true );
-        pActionToolFont->setCheckable( true );
-
-        pActionToolFile->setChecked( true );
-        pActionToolEdit->setChecked( true );
-        pActionToolPen->setChecked( true );
-        pActionToolBrush->setChecked( true );
-        pActionToolFont->setChecked( true );
-
-        // view -> docks
-        pActionDockTools        = new QAction( tr("Tools"), this );
-        pActionDockPaletteColor = new QAction( tr("Palette Color"), this );
-        pActionDockScratch      = new QAction( tr("Scratch Pad"), this );
-
-        pActionDockTools->setCheckable( true );
-        pActionDockPaletteColor->setCheckable( true );
-        pActionDockScratch->setCheckable( true );
-
-        pActionDockTools->setChecked( true );
-        pActionDockPaletteColor->setChecked( true );
-        pActionDockScratch->setChecked( true );
     }
 
     // TOOLS
     pActionGroupTools = new QActionGroup( this );
     // Default
     {
-        pActionSelectRectangle = new QAction( QIcon( ":E/SelectRectangle" ), tr(""), this );
+        pActionSelectRectangle = new QAction( QIcon( ":E/SelectRectangle" ), tr("Select using rectangle"), this );
         pActionSelectRectangle->setToolTip( tr("select using a rectangle") );
         pActionSelectRectangle->setCheckable( true );
         pActionGroupTools->addAction( pActionSelectRectangle );  
         connect( pActionSelectRectangle, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionSelectEllipse = new QAction( QIcon( ":E/SelectEllipse" ), tr(""), this );
+        pActionSelectEllipse = new QAction( QIcon( ":E/SelectEllipse" ), tr("Select using ellipse"), this );
         pActionSelectEllipse->setToolTip( tr("select using an ellipse") );
         pActionSelectEllipse->setCheckable( true );
         pActionGroupTools->addAction( pActionSelectEllipse );  
         connect( pActionSelectEllipse, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionSelectPolygon = new QAction( QIcon( ":E/SelectPolygon" ), tr(""), this );
+        pActionSelectPolygon = new QAction( QIcon( ":E/SelectPolygon" ), tr("Select using polygon"), this );
         pActionSelectPolygon->setToolTip( tr("select using a polygon") );
         pActionSelectPolygon->setCheckable( true );
         pActionGroupTools->addAction( pActionSelectPolygon );  
         connect( pActionSelectPolygon, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawFreeHand = new QAction( QIcon( ":E/FreeHand" ), tr(""), this );
+        pActionDrawFreeHand = new QAction( QIcon( ":E/FreeHand" ), tr("Free hand"), this );
         pActionDrawFreeHand->setToolTip( tr("Free Hand") );
         pActionDrawFreeHand->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawFreeHand );  
         connect( pActionDrawFreeHand, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawSpray = new QAction( QIcon( ":E/Spray" ), tr(""), this );
+        pActionDrawSpray = new QAction( QIcon( ":E/Spray" ), tr("Spray"), this );
         pActionDrawSpray->setToolTip( tr("Spray") );
         pActionDrawSpray->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawSpray );  
         connect( pActionDrawSpray, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawErase = new QAction( QIcon( ":E/Erase" ), tr(""), this );
+        pActionDrawErase = new QAction( QIcon( ":E/Erase" ), tr("Erase"), this );
         pActionDrawErase->setToolTip( tr("Erase") );
         pActionDrawErase->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawErase );  
         connect( pActionDrawErase, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawText = new QAction( QIcon( ":E/Text" ), tr(""), this );
+        pActionDrawText = new QAction( QIcon( ":E/Text" ), tr("Text"), this );
         pActionDrawText->setToolTip( tr("Text") );
         pActionDrawText->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawText );  
         connect( pActionDrawText, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawLine = new QAction( QIcon( ":E/Line" ), tr(""), this );
+        pActionDrawLine = new QAction( QIcon( ":E/Line" ), tr("Line"), this );
         pActionDrawLine->setToolTip( tr("straight line") );
         pActionDrawLine->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawLine );  
         connect( pActionDrawLine, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawRectangle = new QAction( QIcon( ":E/Rectangle" ), tr(""), this );
+        pActionDrawRectangle = new QAction( QIcon( ":E/Rectangle" ), tr("Rectangle"), this );
         pActionDrawRectangle->setToolTip( tr("rectangle") );
         pActionDrawRectangle->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawRectangle );  
         connect( pActionDrawRectangle, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawEllipse = new QAction( QIcon( ":E/Ellipse" ), tr(""), this );
+        pActionDrawEllipse = new QAction( QIcon( ":E/Ellipse" ), tr("Ellipse"), this );
         pActionDrawEllipse->setToolTip( tr("ellipse") );
         pActionDrawEllipse->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawEllipse );  
         connect( pActionDrawEllipse, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawPolygon = new QAction( QIcon( ":E/Polygon" ), tr(""), this );
+        pActionDrawPolygon = new QAction( QIcon( ":E/Polygon" ), tr("Polygon"), this );
         pActionDrawPolygon->setToolTip( tr("polygon") );
         pActionDrawPolygon->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawPolygon );  
         connect( pActionDrawPolygon, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawPolyline = new QAction( QIcon( ":E/Polyline" ), tr(""), this );
+        pActionDrawPolyline = new QAction( QIcon( ":E/Polyline" ), tr("Polyline"), this );
         pActionDrawPolyline->setToolTip( tr("polyline") );
         pActionDrawPolyline->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawPolyline );  
         connect( pActionDrawPolyline, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawRectangleFilled = new QAction( QIcon( ":E/RectangleFilled" ), tr(""), this );
+        pActionDrawRectangleFilled = new QAction( QIcon( ":E/RectangleFilled" ), tr("Rectangle filled"), this );
         pActionDrawRectangleFilled->setToolTip( tr("rectangle filled") );
         pActionDrawRectangleFilled->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawRectangleFilled );  
         connect( pActionDrawRectangleFilled, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawEllipseFilled = new QAction( QIcon( ":E/EllipseFilled" ), tr(""), this );
+        pActionDrawEllipseFilled = new QAction( QIcon( ":E/EllipseFilled" ), tr("Ellipse filled"), this );
         pActionDrawEllipseFilled->setToolTip( tr("ellipse filled") );
         pActionDrawEllipseFilled->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawEllipseFilled );  
         connect( pActionDrawEllipseFilled, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionDrawPolygonFilled = new QAction( QIcon( ":E/PolygonFilled" ), tr(""), this );
+        pActionDrawPolygonFilled = new QAction( QIcon( ":E/PolygonFilled" ), tr("Polygon filled"), this );
         pActionDrawPolygonFilled->setToolTip( tr("polygon filled") );
         pActionDrawPolygonFilled->setCheckable( true );
         pActionGroupTools->addAction( pActionDrawPolygonFilled );  
         connect( pActionDrawPolygonFilled, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionFillFlood = new QAction( QIcon( ":E/FillFlood" ), tr(""), this );
-        pActionFillFlood->setToolTip( tr("flood fill") );
+        pActionFillFlood = new QAction( QIcon( ":E/FillFlood" ), tr("Fill"), this );
+        pActionFillFlood->setToolTip( tr("fill") );
         pActionFillFlood->setCheckable( true );
         pActionGroupTools->addAction( pActionFillFlood );  
         connect( pActionFillFlood, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
-        pActionFillGradient = new QAction( QIcon( ":E/FillGradient" ), tr(""), this );
+        pActionFillGradient = new QAction( QIcon( ":E/FillGradient" ), tr("Fill with gradient"), this );
         pActionFillGradient->setToolTip( tr("gradient fill") );
         pActionFillGradient->setCheckable( true );
         pActionGroupTools->addAction( pActionFillGradient );  
         connect( pActionFillGradient, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
+
+        pActionSelectRectangle->setChecked( true );
     }
     // REGION
 
     {
-        pActionRegionFlipX      = new  QAction( tr("Flip X Axis"), this );
-        pActionRegionFlipY      = new  QAction( tr("Flip Y Axis"), this );
-        pActionRegionRotate     = new  QAction( tr("Rotate By.."), this );
-        pActionRegionLinear     = new  QAction( tr("Linear Transformation..."), this );
-        pActionRegionReset      = new  QAction( tr("Reset"), this );
-        pActionRegionExpand     = new  QAction( tr("Expand"), this );
-        pActionRegionDownscale  = new  QAction( tr("Downscale..."), this );
-        pActionRegionEdit       = new  QAction( tr("Edit Region"), this );
-        pActionRegionCrop       = new  QAction( tr("Crop"), this );
-        pActionRegionCreateMask = new  QAction( tr("Create mask of Region"), this );
-        pActionRegionMerge      = new  QAction( tr("Merge Region"), this );
-        pActionRegionAutoCrop   = new  QAction( tr("Auto Crop..."), this );
-        pActionRegionComplement = new  QAction( tr("Complement Region"), this );
-        pActionRegionDelimit    = new  QAction( tr("Delimit Region"), this );
-        pActionRegionOCR        = new  QAction( tr("OCR"), this );
+        pActionRegionCrop       = new QAction( QIcon( ":E/Crop" ), tr("Crop"), this );
+        pActionRegionScale      = new QAction( tr("Scale"), this );
+        pActionRegionFlipX      = new QAction( tr("Flip X Axis"), this );
+        pActionRegionFlipY      = new QAction( tr("Flip Y Axis"), this );
+        pActionRegionRotate     = new QAction( tr("Rotate By.."), this );
+        pActionRegionHeuristicMask    = new QAction( tr("Create Heuristic Mask"), this );
+        pActionRegionAlphaMask        = new QAction( tr("Create Alpha Mask"), this );
+
+        pActionRegionCrop->setToolTip( tr("crop image to current selection") );
+        pActionRegionScale->setToolTip( tr("compress or stretch image to be a new size") );
+        pActionRegionFlipX->setToolTip( tr("flip image on the X-axis") );
+        pActionRegionFlipY->setToolTip( tr("flip image on the Y-axis") );
+        pActionRegionRotate->setToolTip( tr("rotate image") );
+        pActionRegionHeuristicMask->setToolTip( tr("Creates a 1-bpp mask from the alpha buffer in this image. Returns a null image if the image's format is RGB32.") );
+        pActionRegionAlphaMask->setToolTip( tr("Creates a 1-bpp heuristic mask for this image.") );
+
+        pActionRegionCrop->setEnabled( false );
+        pActionRegionScale->setEnabled( false );
+        pActionRegionFlipX->setEnabled( false );
+        pActionRegionFlipY->setEnabled( false );
+        pActionRegionRotate->setEnabled( false );
+        pActionRegionHeuristicMask->setEnabled( false );
+        pActionRegionAlphaMask->setEnabled( false );
+
+        connect( pActionRegionCrop, &QAction::triggered, this, &EMainWindow::slotCrop );
+        connect( pActionRegionScale, &QAction::triggered, this, &EMainWindow::slotScale );
+        connect( pActionRegionFlipX, &QAction::triggered, this, &EMainWindow::slotFlipX );
+        connect( pActionRegionFlipY, &QAction::triggered, this, &EMainWindow::slotFlipY );
+        connect( pActionRegionRotate, &QAction::triggered, this, &EMainWindow::slotRotate );
+        connect( pActionRegionHeuristicMask, &QAction::triggered, this, &EMainWindow::slotCreateHeuristicMask );
+        connect( pActionRegionAlphaMask, &QAction::triggered, this, &EMainWindow::slotCreateAlphaMask );
     }
+
     // FILTERS
     {
         pActionFiltersInvert            = new QAction( tr("Invert"), this );
@@ -431,7 +414,6 @@ void EMainWindow::doInitMenus()
     pMenuEdit->addAction( pActionSelectAll );
     pMenuEdit->addAction( pActionSelectNone );
     pMenuEdit->addSeparator();
-    pMenuEdit->addAction( pActionCrop );
     pMenuEdit->addAction( pActionAutoCommit );
     pMenuEdit->addAction( pActionCommit );
     pMenuEdit->addAction( pActionCancel );
@@ -444,48 +426,40 @@ void EMainWindow::doInitMenus()
     pMenuView->addAction( pActionZoomOut );
     pMenuView->addSeparator();
 
-    pMenuToolBars = new QMenu( tr("Tool Bars...") );
-    pMenuToolBars->addAction( pActionToolFile  );
-    pMenuToolBars->addAction( pActionToolEdit  );
-    pMenuToolBars->addAction( pActionToolPen   );
-    pMenuToolBars->addAction( pActionToolBrush );
-    pMenuToolBars->addAction( pActionToolFont  );
-    pMenuView->addMenu( pMenuToolBars );
-
-    pMenuDocks = new QMenu( tr("Dock Windows...") );
-    pMenuDocks->addAction( pActionDockTools        );
-    pMenuDocks->addAction( pActionDockPaletteColor   );
-    pMenuDocks->addAction( pActionDockScratch      );
-    pMenuView->addMenu( pMenuDocks );
-
     // TOOLS
     pMenuTools = menuBar()->addMenu( tr("Tools") );
+    pMenuTools->addAction( pActionSelectRectangle );    
+    pMenuTools->addAction( pActionSelectEllipse );      
+    pMenuTools->addAction( pActionSelectPolygon );      
+    pMenuTools->addAction( pActionDrawFreeHand );       
+    pMenuTools->addAction( pActionDrawSpray );          
+    pMenuTools->addAction( pActionDrawErase );          
+    pMenuTools->addAction( pActionDrawText );           
+    pMenuTools->addAction( pActionDrawLine );           
+    pMenuTools->addAction( pActionDrawRectangle );      
+    pMenuTools->addAction( pActionDrawEllipse );        
+    pMenuTools->addAction( pActionDrawPolygon );        
+    pMenuTools->addAction( pActionDrawPolyline );       
+    pMenuTools->addAction( pActionDrawRectangleFilled );
+    pMenuTools->addAction( pActionDrawEllipseFilled );  
+    pMenuTools->addAction( pActionDrawPolygonFilled );  
+    pMenuTools->addAction( pActionFillFlood );          
+    pMenuTools->addAction( pActionFillGradient );       
 
     // REGION
     pMenuRegion = menuBar()->addMenu( tr("Region") );
+    pMenuRegion->addAction( pActionRegionCrop       );
+    pMenuRegion->addAction( pActionRegionScale       );
     pMenuRegion->addAction( pActionRegionFlipX      );
     pMenuRegion->addAction( pActionRegionFlipY      );
     pMenuRegion->addAction( pActionRegionRotate     );
-    pMenuRegion->addAction( pActionRegionLinear     );
-    pMenuRegion->addAction( pActionRegionReset      );
     pMenuRegion->addSeparator();
-    pMenuRegion->addAction( pActionRegionExpand     );
-    pMenuRegion->addAction( pActionRegionDownscale  );
-    pMenuRegion->addSeparator();
-    pMenuRegion->addAction( pActionRegionEdit       );
-    pMenuRegion->addAction( pActionRegionCrop       );
-    pMenuRegion->addSeparator();
-    pMenuRegion->addAction( pActionRegionCreateMask );
-    pMenuRegion->addAction( pActionRegionMerge      );
-    pMenuRegion->addSeparator();
-    pMenuRegion->addAction( pActionRegionAutoCrop   );
-    pMenuRegion->addAction( pActionRegionComplement );
-    pMenuRegion->addAction( pActionRegionDelimit    );
-    pMenuRegion->addSeparator();
-    pMenuRegion->addAction( pActionRegionOCR        );
+    pMenuRegion->addAction( pActionRegionHeuristicMask    );
+    pMenuRegion->addAction( pActionRegionAlphaMask        );
 
     // FILTERS
-    pMenuFilters = menuBar()->addMenu( tr("Filters") );
+/*
+    pMenuFilters = menuBar()->addMenu( tr("Filters") );     
     pMenuFilters->addAction( pActionFiltersInvert         );
     pMenuFilters->addAction( pActionFiltersGreyScale      );
     pMenuFilters->addAction( pActionFiltersNormalize      );
@@ -493,13 +467,13 @@ void EMainWindow::doInitMenus()
     pMenuFilters->addAction( pActionFiltersFloyd          );
     pMenuFilters->addAction( pActionFiltersQuantize       );
     pMenuFilters->addAction( pActionFiltersSolarize       );
-    pMenuFilters->addSeparator();
+    pMenuFilters->addSeparator();                           
     pMenuFilters->addAction( pActionFiltersSharpen        );
     pMenuFilters->addAction( pActionFiltersMerge          );
     pMenuFilters->addAction( pActionFiltersSmooth         );
     pMenuFilters->addAction( pActionFiltersDirectional    );
     pMenuFilters->addAction( pActionFiltersDespeckle      );
-    pMenuFilters->addSeparator();
+    pMenuFilters->addSeparator();                           
     pMenuFilters->addAction( pActionFiltersEdge           );
     pMenuFilters->addAction( pActionFiltersEmboss         );
     pMenuFilters->addAction( pActionFiltersOil            );
@@ -509,11 +483,21 @@ void EMainWindow::doInitMenus()
     pMenuFilters->addAction( pActionFiltersDistortion     );
     pMenuFilters->addAction( pActionFiltersPerspective    );
     pMenuFilters->addAction( pActionFiltersBlend          );
-    pMenuFilters->addSeparator();
+    pMenuFilters->addSeparator();                           
     pMenuFilters->addAction( pActionFiltersUser           );
-    pMenuFilters->addSeparator();
+    pMenuFilters->addSeparator();                           
     pMenuFilters->addAction( pActionFiltersRepeat         );
     pMenuFilters->addAction( pActionFiltersUndo           );
+*/
+
+    // window
+    pMenuWindow = menuBar()->addMenu( tr("&Window") );
+    // toggle toolbars
+    pMenuToolBars = new QMenu( tr("Tool Bars...") );
+    pMenuWindow->addMenu( pMenuToolBars );
+    // toggle docks
+    pMenuDocks = new QMenu( tr("Dock Windows...") );
+    pMenuWindow->addMenu( pMenuDocks );
 
     // HELP
     menuBar()->addSeparator();
@@ -536,6 +520,7 @@ void EMainWindow::doInitToolbar()
     pToolBar->addAction( pActionNew );
     pToolBar->addAction( pActionOpen );
     pToolBar->addAction( pActionSave );
+    pMenuToolBars->addAction( pToolBar->toggleViewAction() );
 
     pToolBar = addToolBar( tr("Edit") );
     pToolBar->setObjectName( "Edit" );
@@ -546,17 +531,22 @@ void EMainWindow::doInitToolbar()
     pToolBar->addAction( pActionRedo );
     pToolBar->addAction( pActionCommit );
     pToolBar->addAction( pActionCancel );
+    pMenuToolBars->addAction( pToolBar->toggleViewAction() );
 
     // pen and brush (fill)
     pToolBar = addToolBar( tr("Pen") );
     pToolBar->setObjectName( "Pen" );
     pToolBar->addWidget( new PPenToolBar( this ) );
+    pMenuToolBars->addAction( pToolBar->toggleViewAction() );
+
     pToolBar = addToolBar( tr("Brush") );
     pToolBar->setObjectName( "Brush" );
     pToolBar->addWidget( new PBrushToolBar( this ) );
+    pMenuToolBars->addAction( pToolBar->toggleViewAction() );
 
     pToolBarToolConfig = addToolBar( tr("Tool Config") );
     pToolBarToolConfig->setObjectName( "ToolConfig" );
+    pMenuToolBars->addAction( pToolBarToolConfig->toggleViewAction() );
 }
 
 void EMainWindow::doInitStatusBar()
@@ -595,9 +585,9 @@ void EMainWindow::doInitDockWindows()
 void EMainWindow::doInitDockTools()
 {
     // tools
-    QDockWidget *pDock = new QDockWidget( tr("Tools"), this );
-    pDock->setObjectName( "DockTools" );
-    pDock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+    pDockTools = new QDockWidget( tr("Tools"), this );
+    pDockTools->setObjectName( "DockTools" );
+    pDockTools->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
 
     // layout the tool buttons on a widget using a flow layout
     QToolButton *pButton;
@@ -605,7 +595,7 @@ void EMainWindow::doInitDockTools()
     QVBoxLayout *pLayoutTop;
     WIconLayout *pIconLayout;
 
-    pWidgetTools    = new QWidget( pDock );
+    pWidgetTools    = new QWidget( pDockTools );
     pLayoutTop      = new QVBoxLayout( pWidgetTools );
     pIconLayout     = new WIconLayout();
 
@@ -682,12 +672,14 @@ void EMainWindow::doInitDockTools()
     pLayoutTop->addStretch( 11 );
 
     // put the new widget into a scroll area so we get scroll bars as needed
-    QScrollArea *pScrollArea = new QScrollArea( pDock );
+    QScrollArea *pScrollArea = new QScrollArea( pDockTools );
     pScrollArea->setWidgetResizable( true );
     pScrollArea->setWidget( pWidgetTools );
 
-    pDock->setWidget( pScrollArea );
-    addDockWidget( Qt::LeftDockWidgetArea, pDock );
+    pDockTools->setWidget( pScrollArea );
+    addDockWidget( Qt::LeftDockWidgetArea, pDockTools );
+
+    pMenuDocks->addAction( pDockTools->toggleViewAction() );
 }
 
 void EMainWindow::doInitDockColors()
@@ -698,21 +690,21 @@ void EMainWindow::doInitDockColors()
     pPaletteColor = new WPaletteColorWidget( pDockColors );
     pDockColors->setWidget( pPaletteColor );
     addDockWidget( Qt::LeftDockWidgetArea, pDockColors );
-    // viewMenu->addAction(dock->toggleViewAction());
 
     slotPaletteColorWindowTitle();
     connect( g_PaletteColors, SIGNAL(signalModifiedFileName()), SLOT(slotPaletteColorWindowTitle()) );
+
+    pMenuDocks->addAction( pDockColors->toggleViewAction() );
 }
 
 void EMainWindow::doInitDockScratch()
 {
-    QDockWidget *pDock = new QDockWidget( tr("Scratch"), this );
-    pDock->setObjectName( "DockScratch" );
-    pDock->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
-    pScratchTool = new WScratchTool( pDock );
-    pDock->setWidget( pScratchTool );
-    addDockWidget( Qt::LeftDockWidgetArea, pDock );
-    // viewMenu->addAction(dock->toggleViewAction());
+    QDockWidget *pDockScratch = new QDockWidget( tr("Scratch"), this );
+    pDockScratch->setObjectName( "DockScratch" );
+    pDockScratch->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+    pScratchTool = new WScratchTool( pDockScratch );
+    pDockScratch->setWidget( pScratchTool );
+    addDockWidget( Qt::LeftDockWidgetArea, pDockScratch );
 
     // enable when;
     // - when canvas has selection (selection only)     
@@ -723,6 +715,8 @@ void EMainWindow::doInitDockScratch()
     pScratchTool->doEnableAdd(); 
     connect( pScratchTool, SIGNAL(signalAdd()), SLOT(slotScratch()) );
     connect( pScratchTool, SIGNAL(signalPaste(const QImage &)), SLOT(slotScratch(const QImage &)) );
+
+    pMenuDocks->addAction( pDockScratch->toggleViewAction() );
 }
 
 void EMainWindow::doInitCentralArea()
@@ -1004,7 +998,7 @@ bool EMainWindow::slotNewWithSize()
     QSize size( 1024, 768 );                                                                       
     {                                                                                              
         bool bOk = false;                                                                          
-        size = WSizeDialogI::getSize( &bOk, size, this );                                          
+        size = WSizeDialogInt::getSize( &bOk, size, this );                                          
         if ( !bOk ) return false;                                                                  
     }                                                                                              
                                                                                                    
@@ -1108,6 +1102,9 @@ bool EMainWindow::slotClose( bool bPrompt )
 {
     Q_ASSERT( pView );
 
+    // copy pointer to view because pView will be processed and then set to null when removed from tab.
+    PGraphicsView *p = pView;
+
     // Get rid of any temp shapes and any handles.
     if ( pView->getCanvas()->isDrawing() ) pView->getCanvas()->doCancel();
 
@@ -1117,13 +1114,12 @@ bool EMainWindow::slotClose( bool bPrompt )
     // this does NOT delete widget
     pTabWidget->removeTab( pTabWidget->currentIndex() );
 
-    // At this point the scene just has just a background and a canvas (no temp shapes and no handles).
+    // At this point the scene just has a background and a canvas (no temp shapes and no handles).
     // So its ok for the scene to silently delete the background and scene.
 
     // delete widget
-    delete pView->getScene(); 
-    delete pView;
-    pView = nullptr;
+    delete p->getScene(); 
+    delete p;
 
     return true;
 }
@@ -1212,12 +1208,6 @@ void EMainWindow::slotSelectNone()
     pView->getCanvas()->doSelectNone();
 }
 
-void EMainWindow::slotCrop()
-{
-    Q_ASSERT( pView );
-    pView->getCanvas()->doCrop();
-}
-
 void EMainWindow::slotAutoCommit( bool b )
 {
     int nCount = pTabWidget->count();
@@ -1242,6 +1232,81 @@ void EMainWindow::slotCancel()
 void EMainWindow::slotPreferences()
 {
     EPreferencesDialog::doPreferences( this );
+}
+
+void EMainWindow::slotCrop()
+{
+    Q_ASSERT( pView );
+    pView->getCanvas()->doCrop();
+}
+
+void EMainWindow::slotScale()
+{
+    Q_ASSERT( pView );
+    PCanvas *pCanvas = pView->getCanvas();
+
+    QSize size = pCanvas->getImage().size();
+
+    {                                                                                              
+        bool bOk = false;                                                                          
+        size = WSizeDialogInt::getSize( &bOk, size, this );                                          
+        if ( !bOk ) return;                                                                  
+    }                                                                                              
+                                                                                                   
+    pView->getCanvas()->doScale( size.width(), size.height() );
+}
+
+void EMainWindow::slotFlipX()
+{
+    Q_ASSERT( pView );
+    pView->getCanvas()->doFlipX();
+}
+
+void EMainWindow::slotFlipY()
+{
+    Q_ASSERT( pView );
+    pView->getCanvas()->doFlipY();
+}
+
+void EMainWindow::slotRotate()
+{
+    Q_ASSERT( pView );
+    bool bOk;
+    int n = QInputDialog::getInt( this, tr("Rotate"), tr("Degrees:"), 90, 1, 359, 1, &bOk );  
+    if ( !bOk ) return;
+    pView->getCanvas()->doRotate( n );
+}
+
+void EMainWindow::slotCreateHeuristicMask()
+{
+    Q_ASSERT( pView );
+    PCanvas *pCanvas = pView->getCanvas();
+
+    QImage image;
+    if ( pCanvas->canCopy() )
+        image = pCanvas->getCopy().createHeuristicMask();
+    else
+        image = pCanvas->getImage().createHeuristicMask();
+
+    slotNew();
+    Q_ASSERT( pView );
+    pView->getCanvas()->setImage( image );
+}
+
+void EMainWindow::slotCreateAlphaMask()
+{
+    Q_ASSERT( pView );
+    PCanvas *pCanvas = pView->getCanvas();
+
+    QImage image;
+    if ( pCanvas->canCopy() )
+        image = pCanvas->getCopy().createAlphaMask();
+    else
+        image = pCanvas->getImage().createAlphaMask();
+
+    slotNew();
+    Q_ASSERT( pView );
+    pView->getCanvas()->setImage( image );
 }
 
 void EMainWindow::slotAbout()
@@ -1330,6 +1395,7 @@ void EMainWindow::slotCanvasFocused( int nIndex )
     if ( pView  )
     {
         PCanvas *pCanvas = pView->getCanvas();
+
         if ( pCanvas->isDrawing() ) pCanvas->doCancel();
         disconnect( pZoom, SIGNAL(signalZoom(WZoomWidget::FitTypes,int)), pView, SLOT(slotZoomChanged(WZoomWidget::FitTypes,int)) );
         disconnect( pView, SIGNAL(signalScaleChanged()), pCanvas, SLOT(slotZoomChanged()) );
@@ -1357,11 +1423,19 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         pActionRedo->setEnabled( false ); 
         pActionSelectAll->setEnabled( false ); 
         pActionSelectNone->setEnabled( false ); 
-        pActionCrop->setEnabled( false ); 
         pActionCommit->setEnabled( false ); 
         pActionCancel->setEnabled( false ); 
 
         // view
+
+        // region
+        pActionRegionCrop->setEnabled( false ); 
+        pActionRegionScale->setEnabled( false ); 
+        pActionRegionFlipX->setEnabled( false ); 
+        pActionRegionFlipY->setEnabled( false ); 
+        pActionRegionRotate->setEnabled( false ); 
+        pActionRegionHeuristicMask->setEnabled( false ); 
+        pActionRegionAlphaMask->setEnabled( false ); 
 
         // status bar
         pZoom->setEnabled( false );
@@ -1374,6 +1448,14 @@ void EMainWindow::slotCanvasFocused( int nIndex )
     {
         pView = getView( nIndex );
         PCanvas *pCanvas = pView->getCanvas();
+
+        pActionRegionScale->setEnabled( true ); 
+        pActionRegionFlipX->setEnabled( true ); 
+        pActionRegionFlipY->setEnabled( true ); 
+        pActionRegionRotate->setEnabled( true ); 
+        pActionRegionHeuristicMask->setEnabled( true ); 
+        pActionRegionAlphaMask->setEnabled( true ); 
+
         // zoom
         connect( pZoom, SIGNAL(signalZoom(WZoomWidget::FitTypes,int)), pView, SLOT(slotZoomChanged(WZoomWidget::FitTypes,int)) );
         connect( pView, SIGNAL(signalScaleChanged()), pCanvas, SLOT(slotZoomChanged()) );
@@ -1422,9 +1504,11 @@ void EMainWindow::slotCanvasChangedState()
     pActionRedo->setEnabled( pCanvas->canRedo() ); 
     pActionSelectAll->setEnabled( true ); 
     pActionSelectNone->setEnabled( pCanvas->hasSelection() ); 
-    pActionCrop->setEnabled( pCanvas->hasSelection() ); 
     pActionCommit->setEnabled( pCanvas->canCommit() ); 
     pActionCancel->setEnabled( pCanvas->canCancel() ); 
+
+    // region
+    pActionRegionCrop->setEnabled( pCanvas->canCrop() ); 
 
     // status bar
     pModified->setPixmap( pCanvas->isModified() ? QPixmap( ":W/Draw16x16" ) : QPixmap() );

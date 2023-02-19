@@ -36,9 +36,11 @@ private:
     QToolButton *   pTabCloseButton;
 
     // docks
-    QDockWidget *          pDockColors;
-    WPaletteColorWidget *  pPaletteColor;
-    WScratchTool *         pScratchTool;
+    QDockWidget *           pDockTools;
+    QDockWidget *           pDockScratch;
+    QDockWidget *           pDockColors;
+    WPaletteColorWidget *   pPaletteColor;
+    WScratchTool *          pScratchTool;
 
     // status bar
     QLabel *        pMessage;
@@ -71,7 +73,6 @@ private:
     QAction *pActionUndoLevels;
     QAction *pActionSelectAll;
     QAction *pActionSelectNone;
-    QAction *pActionCrop;
     QAction *pActionAutoCommit;
     QAction *pActionCommit;
     QAction *pActionCancel;
@@ -80,18 +81,6 @@ private:
     QMenu *pMenuView;
     QAction *pActionZoomIn;
     QAction *pActionZoomOut;
-    // view -> tool bars
-    QMenu *pMenuToolBars;
-    QAction *pActionToolFile;
-    QAction *pActionToolEdit;
-    QAction *pActionToolPen;
-    QAction *pActionToolBrush;
-    QAction *pActionToolFont;
-    // view -> docks
-    QMenu *pMenuDocks;
-    QAction *pActionDockTools;
-    QAction *pActionDockPaletteColor;
-    QAction *pActionDockScratch;
     // tools
     QMenu *pMenuTools;
     QMenu *pMenuSelections;
@@ -124,21 +113,13 @@ private:
 
     // region
     QMenu *pMenuRegion;
+    QAction *pActionRegionCrop;
+    QAction *pActionRegionScale;
     QAction *pActionRegionFlipX;
     QAction *pActionRegionFlipY;
     QAction *pActionRegionRotate;
-    QAction *pActionRegionLinear;
-    QAction *pActionRegionReset;
-    QAction *pActionRegionExpand;
-    QAction *pActionRegionDownscale;
-    QAction *pActionRegionEdit;
-    QAction *pActionRegionCrop;
-    QAction *pActionRegionCreateMask;
-    QAction *pActionRegionMerge;
-    QAction *pActionRegionAutoCrop;
-    QAction *pActionRegionComplement;
-    QAction *pActionRegionDelimit;
-    QAction *pActionRegionOCR;
+    QAction *pActionRegionHeuristicMask;
+    QAction *pActionRegionAlphaMask;
     // filters
     QMenu *pMenuFilters;
     QAction *pActionFiltersInvert;    
@@ -165,6 +146,14 @@ private:
     QAction *pActionFiltersUser;    
     QAction *pActionFiltersRepeat;    
     QAction *pActionFiltersUndo;    
+
+    // window
+    QMenu *pMenuWindow;
+    // tool bars
+    QMenu *pMenuToolBars;
+    // docks
+    QMenu *pMenuDocks;
+    
     // help
     QMenu *pMenuHelp;
     QAction *pActionAbout;      
@@ -237,11 +226,18 @@ private slots:
     void slotUndoLevels();
     void slotSelectAll();
     void slotSelectNone();
-    void slotCrop();
     void slotAutoCommit( bool );
     void slotCommit();
     void slotCancel();
     void slotPreferences();
+
+    void slotCrop();
+    void slotScale();
+    void slotFlipX();
+    void slotFlipY();
+    void slotRotate();
+    void slotCreateHeuristicMask();
+    void slotCreateAlphaMask();
 
     void slotAbout();
     void slotAboutCBD();

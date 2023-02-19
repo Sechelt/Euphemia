@@ -20,6 +20,7 @@
 	<file alias="FillGradient">images/FillGradient.svg</file>
 	<file alias="Feedback">images/Feedback.svg</file>
 	<file alias="Euphemia">images/Euphemia.svg</file>
+	<file alias="Crop">images/crop.png</file>
 	<file alias="Commit">images/Commit.png</file>
 	<file alias="Cancel">images/Cancel.png</file>
 	<file alias="PeterHarvey">images/PeterHarvey.jpg</file>

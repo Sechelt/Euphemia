@@ -136,6 +136,7 @@ void EMainWindow::doInitActions()
         pActionSelectAll    = new QAction( tr("Select &All"), this );
         pActionSelectNone   = new QAction( tr("Select &None"), this );
         pActionAutoCommit   = new QAction( tr("Auto Commit"), this );
+        pActionCrop         = new QAction( QIcon( ":E/Crop" ), tr("Crop"), this );
         pActionCommit       = new QAction( QIcon( ":E/Commit" ), tr("Commit"), this );
         pActionCancel       = new QAction( QIcon( ":E/Cancel" ), tr("Cancel"), this );
         pActionPreferences  = new QAction( QIcon( ":W/Properties16x16" ), tr("Preferences"), this );
@@ -147,6 +148,7 @@ void EMainWindow::doInitActions()
         pActionRedo->setShortcut( QKeySequence::Redo );
         pActionCancel->setShortcut( QKeySequence::Cancel );
 
+        pActionCrop->setToolTip( tr("crop image to current selection") );
         pActionAutoCommit->setToolTip( tr("auto commit changes to canvas else allow manipulation before commit when possible") );
 
         pActionAutoCommit->setCheckable( true );
@@ -160,6 +162,7 @@ void EMainWindow::doInitActions()
         pActionUndoLevels->setEnabled( true );
         pActionSelectAll->setEnabled( false );
         pActionSelectNone->setEnabled( false );
+        pActionCrop->setEnabled( false );
         pActionAutoCommit->setEnabled( true );
         pActionCommit->setEnabled( false );
         pActionCancel->setEnabled( false );
@@ -173,6 +176,7 @@ void EMainWindow::doInitActions()
         connect( pActionUndoLevels, &QAction::triggered, this, &EMainWindow::slotUndoLevels );
         connect( pActionSelectAll, &QAction::triggered, this, &EMainWindow::slotSelectAll );
         connect( pActionSelectNone, &QAction::triggered, this, &EMainWindow::slotSelectNone );
+        connect( pActionCrop, &QAction::triggered, this, &EMainWindow::slotCrop );
         connect( pActionAutoCommit, &QAction::toggled, this, &EMainWindow::slotAutoCommit );
         connect( pActionCommit, &QAction::triggered, this, &EMainWindow::slotCommit );
         connect( pActionCancel, &QAction::triggered, this, &EMainWindow::slotCancel );
@@ -427,6 +431,7 @@ void EMainWindow::doInitMenus()
     pMenuEdit->addAction( pActionSelectAll );
     pMenuEdit->addAction( pActionSelectNone );
     pMenuEdit->addSeparator();
+    pMenuEdit->addAction( pActionCrop );
     pMenuEdit->addAction( pActionAutoCommit );
     pMenuEdit->addAction( pActionCommit );
     pMenuEdit->addAction( pActionCancel );
@@ -1207,6 +1212,12 @@ void EMainWindow::slotSelectNone()
     pView->getCanvas()->doSelectNone();
 }
 
+void EMainWindow::slotCrop()
+{
+    Q_ASSERT( pView );
+    pView->getCanvas()->doCrop();
+}
+
 void EMainWindow::slotAutoCommit( bool b )
 {
     int nCount = pTabWidget->count();
@@ -1346,6 +1357,7 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         pActionRedo->setEnabled( false ); 
         pActionSelectAll->setEnabled( false ); 
         pActionSelectNone->setEnabled( false ); 
+        pActionCrop->setEnabled( false ); 
         pActionCommit->setEnabled( false ); 
         pActionCancel->setEnabled( false ); 
 
@@ -1410,6 +1422,7 @@ void EMainWindow::slotCanvasChangedState()
     pActionRedo->setEnabled( pCanvas->canRedo() ); 
     pActionSelectAll->setEnabled( true ); 
     pActionSelectNone->setEnabled( pCanvas->hasSelection() ); 
+    pActionCrop->setEnabled( pCanvas->hasSelection() ); 
     pActionCommit->setEnabled( pCanvas->canCommit() ); 
     pActionCancel->setEnabled( pCanvas->canCancel() ); 
 

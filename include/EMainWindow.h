@@ -71,6 +71,7 @@ private:
     QAction *pActionUndoLevels;
     QAction *pActionSelectAll;
     QAction *pActionSelectNone;
+    QAction *pActionCrop;
     QAction *pActionAutoCommit;
     QAction *pActionCommit;
     QAction *pActionCancel;
@@ -236,6 +237,7 @@ private slots:
     void slotUndoLevels();
     void slotSelectAll();
     void slotSelectNone();
+    void slotCrop();
     void slotAutoCommit( bool );
     void slotCommit();
     void slotCancel();

@@ -19,7 +19,8 @@
 
 #define PZOOM_MIN 10
 #define PZOOM_MAX 300
-#define PZOOM_INC 10
+#define PZOOM_PAGE 10
+#define PZOOM_INC 1
 
 EMainWindow::EMainWindow( QWidget *pWidget ) 
     : QMainWindow( pWidget )
@@ -183,8 +184,15 @@ void EMainWindow::doInitActions()
     {
         pActionZoomIn          = new QAction( QIcon( ":W/ZoomIn48x48" ), tr("Zoom &In"), this );
         pActionZoomOut         = new QAction( QIcon( ":W/ZoomOut48x48" ), tr("Zoom &Out"), this );
-        pActionZoomIn->setShortcut( QKeySequence::ZoomIn );
+        pActionZoomIn->setShortcut( QKeySequence::ZoomIn ); // this is actually translates into Ctrl+Shft++ for some reason
+        // pActionZoomIn->setShortcut( QString( "Ctrl++" ) );
         pActionZoomOut->setShortcut( QKeySequence::ZoomOut );
+
+        pActionZoomIn->setEnabled( false ); 
+        pActionZoomOut->setEnabled( false ); 
+
+        connect( pActionZoomIn, &QAction::triggered, this, &EMainWindow::slotZoomIn );
+        connect( pActionZoomOut, &QAction::triggered, this, &EMainWindow::slotZoomOut );
     }
 
     // TOOLS
@@ -568,9 +576,12 @@ void EMainWindow::doInitStatusBar()
     // Zoom (scale) is managed in the view
     // - here we add a tool bar widget which will get connect/disconnected to the view
     pZoom = new WZoomWidget( statusBar() );
+    pZoom->setVisibleFit( false );
     pZoom->setMin( PZOOM_MIN );
     pZoom->setMax( PZOOM_MAX );
+    pZoom->setPage( PZOOM_PAGE );
     pZoom->setInc( PZOOM_INC );
+
     statusBar()->addPermanentWidget( pZoom, 0 );
     pZoom->setEnabled( false );
 }
@@ -978,7 +989,7 @@ QString EMainWindow::getFilePath( const QString &stringFileName )
  */
 bool EMainWindow::slotNew()
 {
-    PGraphicsScene *pScene = new PGraphicsScene( QRectF( 0, 0, 1024, 768 ) );
+    PGraphicsScene *pScene = new PGraphicsScene( QRectF( 0, 0, 1024, 100 ) );
     PGraphicsView *pView = new PGraphicsView( pScene, pTabWidget );
     PCanvas *pCanvas = pScene->getCanvas();
 
@@ -1234,6 +1245,22 @@ void EMainWindow::slotPreferences()
     EPreferencesDialog::doPreferences( this );
 }
 
+void EMainWindow::slotZoomIn()
+{
+    Q_ASSERT( pView );
+    int nZoom = pView->getZoom();
+    if ( nZoom <= 290 ) nZoom += 10;
+    pView->slotZoomChanged( WZoomWidget::FitIgnore, nZoom );
+}
+
+void EMainWindow::slotZoomOut()
+{
+    Q_ASSERT( pView );
+    int nZoom = pView->getZoom();
+    if ( nZoom >= 20 ) nZoom -= 10;
+    pView->slotZoomChanged( WZoomWidget::FitIgnore, nZoom );
+}
+
 void EMainWindow::slotCrop()
 {
     Q_ASSERT( pView );
@@ -1397,8 +1424,10 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         PCanvas *pCanvas = pView->getCanvas();
 
         if ( pCanvas->isDrawing() ) pCanvas->doCancel();
+
         disconnect( pZoom, SIGNAL(signalZoom(WZoomWidget::FitTypes,int)), pView, SLOT(slotZoomChanged(WZoomWidget::FitTypes,int)) );
-        disconnect( pView, SIGNAL(signalScaleChanged()), pCanvas, SLOT(slotZoomChanged()) );
+        disconnect( pView, SIGNAL(signalZoomChanged(WZoomWidget::FitTypes,int)), pZoom, SLOT(slotRefresh(WZoomWidget::FitTypes,int)) );
+
         disconnect( pCanvas, SIGNAL(signalChangedFileName(const QString &)), this, SLOT(slotChangedFileName(const QString &)) );
         disconnect( pCanvas, SIGNAL(signalChangedState()), this, SLOT(slotCanvasChangedState()) );
         pView = nullptr;
@@ -1427,6 +1456,8 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         pActionCancel->setEnabled( false ); 
 
         // view
+        pActionZoomIn->setEnabled( false ); 
+        pActionZoomOut->setEnabled( false ); 
 
         // region
         pActionRegionCrop->setEnabled( false ); 
@@ -1449,6 +1480,9 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         pView = getView( nIndex );
         PCanvas *pCanvas = pView->getCanvas();
 
+        pActionZoomIn->setEnabled( true ); 
+        pActionZoomOut->setEnabled( true ); 
+
         pActionRegionScale->setEnabled( true ); 
         pActionRegionFlipX->setEnabled( true ); 
         pActionRegionFlipY->setEnabled( true ); 
@@ -1457,8 +1491,11 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         pActionRegionAlphaMask->setEnabled( true ); 
 
         // zoom
+        // - the view holds the current zoom/scale for the canvas 
+        // - requests to change zoom go to view and then view notifies (if change) via signalZoomChanged
+        pZoom->slotRefresh( pView->getZoomFit(), pView->getZoom() );
         connect( pZoom, SIGNAL(signalZoom(WZoomWidget::FitTypes,int)), pView, SLOT(slotZoomChanged(WZoomWidget::FitTypes,int)) );
-        connect( pView, SIGNAL(signalScaleChanged()), pCanvas, SLOT(slotZoomChanged()) );
+        connect( pView, SIGNAL(signalZoomChanged(WZoomWidget::FitTypes,int)), pZoom, SLOT(slotRefresh(WZoomWidget::FitTypes,int)) );
         pZoom->setEnabled( true );
         // canvas
         connect( pCanvas, SIGNAL(signalChangedFileName(const QString &)), this, SLOT(slotChangedFileName(const QString &)) );

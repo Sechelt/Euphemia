@@ -83,13 +83,9 @@ private:
     QAction *pActionZoomOut;
     // tools
     QMenu *pMenuTools;
-    QMenu *pMenuSelections;
-    QMenu *pMenuFreeHand;
-    QMenu *pMenuShapes;
-    QMenu *pMenuFills;
 
-    QAction *pActionToolsFatBitEditor;
-    QAction *pActionMagnifier;
+    // QAction *pActionToolsFatBitEditor;
+    // QAction *pActionMagnifier;
 
     // tools
     QActionGroup *pActionGroupTools;
@@ -230,6 +226,9 @@ private slots:
     void slotCommit();
     void slotCancel();
     void slotPreferences();
+
+    void slotZoomIn();
+    void slotZoomOut();
 
     void slotCrop();
     void slotScale();

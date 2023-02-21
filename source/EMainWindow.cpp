@@ -989,7 +989,7 @@ QString EMainWindow::getFilePath( const QString &stringFileName )
  */
 bool EMainWindow::slotNew()
 {
-    PGraphicsScene *pScene = new PGraphicsScene( QRectF( 0, 0, 1024, 100 ) );
+    PGraphicsScene *pScene = new PGraphicsScene( QRectF( 0, 0, 1024, 768 ) );
     PGraphicsView *pView = new PGraphicsView( pScene, pTabWidget );
     PCanvas *pCanvas = pScene->getCanvas();
 

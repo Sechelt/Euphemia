@@ -31,7 +31,7 @@ EMainWindow::EMainWindow( QWidget *pWidget )
     if ( windowHandle() ) windowHandle()->setIcon( QIcon( ":E/Euphemia" ) );
     setWindowIcon( QIcon( ":E/Euphemia" ) );
 
-    setWindowTitle( APP_NAME );
+    setWindowTitle( APP_NAME " - " APP_VER " - " APP_DESC );
 
     doInitActions();
     doInitMenus();

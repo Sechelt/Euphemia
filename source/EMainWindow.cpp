@@ -7,6 +7,7 @@
 
 #include <PPenToolBar.h>
 #include <PBrushToolBar.h>
+#include <PColorControl.h>
 
 #include <PFillFlood.h>
 #include <PFillGradient.h>
@@ -698,8 +699,27 @@ void EMainWindow::doInitDockColors()
     pDockColors = new QDockWidget( tr("Colors - User defined"), this );
     pDockColors->setObjectName( "DockColors" );
     pDockColors->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
-    pPaletteColor = new WPaletteColorWidget( pDockColors );
-    pDockColors->setWidget( pPaletteColor );
+
+    // add color control to color palette widget
+    QWidget *pWidget = new QWidget( pDockColors );
+    {
+        QVBoxLayout *pVLayout = new QVBoxLayout( pWidget );
+        QHBoxLayout *pHLayout = new QHBoxLayout();
+
+        PColorToolBar *pColorControl = new PColorToolBar( pWidget );
+        pHLayout->addWidget( pColorControl );
+        pHLayout->addStretch( 10 );
+
+        pVLayout->addLayout( pHLayout );
+         
+        pPaletteColor = new WPaletteColorWidget( pWidget );
+        pVLayout->addWidget( pPaletteColor );
+
+        connect( pPaletteColor, SIGNAL(signalSelected(const QColor &)), pColorControl, SLOT(slotChange(const QColor &)) );
+        connect( pColorControl, SIGNAL(signalChanged(const QColor &)), pPaletteColor, SLOT(slotRefresh(const QColor &)) );
+    }
+
+    pDockColors->setWidget( pWidget );
     addDockWidget( Qt::LeftDockWidgetArea, pDockColors );
 
     slotPaletteColorWindowTitle();

@@ -83,11 +83,15 @@
             GUID="{69AED95F-34F1-4EB1-9479-BF490B14E8CE}">
             <F N="common.pri"/>
             <F N="config.pri"/>
+            <F N="CREDITS"/>
             <F N="defines.pri"/>
+            <F N="Euphemia-1.0.spec"/>
             <F N="Euphemia.pri"/>
             <F N="Euphemia.pro"/>
             <F N="LICENSE"/>
+            <F N="MakeTarBall.sh"/>
             <F N="README.md"/>
+            <F N="README.txt"/>
         </Folder>
     </Files>
     <List Name="RTE">

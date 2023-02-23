@@ -1,15 +1,14 @@
 #ifndef H_EMainWindow
 #define H_EMainWindow
 
-// docks
 #include <WPaletteColorWidget.h>
 #include <WScratchTool.h>
-// status bar
 #include <WCoordWidget.h>
 #include <WZoomWidget.h>
 
 #include <PGraphicsView.h>
 #include <PCanvas.h>
+#include <PMagnifierWidget.h>
 
 class EMainWindow : public QMainWindow
 {
@@ -37,10 +36,15 @@ private:
 
     // docks
     QDockWidget *           pDockTools;
+
     QDockWidget *           pDockScratch;
+    WScratchTool *          pScratchTool;
+
     QDockWidget *           pDockColors;
     WPaletteColorWidget *   pPaletteColor;
-    WScratchTool *          pScratchTool;
+
+    QDockWidget *           pDockMagnifier;
+    PMagnifierWidget *      pMagnifier;
 
     // status bar
     QLabel *        pMessage;
@@ -89,6 +93,7 @@ private:
 
     // tools
     QActionGroup *pActionGroupTools;
+    QAction *pActionMagnifierSelection;
     QAction *pActionSelectRectangle;
     QAction *pActionSelectEllipse;
     QAction *pActionSelectPolygon;
@@ -173,8 +178,9 @@ private:
     void doInitStatusBar();
     void doInitDockWindows();
     void doInitDockTools();
-    void doInitDockColors();
     void doInitDockScratch();
+    void doInitDockColors();
+    void doInitDockMagnifier();
 
     // recent file names
     void doSaveRecentFiles();

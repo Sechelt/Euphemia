@@ -200,6 +200,12 @@ void EMainWindow::doInitActions()
     pActionGroupTools = new QActionGroup( this );
     // Default
     {
+        pActionMagnifierSelection = new QAction( QIcon( ":P/MagnifierSelection" ), tr("Select area to magnify"), this );
+        pActionMagnifierSelection->setToolTip( tr("select area to magnify") );
+        pActionMagnifierSelection->setCheckable( true );
+        pActionGroupTools->addAction( pActionMagnifierSelection );  
+        connect( pActionMagnifierSelection, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
+
         pActionSelectRectangle = new QAction( QIcon( ":E/SelectRectangle" ), tr("Select using rectangle"), this );
         pActionSelectRectangle->setToolTip( tr("select using a rectangle") );
         pActionSelectRectangle->setCheckable( true );
@@ -437,6 +443,7 @@ void EMainWindow::doInitMenus()
 
     // TOOLS
     pMenuTools = menuBar()->addMenu( tr("Tools") );
+    pMenuTools->addAction( pActionMagnifierSelection );    
     pMenuTools->addAction( pActionSelectRectangle );    
     pMenuTools->addAction( pActionSelectEllipse );      
     pMenuTools->addAction( pActionSelectPolygon );      
@@ -592,6 +599,7 @@ void EMainWindow::doInitDockWindows()
     doInitDockTools();
     doInitDockScratch(); 
     doInitDockColors();
+    doInitDockMagnifier();
 }
 
 void EMainWindow::doInitDockTools()
@@ -610,6 +618,10 @@ void EMainWindow::doInitDockTools()
     pWidgetTools    = new QWidget( pDockTools );
     pLayoutTop      = new QVBoxLayout( pWidgetTools );
     pIconLayout     = new WIconLayout();
+
+    pButton = new QToolButton( pWidgetTools );
+    pButton->setDefaultAction( pActionMagnifierSelection );
+    pIconLayout->addWidget( pButton );
 
     pButton = new QToolButton( pWidgetTools );
     pButton->setDefaultAction( pActionSelectRectangle );
@@ -694,6 +706,28 @@ void EMainWindow::doInitDockTools()
     pMenuDocks->addAction( pDockTools->toggleViewAction() );
 }
 
+void EMainWindow::doInitDockScratch()
+{
+    QDockWidget *pDockScratch = new QDockWidget( tr("Scratch"), this );
+    pDockScratch->setObjectName( "DockScratch" );
+    pDockScratch->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+    pScratchTool = new WScratchTool( pDockScratch );
+    pDockScratch->setWidget( pScratchTool );
+    addDockWidget( Qt::LeftDockWidgetArea, pDockScratch );
+
+    // enable when;
+    // - when canvas has selection (selection only)     
+    // - clipboard has image (clipboard image)          
+    // - when canvas (all canvas)                       
+    //
+    // Prompt will decide (or cancel).
+    pScratchTool->doEnableAdd(); 
+    connect( pScratchTool, SIGNAL(signalAdd()), SLOT(slotScratch()) );
+    connect( pScratchTool, SIGNAL(signalPaste(const QImage &)), SLOT(slotScratch(const QImage &)) );
+
+    pMenuDocks->addAction( pDockScratch->toggleViewAction() );
+}
+
 void EMainWindow::doInitDockColors()
 {
     pDockColors = new QDockWidget( tr("Colors - User defined"), this );
@@ -728,26 +762,18 @@ void EMainWindow::doInitDockColors()
     pMenuDocks->addAction( pDockColors->toggleViewAction() );
 }
 
-void EMainWindow::doInitDockScratch()
+void EMainWindow::doInitDockMagnifier()
 {
-    QDockWidget *pDockScratch = new QDockWidget( tr("Scratch"), this );
-    pDockScratch->setObjectName( "DockScratch" );
-    pDockScratch->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
-    pScratchTool = new WScratchTool( pDockScratch );
-    pDockScratch->setWidget( pScratchTool );
-    addDockWidget( Qt::LeftDockWidgetArea, pDockScratch );
+    pDockMagnifier = new QDockWidget( tr("Magnifier"), this );
+    pDockMagnifier->setObjectName( "DockMagnifier" );
+    pDockMagnifier->setAllowedAreas( Qt::AllDockWidgetAreas );
 
-    // enable when;
-    // - when canvas has selection (selection only)     
-    // - clipboard has image (clipboard image)          
-    // - when canvas (all canvas)                       
-    //
-    // Prompt will decide (or cancel).
-    pScratchTool->doEnableAdd(); 
-    connect( pScratchTool, SIGNAL(signalAdd()), SLOT(slotScratch()) );
-    connect( pScratchTool, SIGNAL(signalPaste(const QImage &)), SLOT(slotScratch(const QImage &)) );
+    pMagnifier = new PMagnifierWidget( pDockMagnifier );
 
-    pMenuDocks->addAction( pDockScratch->toggleViewAction() );
+    pDockMagnifier->setWidget( pMagnifier );
+    addDockWidget( Qt::RightDockWidgetArea, pDockMagnifier );
+
+    pMenuDocks->addAction( pDockMagnifier->toggleViewAction() );
 }
 
 void EMainWindow::doInitCentralArea()
@@ -875,6 +901,8 @@ void EMainWindow::doCreateToolConfig()
     // - not all tools will have a config tool bar
     switch ( nTool )
     {
+        case PCanvas::ToolMagnifierSelection:
+            break;
         case PCanvas::ToolSelectRectangle:
             break;
         case PCanvas::ToolSelectEllipse:
@@ -1445,6 +1473,8 @@ void EMainWindow::slotCanvasFocused( int nIndex )
 
         if ( pCanvas->isDrawing() ) pCanvas->doCancel();
 
+        pMagnifier->setView( nullptr );
+
         disconnect( pZoom, SIGNAL(signalZoom(WZoomWidget::FitTypes,int)), pView, SLOT(slotZoomChanged(WZoomWidget::FitTypes,int)) );
         disconnect( pView, SIGNAL(signalZoomChanged(WZoomWidget::FitTypes,int)), pZoom, SLOT(slotRefresh(WZoomWidget::FitTypes,int)) );
 
@@ -1509,6 +1539,8 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         pActionRegionRotate->setEnabled( true ); 
         pActionRegionHeuristicMask->setEnabled( true ); 
         pActionRegionAlphaMask->setEnabled( true ); 
+
+        pMagnifier->setView( pView );
 
         // zoom
         // - the view holds the current zoom/scale for the canvas 
@@ -1615,7 +1647,11 @@ void EMainWindow::slotScratch( const QImage &image )
 
 void EMainWindow::slotToolTriggered()
 {
-    if ( pActionSelectRectangle->isChecked() )     
+    if ( pActionMagnifierSelection->isChecked() )     
+    {
+        nTool = PCanvas::ToolMagnifierSelection;
+    }
+    else if ( pActionSelectRectangle->isChecked() )     
     {
         nTool = PCanvas::ToolSelectRectangle;
     }
@@ -1697,6 +1733,8 @@ void EMainWindow::slotToolTriggered()
     {
         getView( n )->getCanvas()->setTool( nTool ); // canvas will cancel any drawing in this call
     }
+
+    if ( nTool == PCanvas::ToolMagnifierSelection ) pDockMagnifier->show();
 }
 
 void EMainWindow::slotPaletteColorWindowTitle()

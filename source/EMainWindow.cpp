@@ -8,7 +8,7 @@
 #include <PPenToolBar.h>
 #include <PBrushToolBar.h>
 #include <PColorControl.h>
-
+#include <PPanner.h>
 #include <PFillFlood.h>
 #include <PFillGradient.h>
 
@@ -200,12 +200,6 @@ void EMainWindow::doInitActions()
     pActionGroupTools = new QActionGroup( this );
     // Default
     {
-        pActionMagnifierSelection = new QAction( QIcon( ":P/MagnifierSelection" ), tr("Select area to magnify"), this );
-        pActionMagnifierSelection->setToolTip( tr("select area to magnify") );
-        pActionMagnifierSelection->setCheckable( true );
-        pActionGroupTools->addAction( pActionMagnifierSelection );  
-        connect( pActionMagnifierSelection, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
-
         pActionSelectRectangle = new QAction( QIcon( ":E/SelectRectangle" ), tr("Select using rectangle"), this );
         pActionSelectRectangle->setToolTip( tr("select using a rectangle") );
         pActionSelectRectangle->setCheckable( true );
@@ -307,6 +301,12 @@ void EMainWindow::doInitActions()
         pActionFillGradient->setCheckable( true );
         pActionGroupTools->addAction( pActionFillGradient );  
         connect( pActionFillGradient, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
+
+        pActionMagnifierSelection = new QAction( QIcon( ":P/MagnifierSelection" ), tr("Select area to magnify"), this );
+        pActionMagnifierSelection->setToolTip( tr("select area to magnify") );
+        pActionMagnifierSelection->setCheckable( true );
+        pActionGroupTools->addAction( pActionMagnifierSelection );  
+        connect( pActionMagnifierSelection, SIGNAL(triggered()), SLOT(slotToolTriggered()) );
 
         pActionSelectRectangle->setChecked( true );
     }
@@ -443,7 +443,6 @@ void EMainWindow::doInitMenus()
 
     // TOOLS
     pMenuTools = menuBar()->addMenu( tr("Tools") );
-    pMenuTools->addAction( pActionMagnifierSelection );    
     pMenuTools->addAction( pActionSelectRectangle );    
     pMenuTools->addAction( pActionSelectEllipse );      
     pMenuTools->addAction( pActionSelectPolygon );      
@@ -461,6 +460,7 @@ void EMainWindow::doInitMenus()
     pMenuTools->addAction( pActionDrawPolygonFilled );  
     pMenuTools->addAction( pActionFillFlood );          
     pMenuTools->addAction( pActionFillGradient );       
+    pMenuTools->addAction( pActionMagnifierSelection );    
 
     // REGION
     pMenuRegion = menuBar()->addMenu( tr("Region") );
@@ -600,6 +600,7 @@ void EMainWindow::doInitDockWindows()
     doInitDockScratch(); 
     doInitDockColors();
     doInitDockMagnifier();
+    doInitDockPanner();
 }
 
 void EMainWindow::doInitDockTools()
@@ -618,10 +619,6 @@ void EMainWindow::doInitDockTools()
     pWidgetTools    = new QWidget( pDockTools );
     pLayoutTop      = new QVBoxLayout( pWidgetTools );
     pIconLayout     = new WIconLayout();
-
-    pButton = new QToolButton( pWidgetTools );
-    pButton->setDefaultAction( pActionMagnifierSelection );
-    pIconLayout->addWidget( pButton );
 
     pButton = new QToolButton( pWidgetTools );
     pButton->setDefaultAction( pActionSelectRectangle );
@@ -689,6 +686,10 @@ void EMainWindow::doInitDockTools()
 
     pButton = new QToolButton( pWidgetTools );
     pButton->setDefaultAction( pActionFillGradient );
+    pIconLayout->addWidget( pButton );
+
+    pButton = new QToolButton( pWidgetTools );
+    pButton->setDefaultAction( pActionMagnifierSelection );
     pIconLayout->addWidget( pButton );
 
     pLayoutTop->addLayout( pIconLayout );
@@ -765,6 +766,7 @@ void EMainWindow::doInitDockColors()
 void EMainWindow::doInitDockMagnifier()
 {
     pDockMagnifier = new QDockWidget( tr("Magnifier"), this );
+    pDockMagnifier->setWindowFlags( Qt::WindowStaysOnTopHint ); // this is supposed to be set by default (lost during state restore)
     pDockMagnifier->setObjectName( "DockMagnifier" );
     pDockMagnifier->setAllowedAreas( Qt::AllDockWidgetAreas );
 
@@ -774,6 +776,20 @@ void EMainWindow::doInitDockMagnifier()
     addDockWidget( Qt::RightDockWidgetArea, pDockMagnifier );
 
     pMenuDocks->addAction( pDockMagnifier->toggleViewAction() );
+}
+
+void EMainWindow::doInitDockPanner()
+{
+    pDockPanner = new QDockWidget( tr("Panner"), this );
+    pDockPanner->setObjectName( "DockPanner" );
+    pDockPanner->setAllowedAreas( Qt::AllDockWidgetAreas );
+
+    // contents;
+    // - second view on canvas or null
+
+    addDockWidget( Qt::RightDockWidgetArea, pDockPanner );
+
+    pMenuDocks->addAction( pDockPanner->toggleViewAction() );
 }
 
 void EMainWindow::doInitCentralArea()
@@ -1472,6 +1488,7 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         PCanvas *pCanvas = pView->getCanvas();
 
         if ( pCanvas->isDrawing() ) pCanvas->doCancel();
+        if ( pDockPanner->widget() ) delete pDockPanner->widget();
 
         pMagnifier->setView( nullptr );
 
@@ -1540,6 +1557,7 @@ void EMainWindow::slotCanvasFocused( int nIndex )
         pActionRegionHeuristicMask->setEnabled( true ); 
         pActionRegionAlphaMask->setEnabled( true ); 
 
+        pDockPanner->setWidget( new PPanner( pView->getScene(), pDockPanner ) );
         pMagnifier->setView( pView );
 
         // zoom

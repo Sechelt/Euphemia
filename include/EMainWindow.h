@@ -46,6 +46,8 @@ private:
     QDockWidget *           pDockMagnifier;
     PMagnifierWidget *      pMagnifier;
 
+    QDockWidget *           pDockPanner;                    /*!< has a second PGraphicsView on canvas for panning large images  */
+
     // status bar
     QLabel *        pMessage;
     QLabel *        pModified;
@@ -93,7 +95,6 @@ private:
 
     // tools
     QActionGroup *pActionGroupTools;
-    QAction *pActionMagnifierSelection;
     QAction *pActionSelectRectangle;
     QAction *pActionSelectEllipse;
     QAction *pActionSelectPolygon;
@@ -111,6 +112,7 @@ private:
     QAction *pActionDrawPolygonFilled;
     QAction *pActionFillFlood;
     QAction *pActionFillGradient;
+    QAction *pActionMagnifierSelection;
 
     // region
     QMenu *pMenuRegion;
@@ -181,6 +183,7 @@ private:
     void doInitDockScratch();
     void doInitDockColors();
     void doInitDockMagnifier();
+    void doInitDockPanner();
 
     // recent file names
     void doSaveRecentFiles();

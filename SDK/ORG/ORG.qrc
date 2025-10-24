@@ -1,0 +1,13 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/ORG">
+	<file alias="Camera">images/Camera.png</file>
+	<file alias="Man">images/Man.png</file>
+	<file alias="Woman">images/Woman.png</file>
+	<file alias="PersonPhoto">images/PersonPhoto.png</file>
+	<file alias="Person">images/PersonIcon.png</file>
+	<file alias="OrgChart">images/OrgChart48x48.png</file>
+	<file alias="ReportsTo">images/ReportsTo48x48.png</file>
+	<file alias="TaskedTo">images/TaskedTo48x48.png</file>
+</qresource>
+</RCC>
+

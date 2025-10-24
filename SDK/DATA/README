@@ -1,0 +1,124 @@
+CREATE TABLE DataTypes
+(
+  ProfileID integer NOT NULL,
+  TYPE_NAME varchar(50) NOT NULL,
+  DATA_TYPE varchar(50) NOT NULL,
+  COLUMN_SIZE varchar(50) NOT NULL,
+  LITERAL_PREFIX varchar(50),
+  LITERAL_SUFFIX varchar(50),
+  CREATE_PARAMS varchar(255),
+  NULLABLE varchar(50) NOT NULL,
+  CASE_SENSITIVE varchar(50) NOT NULL,
+  SEARCHABLE varchar(50) NOT NULL,
+  UNSIGNED_ATTRIBUTE varchar(50) NOT NULL,
+  FIXED_PREC_SCALE varchar(50) NOT NULL,
+  AUTO_UNIQUE_VALUE varchar(50) NOT NULL,
+  LOCAL_TYPE_NAME varchar(50),
+  MINIMUM_SCALE varchar(50),
+  MAXIMUM_SCALE varchar(50),
+  SQL_DATA_TYPE varchar(50) NOT NULL,
+  SQL_DATETIME_SUB varchar(50),
+  NUM_PREC_RADIX varchar(50),
+  INTERVAL_PRECISION varchar(50),
+  Desc longvarchar(32768),
+  Syntax varchar(255)
+);
+CREATE INDEX idxDataTypes1 ON DataTypes
+(
+  ProfileID
+);
+CREATE TABLE Info
+(
+  ProfileID integer NOT NULL,
+  Info varchar(50) NOT NULL,
+  Value longvarchar(32768) NOT NULL,
+  PRIMARY KEY (ProfileID,Info)
+);
+CREATE UNIQUE INDEX idxInfo1 ON Info
+(
+  ProfileID,
+  Info
+);
+CREATE INDEX idxInfo2 ON Info
+(
+  ProfileID
+);
+CREATE TABLE Functions
+(
+  ProfileID integer NOT NULL,
+  Function varchar(50) NOT NULL,
+  Supported bit DEFAULT 1 NOT NULL,
+  Compliance varchar(50) NOT NULL,
+  PRIMARY KEY (ProfileID,Function)
+);
+CREATE UNIQUE INDEX idxFunctions1 ON Functions
+(
+  Function,
+  ProfileID
+);
+CREATE INDEX idxFunctions2 ON Functions
+(
+  ComplianceID
+);
+CREATE TABLE Profiles
+(
+  ID integer NOT NULL,
+  OS varchar(50) NOT NULL,
+  OS_VER varchar(50) NOT NULL,
+  SQL_ODBC_VER varchar(50) NOT NULL,
+  SQL_DM_VER varchar(50) NOT NULL,
+  SQL_DRIVER_NAME varchar(50) NOT NULL,
+  SQL_DRIVER_VER varchar(50) NOT NULL,
+  SQL_DRIVER_ODBC_VER varchar(50) NOT NULL,
+  SQL_DBMS_NAME varchar(50) NOT NULL,
+  SQL_DBMS_VER varchar(50) NOT NULL,
+  PRIMARY KEY (ID)
+);
+CREATE UNIQUE INDEX idxProfiles1 ON Profiles
+(
+  OS,
+  OS_VER,
+  SQL_ODBC_VER,
+  SQL_DM_VER,
+  SQL_DRIVER_NAME,
+  SQL_DRIVER_VER,
+  SQL_DRIVER_ODBC_VER,
+  SQL_DBMS_NAME,
+  SQL_DBMS_VER
+);
+CREATE TABLE AttrDbc
+(
+  ProfileID integer NOT NULL,
+  Attr varchar(50) NOT NULL,
+  Value longvarchar(32768) NOT NULL,
+  PRIMARY KEY (ProfileID,Attr)
+);
+CREATE UNIQUE INDEX idxAttributesDbc1 ON AttrDbc
+(
+  Attr,
+  ProfileID
+);
+CREATE INDEX idxAttrDbc2 ON AttrDbc
+(
+  ProfileID
+);
+CREATE TABLE HYC00
+(
+  ProfileID integer NOT NULL,
+  Function varchar(50) NOT NULL,
+  Option1 varchar(50),
+  Option2 varchar(50),
+  Option3 varchar(50),
+  Context varchar(255),
+  PRIMARY KEY (ProfileID,Function)
+);
+CREATE UNIQUE INDEX idxHYC001 ON HYC00
+(
+  FunctionID,
+  Function
+);
+CREATE INDEX idxHYC002 ON HYC00
+(
+  ProfileID
+);
+

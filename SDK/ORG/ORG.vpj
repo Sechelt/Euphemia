@@ -1,0 +1,106 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"ORG.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{26FF02B5-2831-457B-9BBF-97E2FB9E39D2}">
+            <F N="include/ORGDiagram.h"/>
+            <F N="include/ORGDiagramEditorWidget.h"/>
+            <F N="include/ORGDiagramPalWidget.h"/>
+            <F N="include/ORGLayout.h"/>
+            <F N="include/ORGObjectEmploymentWidget.h"/>
+            <F N="include/ORGObjectNameWidget.h"/>
+            <F N="include/ORGObjectProjectWidget.h"/>
+            <F N="include/ORGPerson.h"/>
+            <F N="include/ORGReportsTo.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{1A582F1D-B703-4006-A7AF-9F904D0DBADE}">
+            <F N="source/LibInfo.h"/>
+            <F N="source/ORGDiagram.cpp"/>
+            <F N="source/ORGDiagramEditorWidget.cpp"/>
+            <F N="source/ORGDiagramPalWidget.cpp"/>
+            <F N="source/ORGLayout.cpp"/>
+            <F N="source/ORGObjectEmploymentWidget.cpp"/>
+            <F N="source/ORGObjectNameWidget.cpp"/>
+            <F N="source/ORGObjectProjectWidget.cpp"/>
+            <F N="source/ORGPerson.cpp"/>
+            <F N="source/ORGReportsTo.cpp"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{BB137647-CA15-4078-82B1-0EB0BF733012}">
+            <F N="ORG.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{0EBE0E5E-3513-4205-B06F-611B01F2C353}">
+            <F N="images/Group48x48.png"/>
+            <F N="images/OrgChart48x48.png"/>
+            <F N="images/Person48x48.png"/>
+            <F N="images/ReportsTo48x48.png"/>
+            <F N="images/TaskedTo48x48.png"/>
+        </Folder>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{FA3E37B2-5850-49B2-88BF-E119F36C2EC7}">
+            <F N="ORG.pro"/>
+            <F N="README"/>
+        </Folder>
+    </Files>
+</Project>

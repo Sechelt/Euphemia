@@ -1,0 +1,23 @@
+/* XPM */
+static const char * xpmInheritance16x16[] = {
+"16 16 4 1",
+" 	c none",
+".	c #A0A72007F0FB",
+"X	c #000000000000",
+"o	c #FFFFFFFFFFFF",
+"      .....     ",
+"    ........    ",
+"   ...XXXX...   ",
+"  ..XXooooXX..  ",
+" ..XooooooooX.. ",
+" .XXooooooooXX. ",
+" .XooooooooooX. ",
+"..XooooooooooX..",
+"..XooooooooooX..",
+".XXooooooooooXX.",
+".XXooooooooooXX.",
+".XXooooooooooXX.",
+".XXooooooooooXX.",
+".XXXXXXXXXXXXXX.",
+"................",
+"................"};

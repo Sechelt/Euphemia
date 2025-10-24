@@ -1,0 +1,28 @@
+/* XPM */
+static const char *xpmPaste16x16[]={
+"16 16 8 1",
+". c None",
+"# c #000000",
+"f c #2f2f2f",
+"b c #9f9f9f",
+"e c #a3ffa3",
+"a c #bfbf00",
+"c c #dbdbdb",
+"d c #ffffff",
+".......##.......",
+".######aa#####..",
+"#bbbb#a##a#bbb#.",
+"#cbb#aaaaaa#bb#.",
+"#cbb########bb#.",
+"#cbbbb#dddd##b#.",
+"#cbbbb#dddd#e##.",
+"#cbbbb#dffd#de##",
+"#cbbbb#dddd#####",
+"#cbbbb#dffddbbb#",
+"#cbbbb#dddddede#",
+"#cbbbb#dfffdffe#",
+"#cbbbb#dddedeee#",
+"#bbbbb#dffdfffe#",
+".######dedeeeee#",
+"......##########"};
+

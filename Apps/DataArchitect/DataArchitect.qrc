@@ -1,0 +1,19 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/DA">
+	<file alias="Diagram">images/Diagram.png</file>
+	<file alias="Form">images/Form64x128.png</file>
+	<file alias="OrgChart">images/OrgChart.png</file>
+	<file alias="ObjectNew">images/ObjectNew.png</file>
+	<file alias="Logic">images/LogicDiagram.png</file>
+	<file alias="ER-LogicalModel">images/ER-LogicalModel.png</file>
+	<file alias="ER-PhysicalModel">images/ER-PhysicalModel.png</file>
+	<file alias="SQLEditor">images/SQLEditor64x128.png</file>
+	<file alias="DataArchitectIco">images/DataArchitect.ico</file>
+	<file alias="DataArchitectLarge">images/DataArchitectLarge.png</file>
+	<file alias="DataArchitectSmall">images/DataArchitectSmall.png</file>
+	<file alias="DataArchitectSplash">images/SplashBackgroundLogo.png</file>
+	<file alias="Feedback">images/Feedback.png</file>
+	<file alias="Workspace">images/Workspace.png</file>
+</qresource>
+</RCC>
+

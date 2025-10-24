@@ -1,0 +1,26 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/LM"> 
+	<file alias="Association16x16">resources/Association16x16.png</file>
+	<file alias="AssociationLink16x16">resources/AssociationLink16x16.png</file>
+	<file alias="Attribute16x16">resources/Attribute16x16.png</file>
+	<file alias="Class16x16">resources/Class16x16.png</file>
+	<file alias="ClassTemplate16x16">resources/ClassTemplate16x16.png</file>
+	<file alias="DataItem16x16">resources/DataItem16x16.xpm</file>
+	<file alias="Entity16x16">resources/Entity16x16.png</file>
+	<file alias="ID16x16">resources/ID16x16.png</file>
+	<file alias="Inheritance16x16">resources/Inheritance16x16.png</file>
+	<file alias="InheritanceLink16x16">resources/InheritanceLink16x16.png</file>
+	<file alias="LMDomain16x16">resources/LMDomain16x16.png</file>
+	<file alias="LogicalModel16x16">resources/LogicalModel16x16.png</file>
+	<file alias="LogicalModel22x22">resources/LogicalModel22x22.png</file>
+	<file alias="LogicalModel32x32">resources/LogicalModel32x32.png</file>
+	<file alias="LogicalModel48x48">resources/LogicalModel48x48.png</file>
+	<file alias="Note16x16">resources/Note16x16.png</file>
+	<file alias="Relationship16x16">resources/Relationship16x16.png</file>
+	<file alias="Relationship48x48">resources/Relationship48x48.png</file>
+	<file alias="Rule16x16">resources/Rule16x16.xpm</file>
+	<file alias="Rule32x32">resources/Rule32x32.png</file>
+	<file alias="Rule48x48">resources/Rule48x48.png</file>
+</qresource>
+</RCC>
+

@@ -1,0 +1,97 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"AppData.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{8866596E-3551-43DE-BA7D-1C9514271B77}">
+            <F N="include/AD.h"/>
+            <F N="include/ADDocument.h"/>
+            <F N="include/ADExport.h"/>
+            <F N="include/ADObject.h"/>
+            <F N="include/ADObjectPath.h"/>
+            <F N="include/ADObjectReference.h"/>
+            <F N="include/ADObjectSelectionManager.h"/>
+            <F N="include/ADTransaction.h"/>
+            <F N="include/ADValidation.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{00C593A1-BD9E-41EB-95D6-BC8314C83776}">
+            <F N="source/ADDocument.cpp"/>
+            <F N="source/ADObject.cpp"/>
+            <F N="source/ADObjectPath.cpp"/>
+            <F N="source/ADObjectReference.cpp"/>
+            <F N="source/ADObjectSelectionManager.cpp"/>
+            <F N="source/ADTransaction.cpp"/>
+            <F N="source/ADValidation.cpp"/>
+            <F N="source/LibInfo.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{9B5A3D71-DD14-422C-8C24-3FFE76B8B24B}"/>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{EC962E6E-8808-4D4A-B218-B011632E5D88}"></Folder>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{BAD58D69-ADCD-451B-98C9-6A65B446F22A}">
+            <F N="AD.pro"/>
+        </Folder>
+    </Files>
+    <List Name="RTE">
+    </List>
+</Project>

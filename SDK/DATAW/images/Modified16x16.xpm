@@ -1,0 +1,42 @@
+/* XPM */
+static const char *xpmDraw16x16[] = {
+/* width height num_colors chars_per_pixel */
+"   16    16       17            1",
+/* colors */
+". c #000000",
+"# c #000080",
+"a c #0000ff",
+"b c #008000",
+"c c #00ff00",
+"d c #00ffff",
+"e c #588098",
+"f c #800000",
+"g c #808000",
+"h c #808080",
+"i c none",
+"j c #c0c0c0",
+"k c #cfdbe3",
+"l c #d0dce0",
+"m c #ff0000",
+"n c #ffff00",
+"o c #ffffff",
+/* pixels */
+"iiiiiiiiiiiiiiii",
+"iiiiiiiiiiffiiii",
+"iiiiiiiii.fmfiii",
+"iiiiiiii..mfffii",
+"iiiiiii.h..fffhi",
+"iiiiii.hjh...hii",
+"iiiii.n.hhh.hiii",
+"iiii.nnn.h.hiiii",
+"iii.nnnhn.hiiiii",
+"ii.onnhn.hiiiiii",
+"i.ooohn.hiiiiiii",
+"i.ooho.hiiiiiiii",
+"i..oo.hiiiiiiiii",
+"i....iiiiiiiiiii",
+"iiiiiiiiiiiiiiii",
+"iiiiiiiiiiiiiiii"
+};
+
+

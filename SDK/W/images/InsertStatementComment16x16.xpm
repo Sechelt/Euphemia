@@ -1,0 +1,25 @@
+/* XPM */
+static const char * xpmInsertStatementComment16x16[] = {
+/* width height ncolors cpp [x_hot y_hot] */
+"16 16 3 1 0 0",
+/* colors */
+" 	s none	m none	c none",
+".	c #4D534D534D53",
+"X	s iconColor4	m white	c green",
+/* pixels */
+"                ",
+"       .        ",
+"                ",
+"  .... .........",
+"                ",
+"   XXXX    XXX  ",
+"  XX     XX     ",
+"   XXXX  XX     ",
+"      XX XX     ",
+"   XXXX    XXX  ",
+"                ",
+"  .... .........",
+"                ",
+"  .... ..       ",
+"                ",
+"       .        "};

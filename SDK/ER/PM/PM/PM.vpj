@@ -1,0 +1,165 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"PM.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{1B2F4EDD-15CE-41FE-939B-471E15AEDAB0}">
+            <F N="source/LibInfo.h"/>
+            <F N="include/PMAdditionalChecksWidget.h"/>
+            <F N="include/PMColumn.h"/>
+            <F N="include/PMColumnChecksWidget.h"/>
+            <F N="include/PMColumnsUsedWidget.h"/>
+            <F N="include/PMColumnsWidget.h"/>
+            <F N="include/PMDataTypeArgsWidget.h"/>
+            <F N="include/PMDataTypeWidget.h"/>
+            <F N="include/PMDDLManager.h"/>
+            <F N="include/PMDDLWidget.h"/>
+            <F N="include/PMDomain.h"/>
+            <F N="include/PMDomainChecksWidget.h"/>
+            <F N="include/PMIndex.h"/>
+            <F N="include/PMIndexColumn.h"/>
+            <F N="include/PMIndexColumnsWidget.h"/>
+            <F N="include/PMIndexesWidget.h"/>
+            <F N="include/PMInherit.h"/>
+            <F N="include/PMKey.h"/>
+            <F N="include/PMKeyOptionsWidget.h"/>
+            <F N="include/PMKeysWidget.h"/>
+            <F N="include/PMLine.h"/>
+            <F N="include/PMModel.h"/>
+            <F N="include/PMModelDisplayWidget.h"/>
+            <F N="include/PMNotesWidget.h"/>
+            <F N="include/PMObject.h"/>
+            <F N="include/PMProcedure.h"/>
+            <F N="include/PMProcedureWidget.h"/>
+            <F N="include/PMRectangle.h"/>
+            <F N="include/PMReference.h"/>
+            <F N="include/PMReferenceColumn.h"/>
+            <F N="include/PMReferenceColumnsWidget.h"/>
+            <F N="include/PMReferenceWidget.h"/>
+            <F N="include/PMRule.h"/>
+            <F N="include/PMRulesUsedWidget.h"/>
+            <F N="include/PMRuleWidget.h"/>
+            <F N="include/PMSequence.h"/>
+            <F N="include/PMSequenceWidget.h"/>
+            <F N="include/PMTableBase.h"/>
+            <F N="include/PMTableDerived.h"/>
+            <F N="include/PMTableNormal.h"/>
+            <F N="include/PMView.h"/>
+            <F N="include/PMViewColumn.h"/>
+            <F N="include/PMViewWidget.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{16460CC9-EC65-42A3-BE66-A49004F18FFB}">
+            <F N="source/PMAdditionalChecksWidget.cpp"/>
+            <F N="source/PMColumn.cpp"/>
+            <F N="source/PMColumnChecksWidget.cpp"/>
+            <F N="source/PMColumnsUsedWidget.cpp"/>
+            <F N="source/PMColumnsWidget.cpp"/>
+            <F N="source/PMDataTypeArgsWidget.cpp"/>
+            <F N="source/PMDataTypeWidget.cpp"/>
+            <F N="source/PMDDLManager.cpp"/>
+            <F N="source/PMDDLWidget.cpp"/>
+            <F N="source/PMDomain.cpp"/>
+            <F N="source/PMDomainChecksWidget.cpp"/>
+            <F N="source/PMIndex.cpp"/>
+            <F N="source/PMIndexColumn.cpp"/>
+            <F N="source/PMIndexColumnsWidget.cpp"/>
+            <F N="source/PMIndexesWidget.cpp"/>
+            <F N="source/PMInherit.cpp"/>
+            <F N="source/PMKey.cpp"/>
+            <F N="source/PMKeyOptionsWidget.cpp"/>
+            <F N="source/PMKeysWidget.cpp"/>
+            <F N="source/PMLine.cpp"/>
+            <F N="source/PMModel.cpp"/>
+            <F N="source/PMModelDisplayWidget.cpp"/>
+            <F N="source/PMNotesWidget.cpp"/>
+            <F N="source/PMObject.cpp"/>
+            <F N="source/PMProcedure.cpp"/>
+            <F N="source/PMProcedureWidget.cpp"/>
+            <F N="source/PMRectangle.cpp"/>
+            <F N="source/PMReference.cpp"/>
+            <F N="source/PMReferenceColumn.cpp"/>
+            <F N="source/PMReferenceColumnsWidget.cpp"/>
+            <F N="source/PMReferenceWidget.cpp"/>
+            <F N="source/PMRule.cpp"/>
+            <F N="source/PMRulesUsedWidget.cpp"/>
+            <F N="source/PMRuleWidget.cpp"/>
+            <F N="source/PMSequence.cpp"/>
+            <F N="source/PMSequenceWidget.cpp"/>
+            <F N="source/PMTableBase.cpp"/>
+            <F N="source/PMTableDerived.cpp"/>
+            <F N="source/PMTableNormal.cpp"/>
+            <F N="source/PMView.cpp"/>
+            <F N="source/PMViewColumn.cpp"/>
+            <F N="source/PMViewWidget.cpp"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{DBC11EF4-9DF2-4153-B398-A05E6B1238F1}">
+            <F N="PM.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{C7476EBC-9DE9-439A-AF27-227060A5292D}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{0FCDA439-7C63-4AF9-B6C3-D4BB450CCF5D}">
+            <F N="PM.pro"/>
+        </Folder>
+    </Files>
+</Project>

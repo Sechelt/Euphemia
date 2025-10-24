@@ -1,0 +1,18 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/FL">
+	<file alias="Async">images/Async.png</file>
+	<file alias="Begin">images/Begin48x48.png</file>
+	<file alias="Condition">images/Condition48x48.png</file>
+	<file alias="ConditionOpen">images/ConditionOpen48x48.png</file>
+	<file alias="ConditionClose">images/ConditionClose48x48.png</file>
+	<file alias="End">images/End48x48.png</file>
+	<file alias="Flow">images/Flow48x48.png</file>
+	<file alias="FlowChart">images/FlowChart48x48.png</file>
+	<file alias="Loop">images/Loop48x48.png</file>
+	<file alias="LoopOpen">images/LoopOpen48x48.png</file>
+	<file alias="LoopClose">images/LoopClose48x48.png</file>
+	<file alias="Step">images/Step48x48.png</file>
+	<file alias="Sync">images/Sync.png</file>
+</qresource>
+</RCC>
+

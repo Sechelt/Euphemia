@@ -1,0 +1,140 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"L.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{0DB24D5D-E12A-41C2-81DA-C5685133B7C2}">
+            <F N="source/LColorsWidget.cpp"/>
+            <F N="source/LCrossHairLine.cpp"/>
+            <F N="source/LEditorWidget.cpp"/>
+            <F N="source/LFile.cpp"/>
+            <F N="source/LGraphicsLayer.cpp"/>
+            <F N="source/LGraphicsLine.cpp"/>
+            <F N="source/LGraphicsObject.cpp"/>
+            <F N="source/LGraphicsScene.cpp"/>
+            <F N="source/LGraphicsView.cpp"/>
+            <F N="source/LHandle.cpp"/>
+            <F N="source/LibInfo.h"/>
+            <F N="source/LLayer.cpp"/>
+            <F N="source/LLayersWidget.cpp"/>
+            <F N="source/LObject.cpp"/>
+            <F N="source/LPanner.cpp"/>
+            <F N="source/LPixelsWidget.cpp"/>
+            <F N="source/LSBackground.cpp"/>
+            <F N="source/LScratchWidget.cpp"/>
+            <F N="source/LSEllipse.cpp"/>
+            <F N="source/LSGeneral.cpp"/>
+            <F N="source/LSGrid.cpp"/>
+            <F N="source/LSImage.cpp"/>
+            <F N="source/LSLine.cpp"/>
+            <F N="source/LSPage.cpp"/>
+            <F N="source/LSPointer.cpp"/>
+            <F N="source/LSRectangle.cpp"/>
+            <F N="source/LSRender.cpp"/>
+            <F N="source/LSText.cpp"/>
+            <F N="source/LToolsWidget.cpp"/>
+        </Folder>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{A236B394-7870-4708-9075-CB5EEC5630AC}">
+            <F N="include/L.h"/>
+            <F N="include/LColorsWidget.h"/>
+            <F N="include/LCrossHairLine.h"/>
+            <F N="include/LEditorWidget.h"/>
+            <F N="include/LFile.h"/>
+            <F N="include/LGraphicsLayer.h"/>
+            <F N="include/LGraphicsLine.h"/>
+            <F N="include/LGraphicsObject.h"/>
+            <F N="include/LGraphicsScene.h"/>
+            <F N="include/LGraphicsView.h"/>
+            <F N="include/LHandle.h"/>
+            <F N="include/LLayer.h"/>
+            <F N="include/LLayersWidget.h"/>
+            <F N="include/LObject.h"/>
+            <F N="include/LPanner.h"/>
+            <F N="include/LPixelsWidget.h"/>
+            <F N="include/LSBackground.h"/>
+            <F N="include/LScratchWidget.h"/>
+            <F N="include/LSEllipse.h"/>
+            <F N="include/LSGeneral.h"/>
+            <F N="include/LSGrid.h"/>
+            <F N="include/LSImage.h"/>
+            <F N="include/LSLine.h"/>
+            <F N="include/LSPage.h"/>
+            <F N="include/LSPointer.h"/>
+            <F N="include/LSRectangle.h"/>
+            <F N="include/LSRender.h"/>
+            <F N="include/LSText.h"/>
+            <F N="include/LToolsWidget.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{1B7CBFEB-EB11-4B09-8F40-A3213F652257}">
+            <F N="L.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{ACB4861E-9A0A-41EA-9652-095BED9AC7B3}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{6AB05FD7-83C5-4CA2-A370-CA89FDF36BA9}">
+            <F N="L.pro"/>
+        </Folder>
+    </Files>
+    <List Name="RTE">
+    </List>
+</Project>

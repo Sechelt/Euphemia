@@ -1,0 +1,13 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource prefix="/E">
+	<file alias="Commit">images/Commit.png</file>
+	<file alias="Cancel">images/Cancel.png</file>
+	<file alias="Feedback">images/Feedback.png</file>
+	<file alias="Paint">images/Paint.png</file>
+	<file alias="Crop">images/crop.png</file>
+	<file alias="Splash">images/Splash.png</file>
+</qresource>
+</RCC>
+
+

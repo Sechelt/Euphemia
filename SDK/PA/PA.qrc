@@ -1,0 +1,31 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/PA">
+<!-- plugin -->
+	<file alias="Layers">images/Layers.png</file>
+	<file alias="Paint">images/Paint.png</file>
+<!-- tools -->
+	<file alias="SelectRectangle">images/SelectRectangle.png</file>
+	<file alias="SelectEllipse">images/SelectEllipse.png</file>
+	<file alias="SelectPolygon">images/SelectPolygon.png</file>
+	<file alias="FreeHand">images/FreeHand.png</file>
+	<file alias="Spray">images/Spray.png</file>
+	<file alias="Line">images/Line.png</file>
+	<file alias="Erase">images/Erase.png</file>
+	<file alias="Rectangle">images/Rectangle.png</file>
+	<file alias="Ellipse">images/Ellipse.png</file>
+	<file alias="Polygon">images/Polygon.png</file>
+	<file alias="Polyline">images/Polyline.png</file>
+	<file alias="Text">images/Text.png</file>
+	<file alias="RectangleFilled">images/RectangleFilled.png</file>
+	<file alias="EllipseFilled">images/EllipseFilled.png</file>
+	<file alias="PolygonFilled">images/PolygonFilled.png</file>
+	<file alias="FillFlood">images/FillFlood.png</file>
+	<file alias="FillGradient">images/FillGradient.png</file>
+	<file alias="Pixels">images/Pixels.png</file>
+	<file alias="Arc">images/Arc.png</file>
+	<file alias="Chord">images/Chord.png</file>
+	<file alias="Pie">images/Pie.png</file>
+</qresource>
+</RCC>
+
+

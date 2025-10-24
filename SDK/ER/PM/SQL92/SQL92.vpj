@@ -1,0 +1,111 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"SQL92.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{D63F323A-A7AA-413F-934A-E7FE82AE148E}">
+            <F N="include/SQL92Column.h"/>
+            <F N="include/SQL92Domain.h"/>
+            <F N="include/SQL92Index.h"/>
+            <F N="include/SQL92IndexColumn.h"/>
+            <F N="include/SQL92Key.h"/>
+            <F N="include/SQL92Model.h"/>
+            <F N="include/SQL92ModelEditorWidget.h"/>
+            <F N="include/SQL92ModelPalWidget.h"/>
+            <F N="include/SQL92Procedure.h"/>
+            <F N="include/SQL92Reference.h"/>
+            <F N="include/SQL92ReferenceColumn.h"/>
+            <F N="include/SQL92Rule.h"/>
+            <F N="include/SQL92Sequence.h"/>
+            <F N="include/SQL92Table.h"/>
+            <F N="include/SQL92View.h"/>
+            <F N="include/SQL92ViewColumn.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{D828C38E-E111-4FB5-94BE-F5C62D9912BF}">
+            <F N="source/LibInfo.h"/>
+            <F N="source/SQL92Column.cpp"/>
+            <F N="source/SQL92Domain.cpp"/>
+            <F N="source/SQL92Index.cpp"/>
+            <F N="source/SQL92IndexColumn.cpp"/>
+            <F N="source/SQL92Key.cpp"/>
+            <F N="source/SQL92Model.cpp"/>
+            <F N="source/SQL92ModelEditorWidget.cpp"/>
+            <F N="source/SQL92ModelPalWidget.cpp"/>
+            <F N="source/SQL92Procedure.cpp"/>
+            <F N="source/SQL92Reference.cpp"/>
+            <F N="source/SQL92ReferenceColumn.cpp"/>
+            <F N="source/SQL92Rule.cpp"/>
+            <F N="source/SQL92Sequence.cpp"/>
+            <F N="source/SQL92Table.cpp"/>
+            <F N="source/SQL92View.cpp"/>
+            <F N="source/SQL92ViewColumn.cpp"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{97D33EE8-3CB4-4D66-91E0-6749E631720E}"/>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{2772917B-26F4-45EA-8D96-BD4C90A1734D}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{5F91B36A-3E1A-4315-883E-5D554FF7EAB2}">
+            <F N="SQL92.pro"/>
+        </Folder>
+    </Files>
+</Project>

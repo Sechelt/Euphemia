@@ -1,0 +1,97 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"SystemArchitect.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{9A1A1796-1DC2-48EF-BE68-2115554ADF61}">
+            <F N="include/SAAccountConnectSplash.h"/>
+            <F N="include/SAConnection.h"/>
+            <F N="include/SAFile.h"/>
+            <F N="include/SAMainWindow.h"/>
+            <F N="include/SANewDialog.h"/>
+            <F N="include/SAOutputWidget.h"/>
+            <F N="include/SAPreferencesDialog.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{8630F8CB-C8BE-46C6-A396-2B50D2F2374C}">
+            <F N="source/AppInfo.h"/>
+            <F N="source/main.cpp"/>
+            <F N="source/SAAccountConnectSplash.cpp"/>
+            <F N="source/SAConnection.cpp"/>
+            <F N="source/SAFile.cpp"/>
+            <F N="source/SAMainWindow.cpp"/>
+            <F N="source/SANewDialog.cpp"/>
+            <F N="source/SAOutputWidget.cpp"/>
+            <F N="source/SAPreferencesDialog.cpp"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{7DAB6D18-3F3E-459E-8FED-41301986F203}">
+            <F N="DataArchitect.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{B75A78AD-DE08-4D9F-A886-1A958ABBB968}"></Folder>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{5BA80E0C-2F4C-4ECA-875C-5043A30F2140}">
+            <F N="DataArchitect.pro"/>
+            <F N="README.txt"/>
+        </Folder>
+    </Files>
+</Project>

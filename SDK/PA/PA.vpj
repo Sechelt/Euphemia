@@ -1,0 +1,223 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="Other C/C++"
+    WorkingDir=".">
+    <Config
+        Name="Debug"
+        Type="cpp"
+        DebugCallbackName="gdb"
+        OutputFile="%bdPA"
+        CompilerConfigName="Latest Version">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                OutputExts="*.o"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec CmdLine='cc -c -g %i %defd -o "%bd%n.o" "%f"'/>
+            </Target>
+            <Target
+                Name="Link"
+                MenuCaption="&amp;Link">
+                <Exec CmdLine='cc -g -o "%o" %f %libs'/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%(VSLICKBIN1)vsbuild" rebuild "%w" "%r"'/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                RunFromDir="%rw">
+                <Exec CmdLine='vsdebugio -prog "%o"'/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%o"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Config
+        Name="Release"
+        Type="cpp"
+        DebugCallbackName="gdb"
+        OutputFile="%bdPA"
+        CompilerConfigName="Latest Version">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                OutputExts="*.o"
+                RunFromDir="%rw">
+                <Exec CmdLine='cc -c -O %i %defd -o "%bd%n.o" "%f"'/>
+            </Target>
+            <Target
+                Name="Link"
+                MenuCaption="&amp;Link">
+                <Exec CmdLine='cc -O -o "%o" %f %libs'/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%(VSLICKBIN1)vsbuild" rebuild "%w" "%r"'/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                RunFromDir="%rw">
+                <Exec CmdLine='vsdebugio -prog "%o"'/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                BuildFirst="1"
+                CaptureOutputWith="ProcessBuffer"
+                RunFromDir="%rw">
+                <Exec CmdLine='"%o"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Rules Name="Compile">
+        <Rule
+            InputExts="*.s"
+            OutputExts="*.o"
+            LinkObject="1">
+            <Exec CmdLine='as -o "%bd%n.o" "%f"'/>
+        </Rule>
+    </Rules>
+    <Files>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{18FE59CB-0911-47A4-BCB0-5E4E3BF6CF4C}">
+            <F N="source/LibInfo.h"/>
+            <F N="source/PAArc.cpp"/>
+            <F N="source/PAChord.cpp"/>
+            <F N="source/PAEllipse.cpp"/>
+            <F N="source/PAEllipseFilled.cpp"/>
+            <F N="source/PAErase.cpp"/>
+            <F N="source/PAFloodFill.cpp"/>
+            <F N="source/PAFreeHand.cpp"/>
+            <F N="source/PAGradientFill.cpp"/>
+            <F N="source/PALine.cpp"/>
+            <F N="source/PAPaint.cpp"/>
+            <F N="source/PAPasteRectangle.cpp"/>
+            <F N="source/PAPie.cpp"/>
+            <F N="source/PAPixelSelection.cpp"/>
+            <F N="source/PAPolygon.cpp"/>
+            <F N="source/PAPolygonFilled.cpp"/>
+            <F N="source/PAPolyline.cpp"/>
+            <F N="source/PARectangle.cpp"/>
+            <F N="source/PARectangleFilled.cpp"/>
+            <F N="source/PASelectEllipse.cpp"/>
+            <F N="source/PASelectPolygon.cpp"/>
+            <F N="source/PASelectRectangle.cpp"/>
+            <F N="source/PASErase.cpp"/>
+            <F N="source/PASFreeHand.cpp"/>
+            <F N="source/PASGradient.cpp"/>
+            <F N="source/PASPaste.cpp"/>
+            <F N="source/PASPolygonFilled.cpp"/>
+            <F N="source/PASpray.cpp"/>
+            <F N="source/PASSpray.cpp"/>
+            <F N="source/PAText.cpp"/>
+            <F N="source/PATool.cpp"/>
+            <F N="source/PAToolFree.cpp"/>
+        </Folder>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{B9B669CE-8651-4054-A414-775E457D60D9}">
+            <F N="include/PA.h"/>
+            <F N="include/PAArc.h"/>
+            <F N="include/PAChord.h"/>
+            <F N="include/PAEllipse.h"/>
+            <F N="include/PAEllipseFilled.h"/>
+            <F N="include/PAErase.h"/>
+            <F N="include/PAFloodFill.h"/>
+            <F N="include/PAFreeHand.h"/>
+            <F N="include/PAGradientFill.h"/>
+            <F N="include/PALine.h"/>
+            <F N="include/PAPaint.h"/>
+            <F N="include/PAPasteRectangle.h"/>
+            <F N="include/PAPie.h"/>
+            <F N="include/PAPixelSelection.h"/>
+            <F N="include/PAPolygon.h"/>
+            <F N="include/PAPolygonFilled.h"/>
+            <F N="include/PAPolyline.h"/>
+            <F N="include/PARectangle.h"/>
+            <F N="include/PARectangleFilled.h"/>
+            <F N="include/PASelectEllipse.h"/>
+            <F N="include/PASelectPolygon.h"/>
+            <F N="include/PASelectRectangle.h"/>
+            <F N="include/PASErase.h"/>
+            <F N="include/PASFreeHand.h"/>
+            <F N="include/PASGradient.h"/>
+            <F N="include/PASPaste.h"/>
+            <F N="include/PASPolygonFilled.h"/>
+            <F N="include/PASpray.h"/>
+            <F N="include/PASSpray.h"/>
+            <F N="include/PAText.h"/>
+            <F N="include/PATool.h"/>
+            <F N="include/PAToolFree.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{8EED962C-0727-4EBA-B1DE-99AE5585F72D}">
+            <F N="PA.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{E420F32F-D8B8-47CE-BC22-D8123A60F13E}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{9124A4EF-E70B-4513-956D-80118E29191F}">
+            <F N="PA.pro"/>
+        </Folder>
+    </Files>
+    <List Name="RTE">
+    </List>
+</Project>

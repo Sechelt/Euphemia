@@ -1,0 +1,42 @@
+/* XPM */
+static const char *xpmProcedureColumn16x16[] = {
+/* width height num_colors chars_per_pixel */
+"    16    16       17            1",
+/* colors */
+". c #000000",
+"# c #010100",
+"a c #6d6810",
+"b c #a4a1a4",
+"c c #ac9e2f",
+"d c #c5c2c5",
+"e c #c5c6c5",
+"f c #c7b23c",
+"g c #cdc6cd",
+"h c #dedede",
+"i c #e1cd7c",
+"j c #e6dee6",
+"k c #e9e2e1",
+"l c #f5eab4",
+"m c #fffffe",
+"o c green",
+"n c none",
+/* pixels */
+"nnnnnnoooonannnn",
+"nnnnnnonno#maann",
+"nnnnnnonnomllian",
+"nnnnnnonnol##ff#",
+"nnn.n.o#aol##f#n",
+"nn.n.nok#oiffc#n",
+"n.nnnhoggo#ac#nn",
+"nn.nhjogbo#n#nnn",
+"n.nhj.o.bob.nnnn",
+".nhjd.o.bode.nnn",
+"n.jeg.o.bog.nnnn",
+"nn.gbbobdo.nnnnn",
+"n.gbbboegoj.nnnn",
+"nn.b.boe.o.nnnnn",
+"nnn.n.o.nonnnnnn",
+"nnnnnnoooonnnnnn"
+};
+
+

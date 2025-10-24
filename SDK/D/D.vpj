@@ -1,0 +1,197 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"DI.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{23492716-5F09-452E-B720-E5C469F41EF3}">
+            <F N="source/DArc.cpp"/>
+            <F N="source/DBackgroundWidget.cpp"/>
+            <F N="source/DBitmap.cpp"/>
+            <F N="source/DBitmapWidget.cpp"/>
+            <F N="source/DCallOut.cpp"/>
+            <F N="source/DCallOutWidget.cpp"/>
+            <F N="source/DDiagram.cpp"/>
+            <F N="source/DDiagramEditorWidget.cpp"/>
+            <F N="source/DDiagramPalWidget.cpp"/>
+            <F N="source/DDiagramPanWidget.cpp"/>
+            <F N="source/DEllipse.cpp"/>
+            <F N="source/DFile.cpp"/>
+            <F N="source/DGraphicsItemLine.cpp"/>
+            <F N="source/DGraphicsProxyItem.cpp"/>
+            <F N="source/DGraphicsSceneProxy.cpp"/>
+            <F N="source/DGraphicsView.cpp"/>
+            <F N="source/DGroup.cpp"/>
+            <F N="source/DHandle.cpp"/>
+            <F N="source/DLayout.cpp"/>
+            <F N="source/DLayoutGrid.cpp"/>
+            <F N="source/DLayoutHorizontal.cpp"/>
+            <F N="source/DLayoutLinear.cpp"/>
+            <F N="source/DLayoutVertical.cpp"/>
+            <F N="source/DLine.cpp"/>
+            <F N="source/DLine90.cpp"/>
+            <F N="source/DLine90Auto.cpp"/>
+            <F N="source/DLine90H.cpp"/>
+            <F N="source/DLine90V.cpp"/>
+            <F N="source/DLineDynamic.cpp"/>
+            <F N="source/DLinePoly.cpp"/>
+            <F N="source/DLinePolyAuto.cpp"/>
+            <F N="source/DLineWidget.cpp"/>
+            <F N="source/DObject.cpp"/>
+            <F N="source/DPanner.cpp"/>
+            <F N="source/DPointsWidget.cpp"/>
+            <F N="source/DRectangle.cpp"/>
+            <F N="source/DRectangleBase.cpp"/>
+            <F N="source/DRectangleWidget.cpp"/>
+            <F N="source/DRouteSource.cpp"/>
+            <F N="source/DRubberBand.cpp"/>
+            <F N="source/DSink.cpp"/>
+            <F N="source/DSinksWidget.cpp"/>
+            <F N="source/DSource.cpp"/>
+            <F N="source/DSourcesWidget.cpp"/>
+            <F N="source/DSpacer.cpp"/>
+            <F N="source/DSpacerHorizontal.cpp"/>
+            <F N="source/DSpacerVertical.cpp"/>
+            <F N="source/DSpacerWidget.cpp"/>
+            <F N="source/DStencil.cpp"/>
+            <F N="source/DStencilItem.cpp"/>
+            <F N="source/DStencils.cpp"/>
+            <F N="source/DStencilsWidget.cpp"/>
+            <F N="source/DText.cpp"/>
+            <F N="source/DTitle.cpp"/>
+            <F N="source/DTitleDoc.cpp"/>
+            <F N="source/DVector.cpp"/>
+            <F N="source/DVectorWidget.cpp"/>
+            <F N="source/LibInfo.h"/>
+        </Folder>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{D1AE51A4-8DDA-4F2A-9106-63237213A35D}">
+            <F N="include/DArc.h"/>
+            <F N="include/DBackgroundWidget.h"/>
+            <F N="include/DBitmap.h"/>
+            <F N="include/DBitmapWidget.h"/>
+            <F N="include/DCallOut.h"/>
+            <F N="include/DCallOutWidget.h"/>
+            <F N="include/DDiagram.h"/>
+            <F N="include/DDiagramEditorWidget.h"/>
+            <F N="include/DDiagramPalWidget.h"/>
+            <F N="include/DDiagramPanWidget.h"/>
+            <F N="include/DEllipse.h"/>
+            <F N="include/DFile.h"/>
+            <F N="include/DGraphicsItemLine.h"/>
+            <F N="include/DGraphicsProxyItem.h"/>
+            <F N="include/DGraphicsSceneProxy.h"/>
+            <F N="include/DGraphicsView.h"/>
+            <F N="include/DGroup.h"/>
+            <F N="include/DHandle.h"/>
+            <F N="include/DLayout.h"/>
+            <F N="include/DLayoutGrid.h"/>
+            <F N="include/DLayoutHorizontal.h"/>
+            <F N="include/DLayoutLinear.h"/>
+            <F N="include/DLayoutVertical.h"/>
+            <F N="include/DLine.h"/>
+            <F N="include/DLine90.h"/>
+            <F N="include/DLine90Auto.h"/>
+            <F N="include/DLine90H.h"/>
+            <F N="include/DLine90V.h"/>
+            <F N="include/DLineDynamic.h"/>
+            <F N="include/DLinePoly.h"/>
+            <F N="include/DLinePolyAuto.h"/>
+            <F N="include/DLineWidget.h"/>
+            <F N="include/DObject.h"/>
+            <F N="include/DPanner.h"/>
+            <F N="include/DPointsWidget.h"/>
+            <F N="include/DRectangle.h"/>
+            <F N="include/DRectangleBase.h"/>
+            <F N="include/DRectangleWidget.h"/>
+            <F N="include/DRouteSource.h"/>
+            <F N="include/DRubberBand.h"/>
+            <F N="include/DSink.h"/>
+            <F N="include/DSinksWidget.h"/>
+            <F N="include/DSource.h"/>
+            <F N="include/DSourcesWidget.h"/>
+            <F N="include/DSpacer.h"/>
+            <F N="include/DSpacerHorizontal.h"/>
+            <F N="include/DSpacerVertical.h"/>
+            <F N="include/DSpacerWidget.h"/>
+            <F N="include/DStencil.h"/>
+            <F N="include/DStencilItem.h"/>
+            <F N="include/DStencils.h"/>
+            <F N="include/DStencilsWidget.h"/>
+            <F N="include/DText.h"/>
+            <F N="include/DTitle.h"/>
+            <F N="include/DTitleDoc.h"/>
+            <F N="include/DVector.h"/>
+            <F N="include/DVectorWidget.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{18E9D131-8A83-439E-8108-450F9458B080}">
+            <F N="D.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{CA983F26-DE2E-431D-9EB8-3EB80EA6D799}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{0684E543-9C14-47A6-B673-FCED323B7DBF}">
+            <F N="D.pro"/>
+        </Folder>
+    </Files>
+    <List Name="RTE">
+    </List>
+</Project>

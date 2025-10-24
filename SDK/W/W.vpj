@@ -1,0 +1,189 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"W.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{4728BA27-1B54-4BDD-9690-9E724BF38C05}">
+            <F N="source/LibInfo.h"/>
+            <F N="source/WBitmapButton.cpp"/>
+            <F N="source/WBitmapWidget.cpp"/>
+            <F N="source/WBrush.cpp"/>
+            <F N="source/WBrushStyleComboBox.cpp"/>
+            <F N="source/WCanvasSizeWidget.cpp"/>
+            <F N="source/WColorButton.cpp"/>
+            <F N="source/WColorsPickerDialog.cpp"/>
+            <F N="source/WColorsPickerWidget.cpp"/>
+            <F N="source/WColorsWidget.cpp"/>
+            <F N="source/WCoordWidget.cpp"/>
+            <F N="source/WDataNavWidget.cpp"/>
+            <F N="source/WDirectiveWidget.cpp"/>
+            <F N="source/WDirSelectWidget.cpp"/>
+            <F N="source/WFileSelectWidget.cpp"/>
+            <F N="source/WFindTextDialog.cpp"/>
+            <F N="source/WFindTextWidget.cpp"/>
+            <F N="source/WFontButton.cpp"/>
+            <F N="source/WFontColorButton.cpp"/>
+            <F N="source/WFontColorDialog.cpp"/>
+            <F N="source/WFontColorWidget.cpp"/>
+            <F N="source/WGeometryWidget.cpp"/>
+            <F N="source/WIconLayout.cpp"/>
+            <F N="source/WIconWidget.cpp"/>
+            <F N="source/WImageButton.cpp"/>
+            <F N="source/WLabelButton.cpp"/>
+            <F N="source/WLayoutWidget.cpp"/>
+            <F N="source/WLineEndComboBox.cpp"/>
+            <F N="source/WLineStyleComboBox.cpp"/>
+            <F N="source/WMarginsWidget.cpp"/>
+            <F N="source/WObjectHAlignComboBox.cpp"/>
+            <F N="source/WObjectVAlignComboBox.cpp"/>
+            <F N="source/WPasswordWidget.cpp"/>
+            <F N="source/WPen.cpp"/>
+            <F N="source/WPosWidget.cpp"/>
+            <F N="source/WRulerWidget.cpp"/>
+            <F N="source/WScratchTool.cpp"/>
+            <F N="source/WScriptEditor.cpp"/>
+            <F N="source/WShapeSizeComboBox.cpp"/>
+            <F N="source/WSizeConstraintsWidget.cpp"/>
+            <F N="source/WSizeDialog.cpp"/>
+            <F N="source/WSizeHintWidget.cpp"/>
+            <F N="source/WSizeWidget.cpp"/>
+            <F N="source/WSplash.cpp"/>
+            <F N="source/WStackedWidget.cpp"/>
+            <F N="source/WStretchWidget.cpp"/>
+            <F N="source/WSvgButton.cpp"/>
+            <F N="source/WTabDialog.cpp"/>
+            <F N="source/WText.cpp"/>
+            <F N="source/WTextHAlignComboBox.cpp"/>
+            <F N="source/WTextVAlignComboBox.cpp"/>
+            <F N="source/WValueListWidget.cpp"/>
+            <F N="source/WZoomWidget.cpp"/>
+        </Folder>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{F83F46B9-1A65-480E-B1DF-70D1789804C1}">
+            <F N="include/W.h"/>
+            <F N="include/WBitmapButton.h"/>
+            <F N="include/WBitmapWidget.h"/>
+            <F N="include/WBrush.h"/>
+            <F N="include/WBrushStyleComboBox.h"/>
+            <F N="include/WCanvasSizeWidget.h"/>
+            <F N="include/WColorButton.h"/>
+            <F N="include/WColorsPickerDialog.h"/>
+            <F N="include/WColorsPickerWidget.h"/>
+            <F N="include/WColorsWidget.h"/>
+            <F N="include/WCoordWidget.h"/>
+            <F N="include/WDataNavWidget.h"/>
+            <F N="include/WDirectiveWidget.h"/>
+            <F N="include/WDirSelectWidget.h"/>
+            <F N="include/WFileSelectWidget.h"/>
+            <F N="include/WFindTextDialog.h"/>
+            <F N="include/WFindTextWidget.h"/>
+            <F N="include/WFontButton.h"/>
+            <F N="include/WFontColorButton.h"/>
+            <F N="include/WFontColorDialog.h"/>
+            <F N="include/WFontColorWidget.h"/>
+            <F N="include/WGeometryWidget.h"/>
+            <F N="include/WIconLayout.h"/>
+            <F N="include/WIconWidget.h"/>
+            <F N="include/WImageButton.h"/>
+            <F N="include/WLabelButton.h"/>
+            <F N="include/WLayoutWidget.h"/>
+            <F N="include/WLineEndComboBox.h"/>
+            <F N="include/WLineStyleComboBox.h"/>
+            <F N="include/WMarginsWidget.h"/>
+            <F N="include/WObjectHAlignComboBox.h"/>
+            <F N="include/WObjectVAlignComboBox.h"/>
+            <F N="include/WPasswordWidget.h"/>
+            <F N="include/WPen.h"/>
+            <F N="include/WPosWidget.h"/>
+            <F N="include/WRulerWidget.h"/>
+            <F N="include/WScratchTool.h"/>
+            <F N="include/WScriptEditor.h"/>
+            <F N="include/WShapeSizeComboBox.h"/>
+            <F N="include/WSizeConstraintsWidget.h"/>
+            <F N="include/WSizeDialog.h"/>
+            <F N="include/WSizeHintWidget.h"/>
+            <F N="include/WSizeWidget.h"/>
+            <F N="include/WSplash.h"/>
+            <F N="include/WStackedWidget.h"/>
+            <F N="include/WStretchWidget.h"/>
+            <F N="include/WSvgButton.h"/>
+            <F N="include/WTabDialog.h"/>
+            <F N="include/WText.h"/>
+            <F N="include/WTextHAlignComboBox.h"/>
+            <F N="include/WTextVAlignComboBox.h"/>
+            <F N="include/WValueListWidget.h"/>
+            <F N="include/WZoomWidget.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{51D6D15D-7A10-48DB-9C2D-D606E2D38A2F}">
+            <F N="W.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{0017B24A-D1EE-43C0-A32B-54339DD7BE23}"></Folder>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{AC360F88-9F56-425C-BED9-4DC3035D45A2}">
+            <F N="README"/>
+            <F N="W.pro"/>
+        </Folder>
+    </Files>
+    <List Name="RTE">
+    </List>
+</Project>

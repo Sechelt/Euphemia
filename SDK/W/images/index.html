@@ -1,0 +1,758 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.77C-CCK-MCD Caldera Systems OpenLinux [en] (X11; U; Linux 2.4.2 i686) [Netscape]">
+</head>
+<body>
+<b><font size=+1>Data&nbsp;Architect</font></b>
+<br>4.SEP.01
+<p><b>Graphics</b>
+<p>These are graphic images which are used by Data Architect but are not
+icons.
+<p><img SRC="Splash.gif" height=240 width=360>
+<br>Name: Splash
+<br>Description: Application splash screen.
+<p><img SRC="CodeByDesign.gif" height=47 width=67>
+<br>Name: CodeByDesign
+<br>Description: Used in the About box - Credits tab.
+<p><img SRC="kompany.gif" height=47 width=67>
+<br>Name: kompany
+<br>Description: Used in the About box - Credits tab.
+<p><b>Icons</b>
+<p>All icons exist in gif and xpm format. The gif versions are just for
+documentation (i.e. this document). The xpm versions are used in the application
+itself. Most icons are used on toolbars but many are also used in menus
+as well.
+<p>Data Architect is cross-platform and this may be a factor in creating
+icons because there may be different expectations for the icons on the
+various platforms (UNIX/Linux, Apple, flavours of Windows).
+<p>The application uses these icons by including them into the source code
+at build time. A naming convention exists and must be adhered to.
+<p>For example;
+<p>AddColumn would be named AddColumn.xpm and would contain a 'C' declaration
+as "static const char *xpmAddColumn[]". It is likely that the 'C" declaration
+will have to be edited after saving the image. Also note that all icons
+have a transparent background denoted by the color "none". The icons sizes
+are inconsistent at this time but should adhere to standard sizes as soon
+as possible - starting with a 16x16 set. Image depth can be any reasonable
+depth that will work on the vast majority of machines - perhaps more than
+256 colors.
+<p><tt>/* XPM */</tt>
+<br><tt>static const char *xpmAddColumn[]={</tt>
+<br><tt>"22 18 7 1",</tt>
+<br><tt>"# c #000000",</tt>
+<br><tt>"a c #808080",</tt>
+<br><tt>"b c #ffffff",</tt>
+<br><tt>"c c #c0c0c0",</tt>
+<br><tt>"d c #ffff00",</tt>
+<br><tt>"e c #00ffff",</tt>
+<br><tt>". c None",</tt>
+<br><tt>"......................",</tt>
+<br><tt>"......................",</tt>
+<br><tt>"......................",</tt>
+<br><tt>"......................",</tt>
+<br><tt>"..........d...........",</tt>
+<br><tt>"..........d...........",</tt>
+<br><tt>"........d.d.d.........",</tt>
+<br><tt>".........ddd..........",</tt>
+<br><tt>".....ddddddddddd......",</tt>
+<br><tt>".eeeeeeeedddeeeeeeeee.",</tt>
+<br><tt>".e......d.d.d.......e.",</tt>
+<br><tt>".e........d.........e.",</tt>
+<br><tt>".eeeeeeeeedeeeeeeeeee.",</tt>
+<br><tt>"......................",</tt>
+<br><tt>"......................",</tt>
+<br><tt>"......................",</tt>
+<br><tt>"......................",</tt>
+<br><tt>"......................"</tt>
+<br><tt>};</tt>
+<br><tt></tt>&nbsp;
+<br>&nbsp;
+<table BORDER NOSAVE >
+<tr BGCOLOR="#3366FF" NOSAVE>
+<td NOSAVE></td>
+
+<td>Name</td>
+
+<td>Category</td>
+
+<td>Description</td>
+</tr>
+
+<tr>
+<td><img SRC="AddColumn.gif" height=18 width=22></td>
+
+<td>AddColumn</td>
+
+<td>GridEdit</td>
+
+<td>Used in a toolbar to allow the user to add a new row to a grid. Example;
+to add a new column to a table or a new index to a table.</td>
+</tr>
+
+<tr>
+<td><img SRC="AlignBottom.gif" height=16 width=16></td>
+
+<td>AlignBottom</td>
+
+<td>Font</td>
+
+<td>Used in a custom widget for font settings. Currently found in the main
+toolbar of the modelling tool and the Advanced SQL&nbsp;Editor. May also
+be found in a menu.</td>
+</tr>
+
+<tr>
+<td><img SRC="AlignHCenter.gif" height=16 width=16></td>
+
+<td>AlignHCenter</td>
+
+<td>Font</td>
+
+<td>same as AlignBottom</td>
+</tr>
+
+<tr>
+<td><img SRC="AlignLeft.gif" height=16 width=16></td>
+
+<td>AlignLeft</td>
+
+<td>Font</td>
+
+<td>same as AlignBottom</td>
+</tr>
+
+<tr>
+<td><img SRC="AlignRight.gif" height=16 width=16></td>
+
+<td>AlignRight</td>
+
+<td>Font</td>
+
+<td>same as AlignBottom</td>
+</tr>
+
+<tr>
+<td><img SRC="AlignTop.gif" height=16 width=16></td>
+
+<td>AlignTop</td>
+
+<td>Font</td>
+
+<td>same as AlignBottom</td>
+</tr>
+
+<tr>
+<td><img SRC="AlignVCenter.gif" height=16 width=16></td>
+
+<td>AlignVCenter</td>
+
+<td>Font</td>
+
+<td>same as AlignBottom</td>
+</tr>
+
+<tr>
+<td><img SRC="Arrow.gif" height=16 width=16></td>
+
+<td>Arrow</td>
+
+<td>Tool</td>
+
+<td>Manipulate objects... select, move etc.</td>
+</tr>
+
+<tr>
+<td><img SRC="Bold.gif" height=16 width=16></td>
+
+<td>Bold</td>
+
+<td>Font</td>
+
+<td>same as AlignBottom</td>
+</tr>
+
+<tr>
+<td><img SRC="Column.gif" height=16 width=16></td>
+
+<td>Column</td>
+
+<td>DatabaseObject</td>
+
+<td>Used to represent a table column. Used in browser (left side of main
+window) and in the toolbar/menu of the Advanced&nbsp;SQL&nbsp;Editor.</td>
+</tr>
+
+<tr>
+<td><img SRC="Connected.gif" height=16 width=16></td>
+
+<td>Connected</td>
+
+<td>Status</td>
+
+<td>Indicates that the application is connected to a database. Used in
+the statusbar/menu of the Advanced SQL Editor. May be used in its toolbar
+in the future.</td>
+</tr>
+
+<tr>
+<td><img SRC="Copy.gif" height=16 width=16></td>
+
+<td>Copy</td>
+
+<td>Edit</td>
+
+<td>Used to Copy selected objects/text.</td>
+</tr>
+
+<tr>
+<td><img SRC="Cut.gif" height=16 width=16></td>
+
+<td>Cut</td>
+
+<td>Edit</td>
+
+<td>Used to Cut selected objects/text.</td>
+</tr>
+
+<tr>
+<td><img SRC="DataArchitect.gif" height=16 width=16></td>
+
+<td>DataArchitect</td>
+
+<td>App</td>
+
+<td>This is the main icon for the application. May need various sizes for
+this icon before the others.</td>
+</tr>
+
+<tr>
+<td><img SRC="DatabaseCreate.gif" height=16 width=16></td>
+
+<td>DatabaseCreate</td>
+
+<td>Database</td>
+
+<td>Used to invoke script creation (for creating a database).</td>
+</tr>
+
+<tr>
+<td><img SRC="DatabaseModify.gif" height=16 width=16></td>
+
+<td>DatabaseModify</td>
+
+<td>Database</td>
+
+<td>Used to invoke script creation (for modifying a database).</td>
+</tr>
+
+<tr>
+<td><img SRC="DatabaseReverse.gif" height=16 width=16></td>
+
+<td>DatabaseReverse</td>
+
+<td>Database</td>
+
+<td>Reverse engineer a database.</td>
+</tr>
+
+<tr>
+<td><img SRC="Delete.gif" height=22 width=22></td>
+
+<td>Delete</td>
+
+<td>Edit</td>
+
+<td>Used to Delete selected objects/text.&nbsp;</td>
+</tr>
+
+<tr>
+<td><img SRC="DeleteColumn.gif" height=18 width=22></td>
+
+<td>DeleteColumn</td>
+
+<td>GridEdit</td>
+
+<td>Delete a row in a grid.</td>
+</tr>
+
+<tr>
+<td><img SRC="Disconnected.gif" height=16 width=16></td>
+
+<td>Disconnected</td>
+
+<td>Status</td>
+
+<td>Indicates that the application is not connected to a database. Used
+with "Connected".</td>
+</tr>
+
+<tr>
+<td><img SRC="DownColumn.gif" height=18 width=22></td>
+
+<td>DownColumn</td>
+
+<td>GridEdit</td>
+
+<td>Move a grid row down one row.</td>
+</tr>
+
+<tr>
+<td><img SRC="EditColumn.gif" height=18 width=22></td>
+
+<td>EditColumn</td>
+
+<td>GridEdit</td>
+
+<td>Brings up a window to allow the user to edit the row.</td>
+</tr>
+
+<tr>
+<td><img SRC="Ellipse.gif" height=16 width=16></td>
+
+<td>Ellipse</td>
+
+<td>Tool</td>
+
+<td>Change drawing mode to allow for drawing ellipse.</td>
+</tr>
+
+<tr>
+<td><img SRC="Find.gif" height=16 width=16></td>
+
+<td>Find</td>
+
+<td>Edit</td>
+
+<td>Find is not implemented yet but several types are planned.</td>
+</tr>
+
+<tr>
+<td><img SRC="Indent.gif" height=16 width=16></td>
+
+<td>Indent</td>
+
+<td>Edit</td>
+
+<td>Indents text. Used in the Advanced SQL&nbsp;Editor.</td>
+</tr>
+
+<tr>
+<td><img SRC="Index.gif" height=16 width=16></td>
+
+<td>Index</td>
+
+<td>DatabaseObject</td>
+
+<td>Used to represent a table index. Used in browser (left side of main
+window).</td>
+</tr>
+
+<tr>
+<td><img SRC="Italic.gif" height=16 width=16></td>
+
+<td>Italic</td>
+
+<td>Font</td>
+
+<td>see AlignBottom</td>
+</tr>
+
+<tr>
+<td><img SRC="Line.gif" height=16 width=16></td>
+
+<td>Line</td>
+
+<td>Tool</td>
+
+<td>Change drawing mode to allow for drawing line.</td>
+</tr>
+
+<tr>
+<td><img SRC="ModelProperties.gif" height=16 width=16></td>
+
+<td>ModelProperties</td>
+
+<td>Model</td>
+
+<td>Brings up a window to allow user to edit model properties such as;
+database name, connection information, and validation options.</td>
+</tr>
+
+<tr>
+<td><img SRC="ModelValidate.gif" height=16 width=16></td>
+
+<td>ModelValidate</td>
+
+<td>Model</td>
+
+<td>Invokes model validation. Checks for various problems (or potential
+problems) with the model and logs the results in an output window.</td>
+</tr>
+
+<tr>
+<td><img SRC="New.gif" height=16 width=16></td>
+
+<td>New</td>
+
+<td>File</td>
+
+<td>Used for new model (modelling window) and new SQL window (Advanced
+SQL&nbsp;Editor). These could be two different icons.</td>
+</tr>
+
+<tr>
+<td><img SRC="NewSession.gif" height=16 width=16></td>
+
+<td>NewSession</td>
+
+<td>File</td>
+
+<td>Used by Advanced SQL&nbsp;Editor. Sessions include SQL&nbsp;history.</td>
+</tr>
+
+<tr>
+<td><img SRC="ODBC.gif" height=29 width=24></td>
+
+<td>ODBC</td>
+
+<td>misc</td>
+
+<td>Brings up the systems ODBC&nbsp;Config tool. Icon is the unixODBC&nbsp;icon
+( www.unixodbc.org ).</td>
+</tr>
+
+<tr>
+<td><img SRC="Open.gif" height=16 width=16></td>
+
+<td>Open</td>
+
+<td>File</td>
+
+<td>Used to open a model or SQL&nbsp;file.</td>
+</tr>
+
+<tr>
+<td><img SRC="OpenSession.gif" height=16 width=16></td>
+
+<td>OpenSession</td>
+
+<td>File</td>
+
+<td>Used in the Advanced SQL&nbsp;Editor to open a session.</td>
+</tr>
+
+<tr>
+<td><img SRC="Paste.gif" height=16 width=16></td>
+
+<td>Paste</td>
+
+<td>Edit</td>
+
+<td>Paste selected objects/text.</td>
+</tr>
+
+<tr>
+<td><img SRC="Print.gif" height=16 width=16></td>
+
+<td>Print</td>
+
+<td>File</td>
+
+<td>Print model, data dictionary, SQL, or SQL results.</td>
+</tr>
+
+<tr>
+<td><img SRC="Rectangle.gif" height=16 width=16></td>
+
+<td>Rectangle</td>
+
+<td>Tool</td>
+
+<td>Change drawing mode to allow user to draw rectangle.</td>
+</tr>
+
+<tr>
+<td><img SRC="Redo.gif" height=16 width=16></td>
+
+<td>Redo</td>
+
+<td>Edit</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="Relationship.gif" height=16 width=16></td>
+
+<td>Relationship</td>
+
+<td>DatabaseObject
+<br>Tool</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="Run.gif" height=14 width=16></td>
+
+<td>Run</td>
+
+<td>SQL</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="RunSelected.gif" height=14 width=16></td>
+
+<td>RunSelected</td>
+
+<td>SQL</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>???</td>
+
+<td>Sequence</td>
+
+<td>DatabaseObject</td>
+
+<td>Not created yet. A sequence is often a special database table. Its
+used as a number generator for creating primary keys.</td>
+</tr>
+
+<tr>
+<td><img SRC="SQLEditor.gif" height=16 width=16></td>
+
+<td>SQLEditor</td>
+
+<td>App</td>
+
+<td>This will bring up the Advanced SQL&nbsp;Editor. This will be used
+as an application icon in the future because the Advanced SQL&nbsp;Editor
+will be seperated into its own program. This icon is very poor quality.</td>
+</tr>
+
+<tr>
+<td><img SRC="Save.gif" height=16 width=16></td>
+
+<td>Save</td>
+
+<td>File</td>
+
+<td>Save model or SQL.</td>
+</tr>
+
+<tr>
+<td><img SRC="SaveSession.gif" height=16 width=16></td>
+
+<td>SaveSession</td>
+
+<td>File</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="SelectAll.gif" height=16 width=16></td>
+
+<td>SelectAll</td>
+
+<td>misc</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="SelectNone.gif" height=16 width=16></td>
+
+<td>SelectNone</td>
+
+<td>misc</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="Strikeout.gif" height=16 width=16></td>
+
+<td>Strikeout</td>
+
+<td>Font</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="Table.gif" height=16 width=16></td>
+
+<td>Table</td>
+
+<td>DatabaseObject
+<br>Tool</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>???</td>
+
+<td>TableInherited</td>
+
+<td>DatabaseObject</td>
+
+<td>Not created yet. Will probably be drawn like a normal table but with
+thicker line for bounding rectangle.</td>
+</tr>
+
+<tr>
+<td><img SRC="Text.gif" height=16 width=16></td>
+
+<td>Text</td>
+
+<td>Tool</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="ToBack.gif" height=16 width=16></td>
+
+<td>ToBack</td>
+
+<td>Arrange</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="ToFront.gif" height=16 width=16></td>
+
+<td>ToFront</td>
+
+<td>Arrange</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="Underline.gif" height=16 width=16></td>
+
+<td>Underline</td>
+
+<td>Font</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="Undo.gif" height=16 width=16></td>
+
+<td>Undo</td>
+
+<td>Edit</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="Unindent.gif" height=16 width=16></td>
+
+<td>Unindent</td>
+
+<td>Edit</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="UpColumn.gif" height=18 width=22></td>
+
+<td>UpColumn</td>
+
+<td>GridEdit</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>???</td>
+
+<td>View</td>
+
+<td>DatabaseObject
+<br>Tool</td>
+
+<td>Not created yet. Will be drawn same as table but bounding rect will
+have rounded corners.</td>
+</tr>
+
+<tr>
+<td><img SRC="ZoomIn.gif" height=16 width=16></td>
+
+<td>ZoomIn</td>
+
+<td>Zoom</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="ZoomOut.gif" height=16 width=16></td>
+
+<td>ZoomOut</td>
+
+<td>Zoom</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="msgerror.gif" height=16 width=16></td>
+
+<td>msgerror</td>
+
+<td>Msg</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="msgexclamation.gif" height=16 width=16></td>
+
+<td>msgexclamation</td>
+
+<td>Msg</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td><img SRC="msginformation.gif" height=16 width=16></td>
+
+<td>msginformation</td>
+
+<td>Msg</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td></td>
+
+<td></td>
+
+<td></td>
+
+<td></td>
+</tr>
+</table>
+
+<br>&nbsp;
+<br>&nbsp;
+</body>
+</html>

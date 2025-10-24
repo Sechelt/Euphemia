@@ -1,0 +1,159 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"FR.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{63CBA159-C23D-4B56-A1B7-D422ADE7C717}">
+            <F N="include/FRCalendarWidget.h"/>
+            <F N="include/FRCheckBox.h"/>
+            <F N="include/FRComboBox.h"/>
+            <F N="include/FRDateEdit.h"/>
+            <F N="include/FRDateTimeEdit.h"/>
+            <F N="include/FRDial.h"/>
+            <F N="include/FRDialogButtonBox.h"/>
+            <F N="include/FRDoubleSpinBox.h"/>
+            <F N="include/FRForm.h"/>
+            <F N="include/FRFormEditorWidget.h"/>
+            <F N="include/FRFormPalWidget.h"/>
+            <F N="include/FRFrame.h"/>
+            <F N="include/FRGraphicsProxyObject.h"/>
+            <F N="include/FRGroupBox.h"/>
+            <F N="include/FRHorizontalScrollBar.h"/>
+            <F N="include/FRHorizontalSlider.h"/>
+            <F N="include/FRLabel.h"/>
+            <F N="include/FRLCDNumber.h"/>
+            <F N="include/FRLineEdit.h"/>
+            <F N="include/FRListWidget.h"/>
+            <F N="include/FRObject.h"/>
+            <F N="include/FROpenGLWidget.h"/>
+            <F N="include/FRPlainTextEdit.h"/>
+            <F N="include/FRProgressBar.h"/>
+            <F N="include/FRPushButton.h"/>
+            <F N="include/FRRadioButton.h"/>
+            <F N="include/FRScrollArea.h"/>
+            <F N="include/FRSpinBox.h"/>
+            <F N="include/FRStackedWidget.h"/>
+            <F N="include/FRTableWidget.h"/>
+            <F N="include/FRTabWidget.h"/>
+            <F N="include/FRTextBrowser.h"/>
+            <F N="include/FRTextEdit.h"/>
+            <F N="include/FRTimeEdit.h"/>
+            <F N="include/FRToolBox.h"/>
+            <F N="include/FRToolButton.h"/>
+            <F N="include/FRTreeWidget.h"/>
+            <F N="include/FRVerticalScrollBar.h"/>
+            <F N="include/FRVerticalSlider.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{4370E9AA-0270-4A2A-8946-369CC2818BB5}">
+            <F N="source/FRCalendarWidget.cpp"/>
+            <F N="source/FRCheckBox.cpp"/>
+            <F N="source/FRComboBox.cpp"/>
+            <F N="source/FRDateEdit.cpp"/>
+            <F N="source/FRDateTimeEdit.cpp"/>
+            <F N="source/FRDial.cpp"/>
+            <F N="source/FRDialogButtonBox.cpp"/>
+            <F N="source/FRDoubleSpinBox.cpp"/>
+            <F N="source/FRForm.cpp"/>
+            <F N="source/FRFormEditorWidget.cpp"/>
+            <F N="source/FRFormPalWidget.cpp"/>
+            <F N="source/FRFrame.cpp"/>
+            <F N="source/FRGraphicsProxyObject.cpp"/>
+            <F N="source/FRGroupBox.cpp"/>
+            <F N="source/FRHorizontalScrollBar.cpp"/>
+            <F N="source/FRHorizontalSlider.cpp"/>
+            <F N="source/FRLabel.cpp"/>
+            <F N="source/FRLCDNumber.cpp"/>
+            <F N="source/FRLineEdit.cpp"/>
+            <F N="source/FRListWidget.cpp"/>
+            <F N="source/FRObject.cpp"/>
+            <F N="source/FROpenGLWidget.cpp"/>
+            <F N="source/FRPlainTextEdit.cpp"/>
+            <F N="source/FRProgressBar.cpp"/>
+            <F N="source/FRPushButton.cpp"/>
+            <F N="source/FRRadioButton.cpp"/>
+            <F N="source/FRScrollArea.cpp"/>
+            <F N="source/FRSpinBox.cpp"/>
+            <F N="source/FRStackedWidget.cpp"/>
+            <F N="source/FRTableWidget.cpp"/>
+            <F N="source/FRTabWidget.cpp"/>
+            <F N="source/FRTextBrowser.cpp"/>
+            <F N="source/FRTextEdit.cpp"/>
+            <F N="source/FRTimeEdit.cpp"/>
+            <F N="source/FRToolBox.cpp"/>
+            <F N="source/FRToolButton.cpp"/>
+            <F N="source/FRTreeWidget.cpp"/>
+            <F N="source/FRVerticalScrollBar.cpp"/>
+            <F N="source/FRVerticalSlider.cpp"/>
+            <F N="source/LibInfo.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{DB312619-4996-4340-B1AF-5C070D1633E2}">
+            <F N="FR.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{123178E2-2AA9-4EC8-8AAB-E36080F42848}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{2EDAE907-7B82-4FAF-AD70-19F400629CD3}">
+            <F N="FR.pro"/>
+        </Folder>
+    </Files>
+</Project>

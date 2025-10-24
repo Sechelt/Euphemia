@@ -1,0 +1,26 @@
+/* XPM */
+static const char *xpmTableDerived16x16[]={
+"16 16 6 1",
+"a c None",
+"# c #000000",
+"b c #00ff00",
+"d c #aaaaaa",
+". c #ff0000",
+"c c #ffffff",
+"..#aaaaaaaaaaaaa",
+"..#aaaaaaaaaaaaa",
+"###aaabbbbbbbbbb",
+"a#aaaab#########",
+"a#aaaab#ccccccc#",
+"a#aaaab#c#####c#",
+"a#a#aab#cdddddc#",
+"a#a##ab#ccccccc#",
+"a#a#c#b#c#####c#",
+"a###cc##cdddddc#",
+"aaa#c#b#ccccccc#",
+"aaa##ab#c#####c#",
+"aaa#aab#cdddddc#",
+"aaaaaab#ccccccc#",
+"aaaaaab#########",
+"aaaaaabbbbbbbbbb"};
+

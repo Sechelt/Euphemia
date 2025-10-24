@@ -1,0 +1,23 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/DR">
+<!-- plugin -->
+	<file alias="Layers">images/Layers.png</file>
+	<file alias="Draw">images/Draw.png</file>
+<!-- tools -->
+ 	<file alias="Manipulate">images/Manipulate.png</file>
+	<file alias="SelectRectangle">images/SelectRectangle.png</file>
+	<file alias="SelectPolygon">images/SelectPolygon.png</file>
+	<file alias="Line">images/Line.png</file>
+	<file alias="Rectangle">images/Rectangle.png</file>
+	<file alias="Image">images/Image.png</file>
+	<file alias="Ellipse">images/Ellipse.png</file>
+	<file alias="Polygon">images/Polygon.png</file>
+	<file alias="Polyline">images/Polyline.png</file>
+	<file alias="Text">images/Text.png</file>
+	<file alias="Arc">images/Arc.png</file>
+	<file alias="Chord">images/Chord.png</file>
+	<file alias="Pie">images/Pie.png</file>
+</qresource>
+</RCC>
+
+

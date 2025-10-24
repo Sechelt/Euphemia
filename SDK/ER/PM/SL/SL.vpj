@@ -1,0 +1,111 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"SL.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{8579C5F5-E120-4DD6-ACEF-9F6955E0CEDA}">
+            <F N="include/SLColumn.h"/>
+            <F N="include/SLDomain.h"/>
+            <F N="include/SLIndex.h"/>
+            <F N="include/SLIndexColumn.h"/>
+            <F N="include/SLKey.h"/>
+            <F N="include/SLModel.h"/>
+            <F N="include/SLModelEditorWidget.h"/>
+            <F N="include/SLModelPalWidget.h"/>
+            <F N="include/SLProcedure.h"/>
+            <F N="include/SLReference.h"/>
+            <F N="include/SLReferenceColumn.h"/>
+            <F N="include/SLRule.h"/>
+            <F N="include/SLSequence.h"/>
+            <F N="include/SLTable.h"/>
+            <F N="include/SLView.h"/>
+            <F N="include/SLViewColumn.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{9E399BDD-BEAE-4111-A6A0-97E1AEE43D19}">
+            <F N="source/LibInfo.h"/>
+            <F N="source/SLColumn.cpp"/>
+            <F N="source/SLDomain.cpp"/>
+            <F N="source/SLIndex.cpp"/>
+            <F N="source/SLIndexColumn.cpp"/>
+            <F N="source/SLKey.cpp"/>
+            <F N="source/SLModel.cpp"/>
+            <F N="source/SLModelEditorWidget.cpp"/>
+            <F N="source/SLModelPalWidget.cpp"/>
+            <F N="source/SLProcedure.cpp"/>
+            <F N="source/SLReference.cpp"/>
+            <F N="source/SLReferenceColumn.cpp"/>
+            <F N="source/SLRule.cpp"/>
+            <F N="source/SLSequence.cpp"/>
+            <F N="source/SLTable.cpp"/>
+            <F N="source/SLView.cpp"/>
+            <F N="source/SLViewColumn.cpp"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{85A9C32A-4FEE-4387-A3F4-D8E214C17328}"/>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{E684E4EE-450E-4DE7-B768-37FB9DB6ED3E}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{9B6B5988-511E-4E6F-B770-62C20A22567B}">
+            <F N="SL.pro"/>
+        </Folder>
+    </Files>
+</Project>

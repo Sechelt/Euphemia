@@ -1,0 +1,163 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"LM.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{79F60581-A70F-4F39-91B0-4973A9FE50C3}">
+            <F N="source/LibInfo.h"/>
+            <F N="include/LMAdditionalChecksWidget.h"/>
+            <F N="include/LMAssociativeLink.h"/>
+            <F N="include/LMAssociativeLinkWidget.h"/>
+            <F N="include/LMAttribute.h"/>
+            <F N="include/LMAttributeChecksWidget.h"/>
+            <F N="include/LMAttributesUsedWidget.h"/>
+            <F N="include/LMAttributesWidget.h"/>
+            <F N="include/LMDataItem.h"/>
+            <F N="include/LMDataItemChecksWidget.h"/>
+            <F N="include/LMDataItemsWidget.h"/>
+            <F N="include/LMDataTypeArgsWidget.h"/>
+            <F N="include/LMDataTypeWidget.h"/>
+            <F N="include/LMDiagramDisplayWidget.h"/>
+            <F N="include/LMDomain.h"/>
+            <F N="include/LMDomainChecksWidget.h"/>
+            <F N="include/LMDomainsWidget.h"/>
+            <F N="include/LMEntityAssociative.h"/>
+            <F N="include/LMEntityBase.h"/>
+            <F N="include/LMEntityNormal.h"/>
+            <F N="include/LMEntityOptionsWidget.h"/>
+            <F N="include/LMIdentifier.h"/>
+            <F N="include/LMIdentifierOptionsWidget.h"/>
+            <F N="include/LMIdentifiersWidget.h"/>
+            <F N="include/LMInheritance.h"/>
+            <F N="include/LMInheritanceLink.h"/>
+            <F N="include/LMInheritanceWidget.h"/>
+            <F N="include/LMLine.h"/>
+            <F N="include/LMLineWidget.h"/>
+            <F N="include/LMModel.h"/>
+            <F N="include/LMModelEditorWidget.h"/>
+            <F N="include/LMModelPalWidget.h"/>
+            <F N="include/LMNotesWidget.h"/>
+            <F N="include/LMObject.h"/>
+            <F N="include/LMRectangle.h"/>
+            <F N="include/LMRelationship.h"/>
+            <F N="include/LMRelationshipWidget.h"/>
+            <F N="include/LMRule.h"/>
+            <F N="include/LMRulesUsedWidget.h"/>
+            <F N="include/LMRulesWidget.h"/>
+            <F N="include/LMRuleWidget.h"/>
+            <F N="include/LMValidationWidget.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{D9422C47-0B0C-4086-814D-2BDF2DFECB73}">
+            <F N="source/LMAdditionalChecksWidget.cpp"/>
+            <F N="source/LMAssociativeLink.cpp"/>
+            <F N="source/LMAssociativeLinkWidget.cpp"/>
+            <F N="source/LMAttribute.cpp"/>
+            <F N="source/LMAttributeChecksWidget.cpp"/>
+            <F N="source/LMAttributesUsedWidget.cpp"/>
+            <F N="source/LMAttributesWidget.cpp"/>
+            <F N="source/LMDataItem.cpp"/>
+            <F N="source/LMDataItemChecksWidget.cpp"/>
+            <F N="source/LMDataItemsWidget.cpp"/>
+            <F N="source/LMDataTypeArgsWidget.cpp"/>
+            <F N="source/LMDataTypeWidget.cpp"/>
+            <F N="source/LMDiagramDisplayWidget.cpp"/>
+            <F N="source/LMDomain.cpp"/>
+            <F N="source/LMDomainChecksWidget.cpp"/>
+            <F N="source/LMDomainsWidget.cpp"/>
+            <F N="source/LMEntityAssociative.cpp"/>
+            <F N="source/LMEntityBase.cpp"/>
+            <F N="source/LMEntityNormal.cpp"/>
+            <F N="source/LMEntityOptionsWidget.cpp"/>
+            <F N="source/LMIdentifier.cpp"/>
+            <F N="source/LMIdentifierOptionsWidget.cpp"/>
+            <F N="source/LMIdentifiersWidget.cpp"/>
+            <F N="source/LMInheritance.cpp"/>
+            <F N="source/LMInheritanceLink.cpp"/>
+            <F N="source/LMInheritanceWidget.cpp"/>
+            <F N="source/LMLine.cpp"/>
+            <F N="source/LMLineWidget.cpp"/>
+            <F N="source/LMModel.cpp"/>
+            <F N="source/LMModelEditorWidget.cpp"/>
+            <F N="source/LMModelPalWidget.cpp"/>
+            <F N="source/LMNotesWidget.cpp"/>
+            <F N="source/LMObject.cpp"/>
+            <F N="source/LMRectangle.cpp"/>
+            <F N="source/LMRelationship.cpp"/>
+            <F N="source/LMRelationshipWidget.cpp"/>
+            <F N="source/LMRule.cpp"/>
+            <F N="source/LMRulesUsedWidget.cpp"/>
+            <F N="source/LMRulesWidget.cpp"/>
+            <F N="source/LMRuleWidget.cpp"/>
+            <F N="source/LMValidationWidget.cpp"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{C25F6CFB-BF6D-42FA-8081-6F8DB3F090D2}">
+            <F N="LM.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{31EAD746-E699-4F7E-A5AD-7C5F33C97F05}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{72A77B89-229F-4617-9EB8-5B0BA4377CCC}">
+            <F N="LM.pro"/>
+        </Folder>
+    </Files>
+</Project>

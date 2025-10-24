@@ -1,0 +1,101 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"Paint.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{013F6F63-B797-4FA6-B624-E15CD7369A01}">
+            <F N="source/AppInfo.h"/>
+            <F N="source/EExportDialog.cpp"/>
+            <F N="source/EFile.cpp"/>
+            <F N="source/EMainWindow.cpp"/>
+            <F N="source/EPreferencesDialog.cpp"/>
+            <F N="source/EWorkspace.cpp"/>
+            <F N="source/main.cpp"/>
+        </Folder>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{2C4B4E40-F268-43AC-A39A-B773F0661A6B}">
+            <F N="include/EExportDialog.h"/>
+            <F N="include/EFile.h"/>
+            <F N="include/EMainWindow.h"/>
+            <F N="include/EPreferencesDialog.h"/>
+            <F N="include/EWorkspace.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{311E6FE8-DE30-44BB-B104-806DF37ABBEE}">
+            <F N="Blue.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{C069D53D-BCE9-47F3-AF2B-B783037EBCF7}">
+            <F N="images/Cancel.png"/>
+            <F N="images/Commit.png"/>
+            <F N="images/crop.png"/>
+            <F N="images/Feedback.png"/>
+            <F N="images/Paint.png"/>
+            <F N="images/Splash.png"/>
+        </Folder>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{9540F413-8020-4940-8CA7-2EE3E3551F5D}">
+            <F N="Blue.pro"/>
+        </Folder>
+    </Files>
+    <List Name="RTE">
+    </List>
+</Project>

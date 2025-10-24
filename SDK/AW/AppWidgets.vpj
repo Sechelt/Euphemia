@@ -1,0 +1,175 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"AppWidgets.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{9F8A6B18-97E0-444F-B8E8-211F8E7A9F05}">
+            <F N="include/AWClassDialog.h"/>
+            <F N="include/AWClassNameWidget.h"/>
+            <F N="include/AWClassWidget.h"/>
+            <F N="include/AWContainer.h"/>
+            <F N="include/AWDataDialog.h"/>
+            <F N="include/AWDataTable.h"/>
+            <F N="include/AWDataWidget.h"/>
+            <F N="include/AWDevScriptWidget.h"/>
+            <F N="include/AWDevWidget.h"/>
+            <F N="include/AWDocumentNameWidget.h"/>
+            <F N="include/AWDynamicDataWidget.h"/>
+            <F N="include/AWEditorWidget.h"/>
+            <F N="include/AWFactoryWidget.h"/>
+            <F N="include/AWFile.h"/>
+            <F N="include/AWFolder.h"/>
+            <F N="include/AWObject.h"/>
+            <F N="include/AWObjectChildrenWidget.h"/>
+            <F N="include/AWObjectNameWidget.h"/>
+            <F N="include/AWObjectSelectWidget.h"/>
+            <F N="include/AWObjectsWidget.h"/>
+            <F N="include/AWObjectUsedByWidget.h"/>
+            <F N="include/AWObjectUsesWidget.h"/>
+            <F N="include/AWOutputMessagesWidget.h"/>
+            <F N="include/AWOutputSearchWidget.h"/>
+            <F N="include/AWOutputValidationWidget.h"/>
+            <F N="include/AWOutputWidget.h"/>
+            <F N="include/AWPalWidget.h"/>
+            <F N="include/AWPanWidget.h"/>
+            <F N="include/AWPropObjectWidget.h"/>
+            <F N="include/AWPropWidget.h"/>
+            <F N="include/AWQuery.h"/>
+            <F N="include/AWScratchWidget.h"/>
+            <F N="include/AWTreeWidget.h"/>
+            <F N="include/AWValidationWidget.h"/>
+            <F N="include/AWWorkspace.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{958EB2BE-5932-4D57-A093-30B10F5A426B}">
+            <F N="source/AWClassDialog.cpp"/>
+            <F N="source/AWClassNameWidget.cpp"/>
+            <F N="source/AWClassWidget.cpp"/>
+            <F N="source/AWContainer.cpp"/>
+            <F N="source/AWDataDialog.cpp"/>
+            <F N="source/AWDataTable.cpp"/>
+            <F N="source/AWDataWidget.cpp"/>
+            <F N="source/AWDevScriptWidget.cpp"/>
+            <F N="source/AWDevWidget.cpp"/>
+            <F N="source/AWDocumentNameWidget.cpp"/>
+            <F N="source/AWDynamicDataWidget.cpp"/>
+            <F N="source/AWEditorWidget.cpp"/>
+            <F N="source/AWFactoryWidget.cpp"/>
+            <F N="source/AWFile.cpp"/>
+            <F N="source/AWFolder.cpp"/>
+            <F N="source/AWObject.cpp"/>
+            <F N="source/AWObjectChildrenWidget.cpp"/>
+            <F N="source/AWObjectNameWidget.cpp"/>
+            <F N="source/AWObjectSelectWidget.cpp"/>
+            <F N="source/AWObjectsWidget.cpp"/>
+            <F N="source/AWObjectUsedByWidget.cpp"/>
+            <F N="source/AWObjectUsesWidget.cpp"/>
+            <F N="source/AWOutputMessagesWidget.cpp"/>
+            <F N="source/AWOutputSearchWidget.cpp"/>
+            <F N="source/AWOutputValidationWidget.cpp"/>
+            <F N="source/AWOutputWidget.cpp"/>
+            <F N="source/AWPalWidget.cpp"/>
+            <F N="source/AWPanWidget.cpp"/>
+            <F N="source/AWPropObjectWidget.cpp"/>
+            <F N="source/AWPropWidget.cpp"/>
+            <F N="source/AWQuery.cpp"/>
+            <F N="source/AWScratchWidget.cpp"/>
+            <F N="source/AWTreeWidget.cpp"/>
+            <F N="source/AWValidationWidget.cpp"/>
+            <F N="source/AWWorkspace.cpp"/>
+            <F N="source/LibInfo.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{6010135B-3A57-4432-B0C8-0C97F923FF6F}">
+            <F N="AW.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{22123171-C034-43D9-ACE8-CB8F379CD524}">
+            <F N="images/Blank16x16.xpm"/>
+            <F N="images/CheckAll16x16.xpm"/>
+            <F N="images/CheckMark.xpm"/>
+            <F N="images/CheckNone16x16.xpm"/>
+            <F N="images/Delete16x16.xpm"/>
+            <F N="images/Draw16x16.xpm"/>
+            <F N="images/Error16x16.xpm"/>
+            <F N="images/FileNew22.xpm"/>
+            <F N="images/FileSave22.xpm"/>
+            <F N="images/FolderClosed16x16.xpm"/>
+            <F N="images/FolderOpen16x16.xpm"/>
+            <F N="images/Information16x16.xpm"/>
+            <F N="images/minus.xpm"/>
+            <F N="images/ModelCheck16x16.xpm"/>
+            <F N="images/plus.xpm"/>
+            <F N="images/Properties16x16.xpm"/>
+            <F N="images/RowDelete16x16.xpm"/>
+            <F N="images/RowDown16x16.xpm"/>
+            <F N="images/RowEdit16x16.xpm"/>
+            <F N="images/RowNew16x16.xpm"/>
+            <F N="images/RowUp16x16.xpm"/>
+            <F N="images/Warning16x16.xpm"/>
+        </Folder>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{F9ABBF37-9F1A-486A-B3F4-2434BDC7F5A1}">
+            <F N="AW.pro"/>
+            <F N="notes.txt"/>
+        </Folder>
+    </Files>
+</Project>

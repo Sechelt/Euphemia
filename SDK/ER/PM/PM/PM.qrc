@@ -1,0 +1,26 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/PM"> 
+	<file alias="AlternateKey">resources/AlternateKey.png</file>
+	<file alias="Column">resources/Column48x48.png</file>
+	<file alias="DatabaseModify">resources/DatabaseModify48x48.png</file>
+	<file alias="DatabaseReverse">resources/DatabaseReverse48x48.png</file>
+	<file alias="DatabaseCreate">resources/DatabaseCreate48x48.png</file>
+	<file alias="Domain">resources/Domain16x16.png</file>
+	<file alias="ForeignKey">resources/ForeignKey16x16.png</file>
+	<file alias="Inherit">resources/TableDerived48x48.png</file>
+	<file alias="Index">resources/Index16x16.png</file>
+	<file alias="LogicalModel">resources/LogicalModel48x48.png</file>
+	<file alias="PhysicalModel">resources/PhysicalModel48x48.png</file>
+	<file alias="PrimaryKey">resources/PrimaryKey16x16.png</file>
+	<file alias="Procedure">resources/Procedure16x16.png</file>
+	<file alias="Reference">resources/Reference48x48.png</file>
+	<file alias="ReferenceRotated">resources/ReferenceRotated16x16.png</file>
+	<file alias="Rule">resources/Rule16x16.xpm</file>
+	<file alias="Sequence">resources/Sequence16x16.png</file>
+	<file alias="Table">resources/Table48x48.png</file>
+	<file alias="ToUsed">resources/ArrowLeft.png</file>
+	<file alias="ToAvailable">resources/ArrowRight.png</file>
+	<file alias="View">resources/View48x48.png</file>
+</qresource>
+</RCC>
+

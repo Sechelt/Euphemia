@@ -1,0 +1,28 @@
+/* XPM */
+static const char *xpmRowDelete16x16[]={
+"16 16 6 1",
+"# c None",
+". c #000000",
+"d c #00ff00",
+"b c #808080",
+"c c #ff0000",
+"a c #ffffff",
+".............###",
+".aaaaaaaaaaa.###",
+".aaaaaaaaaaa.###",
+"..............##",
+".aaaaaa..baa.c.#",
+".aaaaaaa.c..ccc.",
+"..........cccc.b",
+".ddddddddd.cc.b#",
+".dddddddd.ccc.b#",
+".........c.b.c.#",
+".aaaaaa.c.ba..c.",
+".aaaaaa..baa.#..",
+"........b....###",
+".aaaaaabaaaa.###",
+".aaaaaaaaaaa.###",
+".............###"};
+
+
+

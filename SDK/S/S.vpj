@@ -1,0 +1,107 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"S.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{4DD3A91E-37EF-4E6E-BE12-138D1D86DD12}">
+            <F N="source/LibInfo.h"/>
+            <F N="source/SBrush.cpp"/>
+            <F N="source/SColors.cpp"/>
+            <F N="source/SColorsPickerDialog.cpp"/>
+            <F N="source/SColorsPickerWidget.cpp"/>
+            <F N="source/SColorsWidget.cpp"/>
+            <F N="source/SFont.cpp"/>
+            <F N="source/SGrid.cpp"/>
+            <F N="source/SPen.cpp"/>
+            <F N="source/SRuler.cpp"/>
+            <F N="source/SSetting.cpp"/>
+            <F N="source/SSettings.cpp"/>
+            <F N="source/SText.cpp"/>
+        </Folder>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{D8E7C061-BA25-48B5-80D0-388120F2B2DC}">
+            <F N="include/S.h"/>
+            <F N="include/SBrush.h"/>
+            <F N="include/SColors.h"/>
+            <F N="include/SColorsPickerDialog.h"/>
+            <F N="include/SColorsPickerWidget.h"/>
+            <F N="include/SColorsWidget.h"/>
+            <F N="include/SFont.h"/>
+            <F N="include/SGrid.h"/>
+            <F N="include/SPen.h"/>
+            <F N="include/SRuler.h"/>
+            <F N="include/SSetting.h"/>
+            <F N="include/SSettings.h"/>
+            <F N="include/SText.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{86B89DA4-DB0D-438A-B645-8C6406A1CB3C}"/>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{6A83ADE3-32EE-4C62-A72E-C6D787A90146}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{2EFF1CDD-F2B6-41C8-90A6-ACA32547A72A}">
+            <F N="README.txt"/>
+            <F N="S.pro"/>
+        </Folder>
+    </Files>
+    <List Name="RTE">
+    </List>
+</Project>

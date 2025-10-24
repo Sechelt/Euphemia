@@ -1,0 +1,26 @@
+/* XPM */
+static const char *xpmClassDiagram16x16[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 4 1",
+"  c black",
+". c red",
+"X c white",
+"o c None",
+/* pixels */
+"ooooooooooo     ",
+"ooooooooooo XXX ",
+"ooooooooooo XXX ",
+"ooooooooooo X.X ",
+"ooooooooooo ... ",
+"ooooooooooooo oo",
+"ooooooooooooo oo",
+"ooooooooooooo oo",
+"oo            oo",
+"oo ooooooooooooo",
+"oo ooooooooooooo",
+" ... ooooooooooo",
+" X.X ooooooooooo",
+" XXX ooooooooooo",
+" XXX ooooooooooo",
+"     ooooooooooo"
+};

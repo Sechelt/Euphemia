@@ -1,0 +1,29 @@
+/* XPM */
+static const char *xpmRowEdit16x16[]={
+"16 16 8 1",
+"a c None",
+". c #000000",
+"f c #00ff00",
+"# c #800000",
+"e c #808080",
+"c c #ff0000",
+"d c #ffff00",
+"b c #ffffff",
+"............##aa",
+".bbbbbbbbbb.#c#a",
+".bbbbbbbbb..c###",
+"..........d..###",
+".bbbbbbb.ddd...a",
+".bbbbbb.ddded.aa",
+".......bdded.aaa",
+".bbbb.bbbed.aaaa",
+".bbbb.bbeb..aaaa",
+".......bb...aaaa",
+".ffff....ff.aaaa",
+".ffffffffff.aaaa",
+"............aaaa",
+".bbbbbbbbbb.aaaa",
+".bbbbbbbbbb.aaaa",
+"............aaaa"};
+
+

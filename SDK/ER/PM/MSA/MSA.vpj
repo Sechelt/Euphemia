@@ -1,0 +1,111 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"MSA.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{38EE3C82-9758-473A-8D65-B538E2458CD3}">
+            <F N="include/MSAColumn.h"/>
+            <F N="include/MSADomain.h"/>
+            <F N="include/MSAIndex.h"/>
+            <F N="include/MSAIndexColumn.h"/>
+            <F N="include/MSAKey.h"/>
+            <F N="include/MSAModel.h"/>
+            <F N="include/MSAModelEditorWidget.h"/>
+            <F N="include/MSAModelPalWidget.h"/>
+            <F N="include/MSAProcedure.h"/>
+            <F N="include/MSAReference.h"/>
+            <F N="include/MSAReferenceColumn.h"/>
+            <F N="include/MSARule.h"/>
+            <F N="include/MSASequence.h"/>
+            <F N="include/MSATable.h"/>
+            <F N="include/MSAView.h"/>
+            <F N="include/MSAViewColumn.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{7FA126CC-E3C3-460B-AD69-A85CFFE315F4}">
+            <F N="source/LibInfo.h"/>
+            <F N="source/MSAColumn.cpp"/>
+            <F N="source/MSADomain.cpp"/>
+            <F N="source/MSAIndex.cpp"/>
+            <F N="source/MSAIndexColumn.cpp"/>
+            <F N="source/MSAKey.cpp"/>
+            <F N="source/MSAModel.cpp"/>
+            <F N="source/MSAModelEditorWidget.cpp"/>
+            <F N="source/MSAModelPalWidget.cpp"/>
+            <F N="source/MSAProcedure.cpp"/>
+            <F N="source/MSAReference.cpp"/>
+            <F N="source/MSAReferenceColumn.cpp"/>
+            <F N="source/MSARule.cpp"/>
+            <F N="source/MSASequence.cpp"/>
+            <F N="source/MSATable.cpp"/>
+            <F N="source/MSAView.cpp"/>
+            <F N="source/MSAViewColumn.cpp"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{D346E10F-D27E-4EC0-AB69-F64769CE3B41}"/>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{E442DB48-9C00-4208-B66B-7CBAA5F50FB3}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{AB87CADD-A06F-4125-9C7D-4BE50ED0D059}">
+            <F N="MSA.pro"/>
+        </Folder>
+    </Files>
+</Project>

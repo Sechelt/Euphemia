@@ -1,0 +1,27 @@
+/* XPM */
+static const char *xpmOpen16x16[]={
+"16 16 7 1",
+". c None",
+"# c #000000",
+"e c #9f9f9f",
+"d c #c2c2c2",
+"c c #dbdbdb",
+"a c #ffa757",
+"b c #ffdba7",
+"......####......",
+".....##.####.#..",
+"....#.....####..",
+"...........###..",
+"..........####..",
+".####...........",
+"#abba#######....",
+"#bbbbaaaaaaa#...",
+"#bb#############",
+"#ba#ccccccccccc#",
+"#b#cddddededee#.",
+"#a#cdddededeee#.",
+"##cdddededeee#..",
+"##cddededeeee#..",
+"#cddededeeee#...",
+"#############..."};
+

@@ -1,0 +1,130 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="Latest Version">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"Wrappers.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if"
+            GUID="{5E8E824A-680C-4D16-A8F9-F0D580D0E857}">
+            <F N="include/DATA.h"/>
+            <F N="include/DATAAttrWidget.h"/>
+            <F N="include/DATAConnectDialog.h"/>
+            <F N="include/DATAConnection.h"/>
+            <F N="include/DATAConstants.h"/>
+            <F N="include/DATADataType.h"/>
+            <F N="include/DATADataTypesWidget.h"/>
+            <F N="include/DATADiagnostic.h"/>
+            <F N="include/DATAEnvironment.h"/>
+            <F N="include/DATAFunctionsWidget.h"/>
+            <F N="include/DATAHandle.h"/>
+            <F N="include/DATAInfoWidget.h"/>
+            <F N="include/DATAMessage.h"/>
+            <F N="include/DATAOutputDiagnosticsWidget.h"/>
+            <F N="include/DATAOutputMessagesWidget.h"/>
+            <F N="include/DATAProfile.h"/>
+            <F N="include/DATAProfiles.h"/>
+            <F N="include/DATAProfileWidget.h"/>
+            <F N="include/DATAResultSetWidget.h"/>
+            <F N="include/DATASqlWidget.h"/>
+            <F N="include/DATAStatement.h"/>
+            <F N="include/DATASystem.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl"
+            GUID="{12068D2B-3DC2-428E-8337-A975AA73DE86}">
+            <F N="source/DATAAttrWidget.cpp"/>
+            <F N="source/DATAConnectDialog.cpp"/>
+            <F N="source/DATAConnection.cpp"/>
+            <F N="source/DATAConstants.cpp"/>
+            <F N="source/DATADataType.cpp"/>
+            <F N="source/DATADataTypesWidget.cpp"/>
+            <F N="source/DATADiagnostic.cpp"/>
+            <F N="source/DATAEnvironment.cpp"/>
+            <F N="source/DATAFunctionsWidget.cpp"/>
+            <F N="source/DATAHandle.cpp"/>
+            <F N="source/DATAInfoWidget.cpp"/>
+            <F N="source/DATAMessage.cpp"/>
+            <F N="source/DATAOutputDiagnosticsWidget.cpp"/>
+            <F N="source/DATAOutputMessagesWidget.cpp"/>
+            <F N="source/DATAProfile.cpp"/>
+            <F N="source/DATAProfiles.cpp"/>
+            <F N="source/DATAProfileWidget.cpp"/>
+            <F N="source/DATAResultSetWidget.cpp"/>
+            <F N="source/DATASqlWidget.cpp"/>
+            <F N="source/DATAStatement.cpp"/>
+            <F N="source/DATASystem.cpp"/>
+            <F N="source/LibInfo.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{E5DC0222-6C82-43AE-AC8A-4E89117FB07E}">
+            <F N="DATA.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{6FA01AA3-D91C-42D5-A029-39CDA9DD4D58}">
+            <F N="images/Error16x16.xpm"/>
+            <F N="images/Information16x16.xpm"/>
+            <F N="images/Properties16x16.xpm"/>
+            <F N="images/Refresh16x16.xpm"/>
+            <F N="images/Warning16x16.xpm"/>
+        </Folder>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{A250EDF8-6D13-4E60-B64C-67CE3E3A16D3}">
+            <F N="DATA.pro"/>
+            <F N="README"/>
+        </Folder>
+    </Files>
+</Project>

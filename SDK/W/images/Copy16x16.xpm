@@ -1,0 +1,26 @@
+/* XPM */
+static const char *xpmCopy16x16[]={
+"16 16 6 1",
+"# c None",
+". c #000000",
+"c c #2f2f2f",
+"d c #9f9f9f",
+"b c #bfffdf",
+"a c #ffffff",
+"......##########",
+".aaaa..#########",
+".aaaa.b.########",
+".acca.ab.#######",
+".aaaa.......####",
+".accaaddd.a..###",
+".aaaaabab.a.b.##",
+".acccaccb.a.ab.#",
+".aaababbb.a.....",
+".accacccb.aaddd.",
+".ababbbbb.aabab.",
+".........ccaccb.",
+"######.aaababbb.",
+"######.accacccb.",
+"######.ababbbbb.",
+"######.........."};
+

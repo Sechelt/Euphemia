@@ -1,0 +1,18 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/L">
+<!-- layers -->
+	<file alias="Layers">images/Layers.png</file>
+	<file alias="Transparent">images/Transparent.png</file>
+	<file alias="Grid">images/Grid.png</file>
+<!-- pointers -->
+	<file alias="SquareDot">images/SquareDot.png</file>
+	<file alias="CircleDot">images/CircleDot.png</file>
+	<file alias="Drag">images/drag.png</file>
+	<file alias="ResizeTopRight">images/resize-topright.png</file>
+	<file alias="ResizeTopLeft">images/resize-topleft.png</file>
+	<file alias="ResizeVert">images/resize-vert.png</file>
+	<file alias="ResizeHoriz">images/resize-horiz.png</file>
+</qresource>
+</RCC>
+
+

@@ -1,0 +1,124 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"FL.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{9AA55C0D-45C5-4382-BDEE-7088195984A3}">
+            <F N="include/FLAsync.h"/>
+            <F N="include/FLBegin.h"/>
+            <F N="include/FLConditionClose.h"/>
+            <F N="include/FLConditionOpen.h"/>
+            <F N="include/FLDiagram.h"/>
+            <F N="include/FLDiagramEditorWidget.h"/>
+            <F N="include/FLDiagramPalWidget.h"/>
+            <F N="include/FLEnd.h"/>
+            <F N="include/FLFlow.h"/>
+            <F N="include/FLLayout.h"/>
+            <F N="include/FLLoopClose.h"/>
+            <F N="include/FLLoopOpen.h"/>
+            <F N="include/FLNameWidget.h"/>
+            <F N="include/FLRectangle.h"/>
+            <F N="include/FLStep.h"/>
+            <F N="include/FLSync.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{BB115407-2428-4347-BF31-439FC93AC57D}">
+            <F N="source/FLAsync.cpp"/>
+            <F N="source/FLBegin.cpp"/>
+            <F N="source/FLConditionClose.cpp"/>
+            <F N="source/FLConditionOpen.cpp"/>
+            <F N="source/FLDiagram.cpp"/>
+            <F N="source/FLDiagramEditorWidget.cpp"/>
+            <F N="source/FLDiagramPalWidget.cpp"/>
+            <F N="source/FLEnd.cpp"/>
+            <F N="source/FLFlow.cpp"/>
+            <F N="source/FLLayout.cpp"/>
+            <F N="source/FLLoopClose.cpp"/>
+            <F N="source/FLLoopOpen.cpp"/>
+            <F N="source/FLNameWidget.cpp"/>
+            <F N="source/FLRectangle.cpp"/>
+            <F N="source/FLStep.cpp"/>
+            <F N="source/FLSync.cpp"/>
+            <F N="source/LibInfo.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{AA9707F4-2B71-4AC0-947B-F1A29CC2818A}">
+            <F N="FL.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{07A1D38F-C96D-426D-84EB-22E2F41C8233}">
+            <F N="images/Async.png"/>
+            <F N="images/Begin48x48.png"/>
+            <F N="images/Condition48x48.png"/>
+            <F N="images/End48x48.png"/>
+            <F N="images/Flow48x48.png"/>
+            <F N="images/FlowChart48x48.png"/>
+            <F N="images/LoopTop48x48.png"/>
+            <F N="images/Step48x48.png"/>
+            <F N="images/Sync.png"/>
+        </Folder>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{588BAB9E-36C3-4A46-A287-79077CAFB70A}">
+            <F N="FL.pro"/>
+            <F N="README"/>
+        </Folder>
+    </Files>
+</Project>

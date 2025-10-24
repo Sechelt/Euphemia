@@ -1,0 +1,30 @@
+/* XPM */
+static const char *xpmDataType16x16[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 6 1",
+"  c black",
+". c green",
+"X c #aaaaaa",
+"o c white",
+"O c None",
+"@ c yellow",
+/* pixels */
+"OOOOOO....OOOOOO",
+"OO    .  .    OO",
+"OO ooo.oo.ooo OO",
+"OO o  .++   o OO",
+"OO oXX.  @@@  OO",
+"OO ooo. @@ @@ OO",
+"OO o  . @@ @@ OO",
+"OO oXX.    @@ OO",
+"OO ooo.X. @@  OO",
+"OO o  .X. @ o OO",
+"OO oXX.X.   o OO",
+"OO ooo.X @@ o OO",
+"OO o  .X @@ o OO",
+"OO oXX.X.   o OO",
+"OO    .X.     OO",
+"OOOOOO....OOOOOO"
+};
+
+

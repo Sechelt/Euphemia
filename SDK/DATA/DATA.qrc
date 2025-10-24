@@ -1,0 +1,12 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/DATA">
+	<file alias="Error">images/Error16x16.png</file>
+	<file alias="Information">images/Information16x16.png</file>
+	<file alias="Warning">images/Warning16x16.png</file>
+	<file alias="Refresh">images/Refresh16x16.png</file>
+	<file alias="Properties">images/Properties16x16.png</file>
+	<file alias="Success">images/Success16x16.png</file>
+</qresource>
+</RCC>
+
+

@@ -1,0 +1,92 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"R.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{F83F767C-D626-406A-ABF5-D0586C33F529}">
+            <F N="include/RRoute.h"/>
+            <F N="include/RRouteAStar.h"/>
+            <F N="include/RRouteAStarControl.h"/>
+            <F N="include/RRouteDynamic.h"/>
+            <F N="include/RRouteDynamicControl.h"/>
+            <F N="include/RSource.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{C37A31E1-C0B7-4B6F-9FD2-FD632946C2DE}">
+            <F N="source/LibInfo.h"/>
+            <F N="source/RRoute.cpp"/>
+            <F N="source/RRouteAStar.cpp"/>
+            <F N="source/RRouteAStarControl.cpp"/>
+            <F N="source/RRouteDynamic.cpp"/>
+            <F N="source/RRouteDynamicControl.cpp"/>
+            <F N="source/RSource.cpp"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{DE540F19-3B28-4371-B3E9-4183271B21AC}"/>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{E1E7F3C2-C671-40B0-9FDC-21F236016BFC}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{A39B956C-AA2E-4C92-817C-C8F6FBBD91D4}">
+            <F N="R.pro"/>
+            <F N="README"/>
+        </Folder>
+    </Files>
+</Project>

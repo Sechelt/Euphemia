@@ -1,0 +1,22 @@
+/* XPM */
+static const char* xpmFolderBack[]={
+    "15 13 3 1",
+    ". c None",
+    "* c #000000",
+    "a c #ffff99",
+    "..*****........",
+    ".*aaaaa*.......",
+    "***************",
+    "*aaaaaaaaaaaaa*",
+    "*aaaa*aaaaaaaa*",
+    "*aaa***aaaaaaa*",
+    "*aa*****aaaaaa*",
+    "*aaaa*aaaaaaaa*",
+    "*aaaa*aaaaaaaa*",
+    "*aaaa******aaa*",
+    "*aaaaaaaaaaaaa*",
+    "*aaaaaaaaaaaaa*",
+    "***************"};
+
+
+

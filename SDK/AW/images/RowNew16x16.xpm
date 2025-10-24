@@ -1,0 +1,29 @@
+/* XPM */
+static const char *xpmRowNew16x16[]={
+"16 16 7 1",
+"# c None",
+". c #000000",
+"d c #00ff00",
+"c c #919191",
+"e c #ff0000",
+"b c #ffff00",
+"a c #ffffff",
+"............####",
+".aaaaaaabba.##cb",
+".aaaaaaacbb.#cbb",
+".........cbbbbb#",
+".dddddddddbeeb##",
+".dddddddddbeeb##",
+".........bbbbbc#",
+".aaaaaaabbc.#bbc",
+".aaaaaaabca.##bb",
+"............####",
+".aaaaaaaaaa.####",
+".aaaaaaaaaa.####",
+"............####",
+".aaaaaaaaaa.####",
+".aaaaaaaaaa.####",
+"............####"};
+
+
+

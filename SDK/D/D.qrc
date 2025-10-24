@@ -1,0 +1,29 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/D">
+	<file alias="Arc">images/Arc200x200.png</file>
+	<file alias="CallOut">images/CallOut.png</file>
+	<file alias="Diagram">images/Diagram48x48.png</file>
+	<file alias="Dynamic">images/Dynamic48x48.png</file>
+	<file alias="Ellipse">images/Ellipse48x48.png</file>
+	<file alias="Image">images/Image200x200.png</file>
+	<file alias="Line">images/Line48x48.png</file>
+	<file alias="Line90H">images/Line90H.png</file>
+	<file alias="Line90V">images/Line90V.png</file>
+	<file alias="Line90Auto">images/Line90Auto48x48.png</file>
+	<file alias="Polyline">images/Polyline48x48.png</file>
+	<file alias="Rectangle">images/Rectangle.png</file>
+	<file alias="Stencil">images/Stencil.png</file>
+	<file alias="Stencils">images/Stencil.png</file>
+	<file alias="Text">images/Text48x48.png</file>
+	<file alias="OptimizeSize">images/OptimizeSize.png</file>
+	<file alias="Title">images/Title48x48.png</file>
+	<file alias="Anchor">images/anchor.svg</file>
+	<file alias="HSpacer">images/HSpacer.png</file>
+	<file alias="VSpacer">images/VSpacer.png</file>
+	<file alias="HLayout">images/HLayout.png</file>
+	<file alias="VLayout">images/VLayout.png</file>
+	<file alias="GLayout">images/GLayout.png</file>
+	<file alias="GroupLayout">images/GroupLayout.png</file>
+</qresource>
+</RCC>
+

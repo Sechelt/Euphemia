@@ -1,0 +1,31 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/AW">
+	<file alias="Blank">images/Blank16x16.png</file>
+	<file alias="CheckAll">images/CheckAll16x16.png</file>
+	<file alias="CheckMark">images/CheckMark.png</file>
+	<file alias="CheckNone">images/CheckNone16x16.png</file>
+	<file alias="Delete">images/Delete16x16.png</file>
+	<file alias="Draw">images/Draw16x16.png</file>
+	<file alias="Error">images/Error16x16.png</file>
+	<file alias="FileNew">images/FileNew22.png</file>
+	<file alias="FileSave">images/FileSave22.png</file>
+	<file alias="FolderClosed">images/FolderClosed16x16.png</file>
+	<file alias="FolderOpen">images/FolderOpen16x16.png</file>
+	<file alias="Information">images/Information16x16.png</file>
+	<file alias="Minus">images/minus.png</file>
+	<file alias="ModelCheck">images/ModelCheck16x16.png</file>
+	<file alias="Plus">images/plus.png</file>
+	<file alias="Properties">images/Properties16x16.png</file>
+	<file alias="Refresh">images/Refresh16x16.png</file>
+	<file alias="RowDelete">images/RowDelete16x16.png</file>
+	<file alias="RowDown">images/RowDown16x16.png</file>
+	<file alias="RowEdit">images/RowEdit16x16.png</file>
+	<file alias="RowNew">images/RowNew16x16.png</file>
+	<file alias="RowUp">images/RowUp16x16.png</file>
+	<file alias="Warning">images/Warning16x16.png</file>
+	<file alias="Find">images/find.png</file>
+	<file alias="Replace">images/replace.png</file>
+</qresource>
+</RCC>
+
+

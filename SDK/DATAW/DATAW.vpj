@@ -1,0 +1,237 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"DATAW.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{B027301D-3AB3-4C28-A375-F5FCB4CF0346}">
+            <F N="include/DATAWConnectDialog.h"/>
+            <F N="include/DATAWConnection.h"/>
+            <F N="include/DATAWConnectionToolBar.h"/>
+            <F N="include/DATAWConnectWizard.h"/>
+            <F N="include/DATAWDataWidget.h"/>
+            <F N="include/DATAWEditorToolBar.h"/>
+            <F N="include/DATAWFindDialog.h"/>
+            <F N="include/DATAWMeta.h"/>
+            <F N="include/DATAWOutputDiagnosticsWidget.h"/>
+            <F N="include/DATAWOutputMessagesWidget.h"/>
+            <F N="include/DATAWPropDialog.h"/>
+            <F N="include/DATAWQuery.h"/>
+            <F N="include/DATAWQueryCatalog.h"/>
+            <F N="include/DATAWQueryCatalogs.h"/>
+            <F N="include/DATAWQueryColumn.h"/>
+            <F N="include/DATAWQueryConnection.h"/>
+            <F N="include/DATAWQueryDataSource.h"/>
+            <F N="include/DATAWQueryDataSourceConnection.h"/>
+            <F N="include/DATAWQueryDataSources.h"/>
+            <F N="include/DATAWQueryDriver.h"/>
+            <F N="include/DATAWQueryDriverConnection.h"/>
+            <F N="include/DATAWQueryDrivers.h"/>
+            <F N="include/DATAWQueryEICallLevelInterface.h"/>
+            <F N="include/DATAWQueryEIConversion.h"/>
+            <F N="include/DATAWQueryEIDataSource.h"/>
+            <F N="include/DATAWQueryEIDataTypes.h"/>
+            <F N="include/DATAWQueryEIDBMS.h"/>
+            <F N="include/DATAWQueryEIDriver.h"/>
+            <F N="include/DATAWQueryEIFunctions.h"/>
+            <F N="include/DATAWQueryEILimits.h"/>
+            <F N="include/DATAWQueryEISupported.h"/>
+            <F N="include/DATAWQueryExtendedInfo.h"/>
+            <F N="include/DATAWQueryExtendedInfoItem.h"/>
+            <F N="include/DATAWQueryFolder.h"/>
+            <F N="include/DATAWQueryForeignKey.h"/>
+            <F N="include/DATAWQueryForeignKeys.h"/>
+            <F N="include/DATAWQueryIndex.h"/>
+            <F N="include/DATAWQueryIndexs.h"/>
+            <F N="include/DATAWQueryPrimaryKeys.h"/>
+            <F N="include/DATAWQuerySchema.h"/>
+            <F N="include/DATAWQuerySpecialColumns.h"/>
+            <F N="include/DATAWQuerySystem.h"/>
+            <F N="include/DATAWQueryTable.h"/>
+            <F N="include/DATAWQueryTableType.h"/>
+            <F N="include/DATAWSql.h"/>
+            <F N="include/DATAWSqlEditorWidget.h"/>
+            <F N="include/DATAWTableModel.h"/>
+            <F N="include/DATAWTableModelApp.h"/>
+            <F N="include/DATAWTableModelODBC.h"/>
+            <F N="include/DATAWTableView.h"/>
+            <F N="include/DATAWTableWidget.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{4339AF4A-6428-474C-9A07-3C64388DD5FA}">
+            <F N="source/DATAWConnectDialog.cpp"/>
+            <F N="source/DATAWConnection.cpp"/>
+            <F N="source/DATAWConnectionToolBar.cpp"/>
+            <F N="source/DATAWConnectWizard.cpp"/>
+            <F N="source/DATAWDataWidget.cpp"/>
+            <F N="source/DATAWEditorToolBar.cpp"/>
+            <F N="source/DATAWFindDialog.cpp"/>
+            <F N="source/DATAWMeta.cpp"/>
+            <F N="source/DATAWOutputDiagnosticsWidget.cpp"/>
+            <F N="source/DATAWOutputMessagesWidget.cpp"/>
+            <F N="source/DATAWPropDialog.cpp"/>
+            <F N="source/DATAWQuery.cpp"/>
+            <F N="source/DATAWQueryCatalog.cpp"/>
+            <F N="source/DATAWQueryCatalogs.cpp"/>
+            <F N="source/DATAWQueryColumn.cpp"/>
+            <F N="source/DATAWQueryConnection.cpp"/>
+            <F N="source/DATAWQueryDataSource.cpp"/>
+            <F N="source/DATAWQueryDataSourceConnection.cpp"/>
+            <F N="source/DATAWQueryDataSources.cpp"/>
+            <F N="source/DATAWQueryDriver.cpp"/>
+            <F N="source/DATAWQueryDriverConnection.cpp"/>
+            <F N="source/DATAWQueryDrivers.cpp"/>
+            <F N="source/DATAWQueryEICallLevelInterface.cpp"/>
+            <F N="source/DATAWQueryEIConversion.cpp"/>
+            <F N="source/DATAWQueryEIDataSource.cpp"/>
+            <F N="source/DATAWQueryEIDataTypes.cpp"/>
+            <F N="source/DATAWQueryEIDBMS.cpp"/>
+            <F N="source/DATAWQueryEIDriver.cpp"/>
+            <F N="source/DATAWQueryEIFunctions.cpp"/>
+            <F N="source/DATAWQueryEILimits.cpp"/>
+            <F N="source/DATAWQueryEISupported.cpp"/>
+            <F N="source/DATAWQueryExtendedInfo.cpp"/>
+            <F N="source/DATAWQueryExtendedInfoItem.cpp"/>
+            <F N="source/DATAWQueryFolder.cpp"/>
+            <F N="source/DATAWQueryForeignKey.cpp"/>
+            <F N="source/DATAWQueryForeignKeys.cpp"/>
+            <F N="source/DATAWQueryIndex.cpp"/>
+            <F N="source/DATAWQueryIndexs.cpp"/>
+            <F N="source/DATAWQueryPrimaryKeys.cpp"/>
+            <F N="source/DATAWQuerySchema.cpp"/>
+            <F N="source/DATAWQuerySpecialColumns.cpp"/>
+            <F N="source/DATAWQuerySystem.cpp"/>
+            <F N="source/DATAWQueryTable.cpp"/>
+            <F N="source/DATAWQueryTableType.cpp"/>
+            <F N="source/DATAWSql.cpp"/>
+            <F N="source/DATAWSqlEditorWidget.cpp"/>
+            <F N="source/DATAWTableModel.cpp"/>
+            <F N="source/DATAWTableModelApp.cpp"/>
+            <F N="source/DATAWTableModelODBC.cpp"/>
+            <F N="source/DATAWTableView.cpp"/>
+            <F N="source/DATAWTableWidget.cpp"/>
+            <F N="source/LibInfo.h"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{440A8E95-CBD8-4097-BE19-770C2585B204}">
+            <F N="DATAW.qrc"/>
+        </Folder>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{C7581B31-5D06-4524-A05E-F7DA15E368FD}">
+            <F N="images/Batched.png"/>
+            <F N="images/CatalogClosed48x48.png"/>
+            <F N="images/CatalogOpen48x48.png"/>
+            <F N="images/CBD-500.png"/>
+            <F N="images/clear.png"/>
+            <F N="images/close.png"/>
+            <F N="images/Column48x48.xpm"/>
+            <F N="images/Connected48x48.xpm"/>
+            <F N="images/Copy48x48.xpm"/>
+            <F N="images/Cut48x48.xpm"/>
+            <F N="images/DatabaseBrowse48x48.xpm"/>
+            <F N="images/DataSource.jpg"/>
+            <F N="images/DataSource.png"/>
+            <F N="images/DataSourcesSystem16x16.xpm"/>
+            <F N="images/DataSourcesUser16x16.xpm"/>
+            <F N="images/Delete.xpm"/>
+            <F N="images/Disconnected48x48.xpm"/>
+            <F N="images/Driver16x16.xpm"/>
+            <F N="images/Drivers16x16.xpm"/>
+            <F N="images/exit.png"/>
+            <F N="images/Feedback.png"/>
+            <F N="images/FileOpen22.png"/>
+            <F N="images/FileSave22.xpm"/>
+            <F N="images/Find.png"/>
+            <F N="images/FolderClosed48x48.png"/>
+            <F N="images/FolderOpen48x48.png"/>
+            <F N="images/ForeignKey16x16.png"/>
+            <F N="images/ID16x16.png"/>
+            <F N="images/Index16x16.png"/>
+            <F N="images/Information16x16.xpm"/>
+            <F N="images/Modified16x16.xpm"/>
+            <F N="images/new.png"/>
+            <F N="images/NewConnection48x48.xpm"/>
+            <F N="images/ODBC48x48.xpm"/>
+            <F N="images/OneArrow.xpm"/>
+            <F N="images/Paste48x48.xpm"/>
+            <F N="images/PrimaryKey16x16.png"/>
+            <F N="images/Procedure16x16.png"/>
+            <F N="images/ProcedureColumn16x16.png"/>
+            <F N="images/Properties16x16.xpm"/>
+            <F N="images/Redo48x48.xpm"/>
+            <F N="images/Refresh16x16.xpm"/>
+            <F N="images/Replace.png"/>
+            <F N="images/Schema16x16.png"/>
+            <F N="images/SQL48x48.xpm"/>
+            <F N="images/Submit48x48.xpm"/>
+            <F N="images/SubmitSelected48x48.xpm"/>
+            <F N="images/Table48x48.xpm"/>
+            <F N="images/TwoArrows.xpm"/>
+            <F N="images/Undo48x48.xpm"/>
+            <F N="images/View48x48.xpm"/>
+        </Folder>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{18AC765B-C8CE-43CB-9139-C68D023B3515}">
+            <F N="DATAW.pro"/>
+        </Folder>
+    </Files>
+    <List Name="RTE">
+    </List>
+</Project>

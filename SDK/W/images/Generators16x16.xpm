@@ -1,0 +1,26 @@
+/* XPM */
+static const char *xpmGenerators16x16[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 3 1",
+"y c black",
+". c green",
+"o c None",
+/* pixels */
+"oooooooooooooooo",
+"o            ooo",
+"o ..........   o",
+"o .......... . o",
+"o .......... . o",
+"o .......... . o",
+"o .......... . o",
+"o .......... . o",
+"o            . o",
+"oo ........... o",
+"oo             o",
+"oooooooooooooooo",
+"oooooooooooooooo",
+"oooooooooooooooo",
+"oooooooooooooooo",
+"oooooooooooooooo"
+};
+

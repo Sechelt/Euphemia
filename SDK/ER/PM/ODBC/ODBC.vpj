@@ -1,0 +1,111 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+    Version="10.0"
+    VendorName="SlickEdit"
+    TemplateName="(Other)"
+    WorkingDir=".">
+    <Config
+        Name="Release"
+        OutputFile=""
+        CompilerConfigName="">
+        <Menu>
+            <Target
+                Name="Compile"
+                MenuCaption="&amp;Compile"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveCurrent"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Build"
+                MenuCaption="&amp;Build"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec CmdLine="make"/>
+            </Target>
+            <Target
+                Name="Rebuild"
+                MenuCaption="&amp;Rebuild"
+                CaptureOutputWith="ProcessBuffer"
+                SaveOption="SaveWorkspaceFiles"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Debug"
+                MenuCaption="&amp;Debug"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec/>
+            </Target>
+            <Target
+                Name="Execute"
+                MenuCaption="E&amp;xecute"
+                SaveOption="SaveNone"
+                RunFromDir="%rw">
+                <Exec CmdLine='"ODBC.exe"'/>
+            </Target>
+        </Menu>
+    </Config>
+    <Files>
+        <Folder
+            Name="Header Files"
+            Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
+            GUID="{BD4A9E0E-38E4-4464-A349-A0E010074AC9}">
+            <F N="source/LibInfo.h"/>
+            <F N="include/ODBCColumn.h"/>
+            <F N="include/ODBCCorModel.h"/>
+            <F N="include/ODBCDomain.h"/>
+            <F N="include/ODBCDrvModel.h"/>
+            <F N="include/ODBCExtModel.h"/>
+            <F N="include/ODBCIndex.h"/>
+            <F N="include/ODBCIndexColumn.h"/>
+            <F N="include/ODBCKey.h"/>
+            <F N="include/ODBCMinModel.h"/>
+            <F N="include/ODBCModel.h"/>
+            <F N="include/ODBCModelEditorWidget.h"/>
+            <F N="include/ODBCModelPalWidget.h"/>
+            <F N="include/ODBCProcedure.h"/>
+            <F N="include/ODBCReference.h"/>
+            <F N="include/ODBCTable.h"/>
+            <F N="include/ODBCView.h"/>
+        </Folder>
+        <Folder
+            Name="Source Files"
+            Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
+            GUID="{1562A39C-F71C-4AE6-9527-4FF604198437}">
+            <F N="source/ODBCColumn.cpp"/>
+            <F N="source/ODBCCorModel.cpp"/>
+            <F N="source/ODBCDomain.cpp"/>
+            <F N="source/ODBCDrvModel.cpp"/>
+            <F N="source/ODBCExtModel.cpp"/>
+            <F N="source/ODBCIndex.cpp"/>
+            <F N="source/ODBCIndexColumn.cpp"/>
+            <F N="source/ODBCKey.cpp"/>
+            <F N="source/ODBCMinModel.cpp"/>
+            <F N="source/ODBCModel.cpp"/>
+            <F N="source/ODBCModelEditorWidget.cpp"/>
+            <F N="source/ODBCModelPalWidget.cpp"/>
+            <F N="source/ODBCProcedure.cpp"/>
+            <F N="source/ODBCReference.cpp"/>
+            <F N="source/ODBCTable.cpp"/>
+            <F N="source/ODBCView.cpp"/>
+        </Folder>
+        <Folder
+            Name="Resource Files"
+            Filters="*.ico;*.cur;*.dlg"
+            GUID="{5DAA9448-0E00-4A59-A915-4964C5BF2E48}"/>
+        <Folder
+            Name="Bitmaps"
+            Filters="*.bmp"
+            GUID="{82C6CF78-DF5F-478D-B417-40F4F65D6D18}"/>
+        <Folder
+            Name="Other Files"
+            Filters=""
+            GUID="{2EC10610-45E6-42DE-94F0-C248387BB49C}">
+            <F N="ODBC.pro"/>
+        </Folder>
+    </Files>
+</Project>

@@ -12,9 +12,12 @@
 #
 # ################################################################ 
 
-# CONFIG	+= thread warn_on release
-CONFIG	+= thread warn_on debug
-CONFIG 	+= c++11
+CONFIG	+= thread
+CONFIG	+= warn_on
+CONFIG	+= debug
+# CONFIG	+= release
+# CONFIG 	+= c++11
+CONFIG 	+= sqlite
 
 unix {
 	macx {
@@ -45,13 +48,34 @@ win32 {
 QT += widgets
 QT += printsupport
 QT += xml
-QT += qml
 QT += svg
-lessThan(QT_MAJOR_VERSION, 6) {
-	QT += multimedia
-}
-greaterThan(QT_MAJOR_VERSION, 5) {
-	QT += openglwidgets
-}
+QT += openglwidgets
+QT += concurrent
+
+#
+# SQL
+# - tried using Qt SQL but decided to use ODBC directly (via DATA & DATAW)
+# - we use our own model (interfacing Qt & ODBC) to allow same use of Qt views
+#
+QT += sql
+
+# ################################################################ 
+#
+# Scintilla
+#
+# UNIX - assumes prebuilt package installed
+# WIN - assumes qscintilla source was built in SDK\qscintilla 
+# ################################################################ 
+# unix {
+# 	CONFIG += qscintilla2
+# 	LIBS += -lqscintilla2_qt6
+# }
+# else {
+# 	CONFIG += qscintilla2
+# 	INCLUDEPATH += c:\SandBox\svn.codebydesign.com\Lab6\trunk\SDK\qscintilla\src
+# 	LIBS += -Lc:\SandBox\svn.codebydesign.com\Lab66\trunk\SDK\qscintilla\src\release
+# 	LIBS += -lqscintilla2_qt6
+# }
+
 
 

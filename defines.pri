@@ -7,12 +7,12 @@
 #
 # Anything set with "DEFINES" will be added to the compile line with a -D. For example;
 #
-# DEFINES += CBD_LM
+# DEFINES += CBD_SCINTILLA
 #
-# Will result in a "-DCBD_LM" on the compile line. This can then be used in the source as follows;
+# Will result in a "-DCBD_SCINTILLA" on the compile line. This can then be used in the source as follows;
 #
-# #ifdef CBD_LM
-# 	#include "LMModel.h"
+# #ifdef CBD_SCINTILLA
+# 	
 # #endif
 #
 # ################################################################ #
@@ -30,9 +30,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 #
 # Version. This is used by the build system (dynamic library version for example) and should be consistent
-# with the version information in the source include files.
+# with the version information in the root SDK.h
 #
-VERSION=0.0.1
+VERSION=6.0.0
+
+# This will cause a stream of debug statements useful when debugging destructor related issues.
+# DEFINES += DEBUG_DESTRUCTORS
+
+# This will cause debug info to be shown in the property dock.
+# DEFINES += DEBUG_PROPDOCK
 
 
-
+# This will enable terminal output for "ToDo" messages.
+# DEFINES += CBD_TODO

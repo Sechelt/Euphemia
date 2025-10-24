@@ -12,6 +12,12 @@ CPP_ALWAYS_CREATE_SOURCE	= TRUE
 # QMAKE_CXXFLAGS -= -Wall
 # QMAKE_CXXFLAGS += -fms-extensions
 
+# Our ambiguous overloading is intentional so...
+# - Needed for latest gcc not sure about on win. 
+!win32 {
+	QMAKE_CXXFLAGS += -Wno-overloaded-virtual
+}
+
 #
 # zlib
 #
@@ -31,7 +37,7 @@ CPP_ALWAYS_CREATE_SOURCE	= TRUE
 
 !win32 {
 # On Linux, perhaps others (not Windows), we need to link to this compression library.
-# Having this here works on openSuSE but not on kubuntu. On kubuntu this needs to at the end of the link info so added in the app pro file.
+# Having this here works on openSuSE but not on kubuntu. On kubuntu this needs to go at the end of the link info so added in the app pro file.
 #    LIBS += -lz
 }
 

@@ -20,9 +20,6 @@ SUBDIRS +=  CBD \
             AD \
             AW \
             R \
-            L \
-            PA \
-            DR \
             D \
             ORG \
             FL \
@@ -30,3 +27,4 @@ SUBDIRS +=  CBD \
             ER \
             FR
 
+CONFIG(CBD_BLUE) SUBDIRS += L PA DR 

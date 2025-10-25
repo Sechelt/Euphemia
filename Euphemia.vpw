@@ -1,8 +1,35 @@
 <!DOCTYPE Workspace SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpw.dtd">
 <Workspace Version="10.0" VendorName="SlickEdit">
     <Projects>
-        <Project File="Euphemia.vpj"/>
-        <Project File="../Euphemia-SDK/P/P.vpj"/>
-        <Project File="../Classic-SDK/W/W.vpj"/>
+        <Project File="SDK/AD/AppData.vpj"/>
+        <Project File="Apps/Apps.vpj"/>
+        <Project File="SDK/AW/AppWidgets.vpj"/>
+        <Project File="Apps/Blue/Blue.vpj"/>
+        <Project File="SDK/CBD/CBD.vpj"/>
+        <Project File="SDK/D/D.vpj"/>
+        <Project File="SDK/DATA/DATA.vpj"/>
+        <Project File="Apps/DataArchitect/DataArchitect.vpj"/>
+        <Project File="SDK/DATAW/DATAW.vpj"/>
+        <Project File="SDK/DR/DR.vpj"/>
+        <Project File="SDK/ER/ER.vpj"/>
+        <Project File="SDK/FL/FL.vpj"/>
+        <Project File="SDK/FR/FR.vpj"/>
+        <Project File="SDK/L/L.vpj"/>
+        <Project File="SDK/ER/LM/LM.vpj"/>
+        <Project File="SDK/ER/PM/MSA/MSA.vpj"/>
+        <Project File="SDK/ER/PM/ODBC/ODBC.vpj"/>
+        <Project File="SDK/ORG/ORG.vpj"/>
+        <Project File="SDK/PA/PA.vpj"/>
+        <Project File="SDK/ER/PM/PM-All.vpj"/>
+        <Project File="SDK/ER/PM/PM/PM.vpj"/>
+        <Project File="SDK/R/R.vpj"/>
+        <Project File="root.vpj"/>
+        <Project File="Apps/Route/Route.vpj"/>
+        <Project File="SDK/S/S.vpj"/>
+        <Project File="SDK/SDK.vpj"/>
+        <Project File="SDK/ER/PM/SL/SL.vpj"/>
+        <Project File="SDK/ER/PM/SQL92/SQL92.vpj"/>
+        <Project File="SDK/W/W.vpj"/>
+        <Project File="Apps/Widgets/Widgets.vpj"/>
     </Projects>
 </Workspace>

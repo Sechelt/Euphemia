@@ -1,29 +1,21 @@
-TARGET      = euphemia
-DESTDIR     = ./bin
-TEMPLATE    = app
+# #########################################################
+# \brief        This is the main qmake project file.
+#
+#               The qmake command-line tool will use this project
+#               file to generate platform specific make files.
+#
+#               Before running qmake on this you should check the
+#               the *.pri files to ensure that the build settings
+#               are as desired.
+#
+# \sa           Euphemia.pri
+# #########################################################
 
 include(Euphemia.pri)
 
-INCLUDEPATH += ../Classic-SDK/W/include
-INCLUDEPATH += ../Euphemia-SDK/P/include
-INCLUDEPATH += ./include
+TEMPLATE    = subdirs
+SUBDIRS		= \
+            SDK \
+            Apps
 
-LIBS += -L../Euphemia-SDK/lib -lP
-LIBS += -L../Classic-SDK/lib -lW
-
-LIBS += -lz
-
-RESOURCES   = Euphemia.qrc
-
-HEADERS += \
-        include/EMainWindow.h \
-        include/EPreferencesDialog.h
-
-SOURCES += \
-        Euphemia.h \
-        source/AppInfo.h \
-        source/main.cpp \
-        source/EMainWindow.cpp \
-        source/EPreferencesDialog.cpp
-
-
+		

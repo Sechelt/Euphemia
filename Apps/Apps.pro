@@ -7,7 +7,7 @@ SUBDIRS += Widgets
 #
 # Route - test line routing
 #
-SUBDIRS += Route
+CONFIG(CBD_ROUTE) SUBDIRS += Route
 
 #
 # Blue - basic painting and drawing
@@ -17,7 +17,7 @@ SUBDIRS += Route
 # - support for layers as XML
 # - layers can be merged to a single, paint, layer for save as bit map instead of XML
 #
-SUBDIRS += Blue
+CONFIG(CBD_BLUE) SUBDIRS += Blue
 
 #
 # DataArchitect - advanced data management
@@ -26,4 +26,4 @@ SUBDIRS += Blue
 # - SQL editor
 # - table browse
 #
-SUBDIRS += DataArchitect
+CONFIG(CBD_DATAARCHITECT) SUBDIRS += DataArchitect

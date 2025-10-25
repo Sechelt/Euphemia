@@ -19,6 +19,12 @@ CONFIG	+= debug
 # CONFIG 	+= c++11
 CONFIG 	+= sqlite
 
+# APPS
+#
+# CONFIG += CBD_ROUTE
+# CONFIG += CBD_BLUE
+CONFIG += CBD_DATAARCHITECT
+
 unix {
 	macx {
 		#
@@ -72,7 +78,7 @@ QT += sql
 # }
 # else {
 # 	CONFIG += qscintilla2
-# 	INCLUDEPATH += c:\SandBox\svn.codebydesign.com\Lab6\trunk\SDK\qscintilla\src
+# 	INCLUDEPATH += c:\SandBox\svn.codebydesign.com\Euphemia\trunk\SDK\qscintilla\src
 # 	LIBS += -Lc:\SandBox\svn.codebydesign.com\Lab66\trunk\SDK\qscintilla\src\release
 # 	LIBS += -lqscintilla2_qt6
 # }

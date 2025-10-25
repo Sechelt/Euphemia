@@ -54,7 +54,7 @@
             Name="Header Files"
             Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
             GUID="{1B079A6B-AD84-4A73-9058-DA9A4BD7CE2E}">
-            <F N="CodeByDesign.h"/>
+            <F N="Euphemia.h"/>
         </Folder>
         <Folder
             Name="Source Files"
@@ -72,15 +72,21 @@
             Name="Other Files"
             Filters=""
             GUID="{EE965C74-A9B7-4B6A-BC90-ED5EB9FEA7AA}">
+            <F N="BuildAll.sh"/>
             <F N="Clean.bat"/>
             <F N="common.pri"/>
             <F N="config.pri"/>
+            <F N="CREDITS"/>
             <F N="defines.pri"/>
-            <F N="Lab6.pri"/>
-            <F N="Lab6.pro"/>
+            <F N="Euphemia-1.0.spec"/>
+            <F N="Euphemia.pri"/>
+            <F N="Euphemia.pro"/>
+            <F N="LICENSE"/>
+            <F N="MakeTarBall.sh"/>
             <F N="odbc.pri"/>
+            <F N="README.md"/>
+            <F N="README.txt"/>
             <F N="sqlite.pri"/>
-            <F N="svn.txt"/>
         </Folder>
     </Files>
     <List Name="RTE">

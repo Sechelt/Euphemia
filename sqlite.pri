@@ -9,8 +9,8 @@ unix {
 	LIBS += -lsqlite3
 }
 else {
-	INCLUDEPATH += c:\SandBox\svn.codebydesign.com\Lab6\trunk\SDK\sqlite
-	LIBS += -Lc:\SandBox\svn.codebydesign.com\Lab6\trunk\SDK\sqlite
+	INCLUDEPATH += c:\SandBox\svn.codebydesign.com\Euphemia\trunk\SDK\sqlite
+	LIBS += -Lc:\SandBox\svn.codebydesign.com\Euphemia\trunk\SDK\sqlite
 	LIBS += -lsqlite3
 }
 

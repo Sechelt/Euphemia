@@ -998,6 +998,8 @@ bool FLDiagram::canPaste()
  */
 bool FLDiagram::isSelectionValid()
 {
+printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
+return true;
     pSelectionStart = nullptr;
     pSelectionFinish= nullptr;
 

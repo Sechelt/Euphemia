@@ -45,7 +45,9 @@ public:
 
 public slots:
     virtual bool slotOpenEditor();
+    virtual void slotSelectionCut();
     virtual void slotSelectionCopy();
+    virtual void slotSelectionPaste();
     virtual void slotSelectionDelete();
 
 protected:
@@ -62,16 +64,15 @@ protected:
 
     virtual bool canInsert( const QString &stringClass );
     virtual bool canInsert( const QString &stringClass, const QPointF &pointPos );
-
     virtual bool doInsert( const QString &stringClass, const QPointF &pointPos );
     virtual bool doInsert( ORGPerson *pTarget, const QList<ORGPerson*> &listObjects );
-
     virtual void doSelect( ORGPerson *p );
-
     virtual void doClear();
+    virtual bool doSelectionValid();
 
+    virtual bool canCut()       { return pSelectionManager->hasSelection(); }
+    virtual bool canCopy()      { return pSelectionManager->hasSelection(); }
     virtual bool canPaste();
-    virtual bool canCopy() { return isSelectionValid(); }
     virtual bool canDelete();
 
     virtual bool isSelectionValid();

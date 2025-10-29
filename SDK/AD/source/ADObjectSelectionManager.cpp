@@ -20,46 +20,28 @@ ADObjectSelectionManager::ADObjectSelectionManager( ADObject *p )
  */
 void ADObjectSelectionManager::setSelected( ADObject *p, bool bSelect )
 {
-printf( "[PAH][%s][%s][%d] %p\n", __FILE__, __FUNCTION__, __LINE__, p );
     Q_ASSERT( p );
 
     bool bHasSelection = hasSelection();
 
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     if ( bSelect )
     {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-        if ( !p->isSelectable() ) 
-        {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-            return;
-        }
-        if ( listSelected.contains( p ) ) 
-        {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-            return;
-        }
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
+        if ( !p->isSelectable() ) return;
+        if ( listSelected.contains( p ) ) return;
         p->setSelected();
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         listSelected.append( p );
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         connect( p, SIGNAL(destroyed(QObject*)), this, SLOT(slotRemove(QObject*)) );
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     }
     else
     {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         if ( !listSelected.contains( p ) ) return;
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         p->setSelected( false );
         listSelected.removeAll( (ADObject*)p );
         disconnect( p, SIGNAL(destroyed(QObject*)), this, SLOT(slotRemove(QObject*)) );
     }
 
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     if ( bHasSelection != hasSelection() ) emit signalChangedHasSelection( hasSelection() );
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
+
     emit signalChangedSelection();
 }
 
@@ -124,23 +106,14 @@ void ADObjectSelectionManager::doSelectAll( bool bRecurse )
  */
 void ADObjectSelectionManager::doSelectNone()
 {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-    if ( !hasSelection() ) 
-    {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-        return;
-    }
+    if ( !hasSelection() ) return;
 
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     ADObject *p;
     foreach( p, listSelected )
     {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         p->setSelected( false );
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         disconnect( p, SIGNAL(destroyed(QObject*)), this, SLOT(slotRemove(QObject*)) );
     }
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 
     listSelected.clear();
 

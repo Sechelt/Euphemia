@@ -139,24 +139,26 @@ bool ORGDiagram::slotOpenEditor()
 {
     if ( pEditorWidget ) return true;
 
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     // create view
     ORGDiagramEditorWidget *p;
     pEditorWidget = p = new ORGDiagramEditorWidget( this, getEditorWidgetParent() );
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 
     if ( isCrossHairs() ) doCreateCrossHairs();
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 
     emit signalEditorOpened( pEditorWidget );
     emit signalEditorOpened( this, pEditorWidget );
 
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     p->doGoTo( pRoot );
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 
     return true;
 }
+
+void ORGDiagram::slotSelectionCut()
+{
+    printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
+    return;
+}
+
 
 /*!
  * \brief Copy selected objects to XML. 
@@ -171,11 +173,19 @@ printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
  */
 void ORGDiagram::slotSelectionCopy()
 {
+printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
+return;
     // validate selection 
-    if ( !canCopy() ) return;
+    if ( !doSelectionValid() ) return;
 
     // call default
     DDiagram::slotSelectionCopy();
+}
+
+void ORGDiagram::slotSelectionPaste()
+{
+    printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
+    return;
 }
 
 /*!
@@ -187,8 +197,23 @@ void ORGDiagram::slotSelectionCopy()
  */
 void ORGDiagram::slotSelectionDelete()
 {
+printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
+return;
     // canDelete will alter selection to make complete - or return false
-    if ( !canDelete() ) return;
+    if ( !doSelectionValid() ) return;
+
+    QList<ADObject*> l = pSelectionManager->getSelected();
+    if ( l.count() < 1 )
+    { 
+//        doMessageBox( "WARNING", tr("Selection Validate"), tr("No selection.") );                            
+        return;                                                                                               
+    }
+
+    if ( l.first() == getRoot() )
+    { 
+//        doMessageBox( "WARNING", tr("Selection Validate"), tr("Invalid selection. Can not delete root person.") );                            
+        return;                                                                                               
+    }
 
     g_Transaction->initDelete( this, getDeleteMode() );
 
@@ -492,6 +517,62 @@ void ORGDiagram::doClear()
 }
 
 /*!
+ * \brief Try to make a selection valid for cut/copy by expanding as may be needed.
+ * 
+ * 1. all selected persons must be siblings 
+ * 2. IF delete THEN select all subordinates for them as well 
+ *  
+ * 
+ * \author pharvey (10/29/25)
+ * 
+ * \return bool true if selection valid
+ */
+bool ORGDiagram::doSelectionValid()
+{
+    ORGPerson *pSuperior = nullptr;
+
+    {                                                                                                               
+        QList<ADObject*> l = pSelectionManager->getSelected();                                                                         
+        ADObject *p;                                                                                                
+        foreach( p, l )                                                                                             
+        {                                                                                                           
+            if ( p->inherits( "ORGPerson" ) )
+            {
+                ORGPerson *pSubordinate = (ORGPerson*)p;
+                if ( pSuperior && pSuperior != pSubordinate->getSuperior() )
+                { 
+                    doMessageBox( "WARNING", tr("Selection Validate"), tr("Invalid selection. Can not copy/delete multiple people unless they all report to the same person.") );                            
+                    return false;                                                                                               
+                }
+                else 
+                    pSuperior = pSubordinate->getSuperior();
+                pSelectionManager->setSelected( pSubordinate );
+            }
+            else                                                                                                    
+                pSelectionManager->setSelected( p, false );                                                                            
+        }                                                                                                           
+    }                                                                                                               
+                                                                                                                    
+    if ( !pSelectionManager->hasSelection() )                                                                                
+    {
+        doMessageBox( "WARNING", tr("Selection Validate"), tr("No viable selection.") );                            
+        return false;                                                                                               
+    }                                                                                                               
+
+    // select all subordinates
+    // - definately want to do this in prep for a cut/delete
+    // - may, or may not, want to do this for a simple copy
+    QList<ADObject*> l = pSelectionManager->getSelected(); 
+    ADObject *p;
+    foreach( p, l )
+    {
+        doSelect( (ORGPerson*)p );
+    }
+
+    return true;
+}
+
+/*!
  * \brief Is selection valid for a paste.
  * 
  * \author pharvey (4/16/20)
@@ -537,84 +618,37 @@ bool ORGDiagram::canPaste()
  */
 bool ORGDiagram::canDelete()  
 { 
-    QList<ADObject*> l = pSelectionManager->getSelected();
-    if ( l.count() < 1 )
-    { 
-//        doMessageBox( "WARNING", tr("Selection Validate"), tr("No selection.") );                            
-        return false;                                                                                               
-    }
-
-    if ( l.first() == getRoot() )
-    { 
-//        doMessageBox( "WARNING", tr("Selection Validate"), tr("Invalid selection. Can not delete root person.") );                            
-        return false;                                                                                               
-    }
-
-    return isSelectionValid(); 
+    printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
+    return true;
 }
 
 /*!
- * \brief Check if selection is valid (for cut/delete). 
- *  
- * 1. all selected persons must be siblings 
- * 2. IF delete THEN select all subordinates for them as well 
- *  
+ * \brief Check if selection is valid enough to enable cut/copy/delete. 
+ * 
+ * Cut/Copy/Delete may still fail due to other constraints.
+ * 
  * \author pharvey (4/1/20)
  * 
  * \return bool 
  */
 bool ORGDiagram::isSelectionValid()
 {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
+    if ( !pSelectionManager->hasSelection() ) return false;
+
     ORGPerson *pSuperior = nullptr;
 
-//    QList<ORGPerson*> listSelection;                                                                                
-    {                                                                                                               
-        QList<ADObject*> l = pSelectionManager->getSelected();                                                                         
-        ADObject *p;                                                                                                
-        foreach( p, l )                                                                                             
-        {                                                                                                           
-printf( "[PAH][%s][%s][%d] %p\n", __FILE__, __FUNCTION__, __LINE__, p );
-printf( "[PAH][%s][%s][%d] %s\n", __FILE__, __FUNCTION__, __LINE__, p->metaObject()->className() );
-            if ( p->inherits( "ORGPerson" ) )
-            {
-                ORGPerson *pSubordinate = (ORGPerson*)p;
-                if ( pSuperior && pSuperior != pSubordinate->getSuperior() )
-                { 
-// message needs to go elsewhere as we call canDelete (which calls here) just to enable/disable controls
-//                    doMessageBox( "WARNING", tr("Selection Validate"), tr("Invalid selection. Can not copy/delete multiple people unless they all report to the same person.") );                            
-                    return false;                                                                                               
-                }
-                else 
-                    pSuperior = pSubordinate->getSuperior();
-                pSelectionManager->setSelected( pSubordinate );
-            }
-            else                                                                                                    
-                pSelectionManager->setSelected( p, false );                                                                            
-        }                                                                                                           
-    }                                                                                                               
-                                                                                                                    
-    if ( !pSelectionManager->hasSelection()  )                                                                                
-    {
-// message needs to go elsewhere as we call canDelete (which calls here) just to enable/disable controls
-//        doMessageBox( "WARNING", tr("Selection Validate"), tr("No viable selection.") );                            
-        return false;                                                                                               
-    }                                                                                                               
+    QList<ADObject*> l = pSelectionManager->getSelected();                                                                         
+    ADObject *p;                                                                                                
+    foreach( p, l )                                                                                             
+    {                                                                                                           
+        if ( p->inherits( "ORGPerson" ) )
+        {
+            ORGPerson *pSubordinate = (ORGPerson*)p;
+            if ( pSuperior && pSuperior != pSubordinate->getSuperior() ) return false;
+            else pSuperior = pSubordinate->getSuperior();
+        }
+    }                                                                                                           
 
-    // select all subordinates
-    // - definately want to do this in prep for a cut/delete
-    // - may, or may not, want to do this for a simple copy
-    QList<ADObject*> l = pSelectionManager->getSelected(); 
-printf( "[PAH][%s][%s][%d] num selected %lld\n", __FILE__, __FUNCTION__, __LINE__, l.count() );
-    ADObject *p;
-    foreach( p, l )
-    {
-printf( "[PAH][%s][%s][%d] %p\n", __FILE__, __FUNCTION__, __LINE__, p );
-printf( "[PAH][%s][%s][%d] %s\n", __FILE__, __FUNCTION__, __LINE__, p->metaObject()->className() );
-        doSelect( (ORGPerson*)p );
-    }
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-
-    return true;
+    return false;
 }
 

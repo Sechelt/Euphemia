@@ -183,7 +183,7 @@ BOOL DATASystem::doManageDataSources( QWidget *pWidgetParent )
  *  
  * In this case we are using any UNIX other than OSX - so unixODBC.
  *  
- * We could be using any number of GUI environments - or none at all but the assumption 
+ * We could be using any number of GUI environments - or none at all - but the assumption 
  * is that the app/caller knows what they want. So it initializes a special window 
  * handle (ODBCINSTWND) provided by unixODBC. This provides a means to indicate the 
  * desired GUI implementation. 
@@ -194,7 +194,7 @@ BOOL DATASystem::doManageDataSources( QWidget *pWidgetParent )
  * \sa SQLManageDataSources in unixODBC source code for details 
  *  
  * \note The unixODBC GUI for Qt needs to be installed (its a seperate install from unixODBC).
- * \note The app will crash if the Qt majour version of the app is not the same as the one used in unixODBC.
+ * \note The app may crash if the Qt majour version of the app is not the same as the one used in unixODBC. Measures have been taken to avoid this.
  *       The terminal will show that the object can not be reparented as its in a different thread.
  *  
  * \author pharvey (2/1/20)
@@ -211,7 +211,11 @@ BOOL DATASystem::doManageDataSources( QWidget *pWidgetParent )
     strcpy( h.szUI, "odbcinstQ6" ); // we are Qt6 code so we must ask for the Qt6 GUI implementation
     h.hWnd = HWND(pWidgetParent);   // we can pass a parent widget since we are requesting a matching library otherwise nullptr
     bool b = SQLManageDataSources( &h );
-    if ( !b ) eventDiagnostic( SQL_API_SQLMANAGEDATASOURCES ); 
+    if ( !b )
+    {
+        QMessageBox::critical( nullptr, "Message", "Call to SQLManageDataSources failed.\nDo you have libodbcinstQ6.so installed?\nThis is in the unixodbc-gui-qt package.\nAn alternative is to use the unixODBC 'odbcinst' command in a terminal." );
+        eventDiagnostic( SQL_API_SQLMANAGEDATASOURCES ); 
+    }
     return b;
 }
 #endif

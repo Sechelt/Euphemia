@@ -83,7 +83,8 @@ AWDataWidget *ORGDiagram::getObjectWidget( QWidget *pWidgetParent )
 
 ADObject *ORGDiagram::getObject( const QString &s, ADObject * )
 {
-    DObject *p = nullptr;
+    bool        bFolders    = false;
+    DObject *   p           = nullptr;
 
     // translate any alias
     QString stringClass = getClass( s );
@@ -93,7 +94,7 @@ ADObject *ORGDiagram::getObject( const QString &s, ADObject * )
     else if ( stringClass == "ORGReportsTo" )
     {
         p = new ORGReportsTo( this );
-        p->setFolder( tr( "Connectors" ) );
+        if ( bFolders ) p->setFolder( tr( "Connectors" ) );
     }
 
     if ( !p )
@@ -102,12 +103,18 @@ ADObject *ORGDiagram::getObject( const QString &s, ADObject * )
         return nullptr;
     }
 
+    // ensure we are the OID source regardless of parent (avoids messing up OID's when reparenting DObject's)
+    p->setOIDSource( this );
     // provide a two-way interface to the scene via a proxy
     DGraphicsProxyItem *pProxy = new DGraphicsProxyObject( p );
+    // get the proxy to create a QGraphicsObject based object - in this case DGraphicsObject
     pProxy->doCreateGraphicsObject();
+    // add QGraphicsObject to scene
     pProxy->setScene( pScene );
+    // set proxy in DObject - may also be used by DObject based objects to init some other things such as create sinks 
     p->setProxy( pProxy );
-    
+    // default pos is center of scene
+    p->setPos( QPointF( pScene->width() / 2, pScene->height() / 2 ) );
     // announce the birth of a new child
     emit signalCreated( p );    
     emit signalCreated( this, p );
@@ -132,19 +139,21 @@ bool ORGDiagram::slotOpenEditor()
 {
     if ( pEditorWidget ) return true;
 
-    pRoot = (ORGPerson*)getObject( "ORGPerson" );
-    pRoot->setPos( QPointF( getScene()->width() / 2, pRoot->boundingRect().height() / 2 + 10 ) );
-
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     // create view
     ORGDiagramEditorWidget *p;
     pEditorWidget = p = new ORGDiagramEditorWidget( this, getEditorWidgetParent() );
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 
     if ( isCrossHairs() ) doCreateCrossHairs();
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 
     emit signalEditorOpened( pEditorWidget );
     emit signalEditorOpened( this, pEditorWidget );
 
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     p->doGoTo( pRoot );
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 
     return true;
 }
@@ -457,13 +466,16 @@ void ORGDiagram::doPostLoad()
  */
 void ORGDiagram::doSelect( ORGPerson *p )
 {
-    pSelectionManager->setSelected( p->getLine( "Top" ) );
+printf( "[PAH][%s][%s][%d] %p\n", __FILE__, __FUNCTION__, __LINE__, p->getLine( "Top" ) );
+    if ( p->getLine( "Top" ) ) pSelectionManager->setSelected( p->getLine( "Top" ) );
     pSelectionManager->setSelected( p );
 
     QList<ORGPerson*> l = p->getSubordinates();
     ORGPerson *pPerson;
     foreach( pPerson, l )
     {
+printf( "[PAH][%s][%s][%d] %p\n", __FILE__, __FUNCTION__, __LINE__, pPerson );
+printf( "[PAH][%s][%s][%d] %s\n", __FILE__, __FUNCTION__, __LINE__, pPerson->metaObject()->className() );
         doSelect( pPerson );
     }
 }
@@ -528,13 +540,13 @@ bool ORGDiagram::canDelete()
     QList<ADObject*> l = pSelectionManager->getSelected();
     if ( l.count() < 1 )
     { 
-        doMessageBox( "WARNING", tr("Selection Validate"), tr("No selection.") );                            
+//        doMessageBox( "WARNING", tr("Selection Validate"), tr("No selection.") );                            
         return false;                                                                                               
     }
 
     if ( l.first() == getRoot() )
     { 
-        doMessageBox( "WARNING", tr("Selection Validate"), tr("Invalid selection. Can not delete root person.") );                            
+//        doMessageBox( "WARNING", tr("Selection Validate"), tr("Invalid selection. Can not delete root person.") );                            
         return false;                                                                                               
     }
 
@@ -553,20 +565,24 @@ bool ORGDiagram::canDelete()
  */
 bool ORGDiagram::isSelectionValid()
 {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     ORGPerson *pSuperior = nullptr;
 
-    QList<ORGPerson*> listSelection;                                                                                
+//    QList<ORGPerson*> listSelection;                                                                                
     {                                                                                                               
         QList<ADObject*> l = pSelectionManager->getSelected();                                                                         
         ADObject *p;                                                                                                
         foreach( p, l )                                                                                             
         {                                                                                                           
+printf( "[PAH][%s][%s][%d] %p\n", __FILE__, __FUNCTION__, __LINE__, p );
+printf( "[PAH][%s][%s][%d] %s\n", __FILE__, __FUNCTION__, __LINE__, p->metaObject()->className() );
             if ( p->inherits( "ORGPerson" ) )
             {
                 ORGPerson *pSubordinate = (ORGPerson*)p;
                 if ( pSuperior && pSuperior != pSubordinate->getSuperior() )
                 { 
-                    doMessageBox( "WARNING", tr("Selection Validate"), tr("Invalid selection. Can not copy/delete multiple people unless they all report to the same person.") );                            
+// message needs to go elsewhere as we call canDelete (which calls here) just to enable/disable controls
+//                    doMessageBox( "WARNING", tr("Selection Validate"), tr("Invalid selection. Can not copy/delete multiple people unless they all report to the same person.") );                            
                     return false;                                                                                               
                 }
                 else 
@@ -579,8 +595,9 @@ bool ORGDiagram::isSelectionValid()
     }                                                                                                               
                                                                                                                     
     if ( !pSelectionManager->hasSelection()  )                                                                                
-    {                                                                                                               
-        doMessageBox( "WARNING", tr("Selection Validate"), tr("No viable selection.") );                            
+    {
+// message needs to go elsewhere as we call canDelete (which calls here) just to enable/disable controls
+//        doMessageBox( "WARNING", tr("Selection Validate"), tr("No viable selection.") );                            
         return false;                                                                                               
     }                                                                                                               
 
@@ -588,11 +605,15 @@ bool ORGDiagram::isSelectionValid()
     // - definately want to do this in prep for a cut/delete
     // - may, or may not, want to do this for a simple copy
     QList<ADObject*> l = pSelectionManager->getSelected(); 
+printf( "[PAH][%s][%s][%d] num selected %lld\n", __FILE__, __FUNCTION__, __LINE__, l.count() );
     ADObject *p;
     foreach( p, l )
     {
+printf( "[PAH][%s][%s][%d] %p\n", __FILE__, __FUNCTION__, __LINE__, p );
+printf( "[PAH][%s][%s][%d] %s\n", __FILE__, __FUNCTION__, __LINE__, p->metaObject()->className() );
         doSelect( (ORGPerson*)p );
     }
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 
     return true;
 }

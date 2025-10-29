@@ -15,7 +15,7 @@ ORGLayout::ORGLayout( ORGDiagram *pDiagram, qreal nHSpacing, qreal nVSpacing )
     this->nH = nHSpacing;
     this->nV = nVSpacing;
 
-    bDebug                  = false;
+    bDebug                  = true;
     pDbgNodeCurrent         = nullptr;
     pDbgNodeConflictCheck   = nullptr;
 }

@@ -895,15 +895,20 @@ void DDiagram::mousePressEvent( QGraphicsSceneMouseEvent *pEvent )
         else if ( hasProxy( pGraphicsObject ) )
         {
 #pragma message ( "add logic to select DRectangle instead of DLine when DLine is connect & truncated and over rectangle regardless of order" )
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
             DGraphicsProxyItem *pProxy = getProxy( pGraphicsObject );
             DObject *pObject = pProxy->getObject();
+printf( "[PAH][%s][%s][%d] pProxy=%p pObject=%p\n", __FILE__, __FUNCTION__, __LINE__, pProxy, pObject );
             // selecting an object in a group is always switched to selecting group (should be outter most group if group nest in another group with no other layout between)
             if ( pObject->inGroup() ) pObject = pObject->getGroup( true );
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
             // are we just altering the selection?
             if ( pEvent->modifiers() == Qt::ControlModifier )
             { 
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
                 // toggle selection
                 pSelectionManager->setSelected( pObject, !pObject->isSelected() );
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
                 return;
             }
             if ( pObject->isSelected() )
@@ -916,9 +921,11 @@ void DDiagram::mousePressEvent( QGraphicsSceneMouseEvent *pEvent )
             }
             else
             { 
+printf( "[PAH][%s][%s][%d] num selected %lld\n", __FILE__, __FUNCTION__, __LINE__, pSelectionManager->getSelected().count() );
                 // unselect everything 
                 slotSelectNone();
                 // select this
+printf( "[PAH][%s][%s][%d] %p\n", __FILE__, __FUNCTION__, __LINE__, pObject );
                 pSelectionManager->setSelected( pObject );
                 pObjectPressed = pObject;
                 nState = StatePressObjectForMove;
@@ -926,6 +933,7 @@ void DDiagram::mousePressEvent( QGraphicsSceneMouseEvent *pEvent )
                 // move? moveevent will move this object
                 // no move? release event does nothing
             }
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
             return;
         }
     }
@@ -1041,6 +1049,7 @@ void DDiagram::mouseMoveEvent( QGraphicsSceneMouseEvent *pEvent )
  */
 void DDiagram::mouseReleaseEvent( QGraphicsSceneMouseEvent *pEvent )
 {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     if ( !pScene ) return;
 
     // we only move stuff using left mouse button

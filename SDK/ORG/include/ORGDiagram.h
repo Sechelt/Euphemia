@@ -52,8 +52,8 @@ protected:
     ORGPerson *pRoot;
     ORGLayout *pLayout;
 
-    ORGPerson *pDragOver;  // flow when drag/drop is over it
-    ORGPerson *pPasteTo;     // paste target
+    ORGPerson *pDragOver;   // flow when drag/drop is over it
+    ORGPerson *pPasteTo;    // paste target
 
     virtual bool canDrop( const QString &stringClassDropped, const QPointF &pointScene );
     virtual bool doDragEnter( const QString &stringClass, const QPointF &pointScene );

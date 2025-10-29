@@ -67,7 +67,6 @@
  *      later - if needed. 
  */
 
-// #include <QtGui>
 #include <CBD.h>
 
 // bring in ODBC stuff...

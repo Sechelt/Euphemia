@@ -68,7 +68,7 @@ QMenu *DATAWQuerySystem::getContextMenu( QWidget *pParent )
 {
     QMenu *pMenu = new QMenu( pParent );
 
-    pMenu->addAction( QPixmap( ":AW/Properties" ), tr("Properties..."), this, SLOT(slotProperties()) );
+    pMenu->addAction( QPixmap( ":AW/Properties" ), tr("Manage Data Sources..."), this, SLOT(slotProperties()) );
     if ( parent() ) pMenu->addAction( QPixmap( ":AW/Delete" ), tr("Remove"), this, SLOT(slotDelete()) );
     return pMenu;
 }

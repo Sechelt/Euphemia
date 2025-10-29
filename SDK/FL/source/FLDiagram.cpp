@@ -195,19 +195,6 @@ bool FLDiagram::slotOpenEditor()
 {
     if ( pEditorWidget ) return true;
 
-    // we always start with a Begin and an End
-    QPoint pointCell( getScene()->width() / getCell().width() / 2, 1 );
-
-    FLBegin *   pBegin  = (FLBegin*)getObject( "FLBegin" );
-    FLEnd *     pEnd    = (FLEnd*)getObject( "FLEnd" );
-    FLFlow *    pFlow   = (FLFlow*)getObject( "FLFlow" );
-
-    pBegin->setPos( mapCellToScene( pointCell ) );
-    pointCell.setY( pointCell.y() + 2 );
-    pEnd->setPos( mapCellToScene( pointCell ) );
-    pFlow->doConnect( pFlow->getSource( CBD::EOLBegin ), pBegin->getSink( "Bottom" ) );
-    pFlow->doConnect( pFlow->getSource( CBD::EOLEnd ), pEnd->getSink( "Top" ) );
-
     // create view
     FLDiagramEditorWidget *p;
     pEditorWidget = p = new FLDiagramEditorWidget( this, getEditorWidgetParent() );

@@ -89,7 +89,7 @@ void DATAWQueryCatalog::doQuery()
             {
                 // create schema object
                 ADObject *p = getObject( "Schema" );
-                p->setName( stringSchema );
+                p->setName( (stringSchema.isEmpty()?"SCHEMA":stringSchema) );
                 p->setModified( false );
                 l << stringSchema;
             }

@@ -14,7 +14,7 @@ class DATAWQueryCatalog;
  *  
  * This provides an AWObject based data connection. 
  * Unlike \sa DATAWQueryConnection - this is not for general browsing of ODBC objects. For example; it 
- * only connects via a driver - no Data Source Names, File Data Sources or 'browse' connection options. 
+ * only connects via a driver - no Data Source Names, File Data Sources nor 'browse' connection options. 
  *  
  * This can be used to streamline adding a data connection to a \sa AWWorkspace. For example; it does not need an
  * ODBC System (\sa DATAWQuerySystem) and Environment (\sa DATAWQueryEnvironment) parent. 

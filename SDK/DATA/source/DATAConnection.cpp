@@ -2223,6 +2223,13 @@ QStringList DATAConnection::getTableTypes()
     }
 
     pStatement = new DATAStatement( this );
+/* EXAMPLE PROPER CALL....
+                        retCode = SQLTables( hstmt, 
+                                             NULL, 0, // CatalogName, CatalogNameLength
+                                             NULL, 0, // SchemaName, SchemaNameLength
+                                             NULL, 0, // TableName, TableNameLength
+                                             (SQLCHAR*)"%", SQL_NTS ); // TableType, TableTypeLength
+*/
     nReturn = pStatement->doTables( QString(), QString(), QString(), SQL_ALL_TABLE_TYPES );
     if ( !SQL_SUCCEEDED( nReturn ) )
     {
@@ -2233,7 +2240,9 @@ QStringList DATAConnection::getTableTypes()
     nReturn = pStatement->doFetch();
     while ( SQL_SUCCEEDED( nReturn ) )
     {
-        l << pStatement->getData( 4 ).toString();
+        QString stringTableType = pStatement->getData( 4 ).toString();
+        if ( !l.contains( stringTableType ) ) l << stringTableType; // should not get duplicates but some drivers, in error, do this
+        
         nReturn = pStatement->doFetch();
     }
     delete pStatement;

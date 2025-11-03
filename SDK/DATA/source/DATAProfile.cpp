@@ -156,7 +156,7 @@ DATAProfile::DATAProfile( sqlite3 *p, DATAConnection *pConnection )
     mapInfo         = getInfo( pConnection );
     // currently get a segfault (on free of statement) when we call SQLGetTypeInfo with sqlite 
     // hopefully this gets resolved but for now we avoid calling it
-    if ( mapInfo.value( "SQL_DBMS_NAME" )->vValue.toString() != "SQLite" )
+//    if ( mapInfo.value( "SQL_DBMS_NAME" )->vValue.toString() != "SQLite" )
         mapDataTypes    = getDataTypes( pConnection );
     mapFunctions    = getFunctions( pConnection );
     mapAttr         = getAttr( pConnection );

@@ -6,7 +6,9 @@
 class DATAConnection;
 
 /*!
- * \brief Schema (namespace within a database) 
+ * \brief Schema
+ * 
+ * SQL_SCHEMA_TERM will indicate how this is used but conformant driver will always return 'schema' (supported) or '' (not supported).
  *  
  * Possible children; 
  *  

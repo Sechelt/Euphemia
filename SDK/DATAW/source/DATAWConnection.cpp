@@ -94,6 +94,8 @@ ADObject *DATAWConnection::getObject( const QString &s, ADObject * )
             return nullptr; 
         }
         p = new DATAWQueryCatalog( this, pConnection );           
+        // IF SQL_CATALOG_TERM == 'database' THEN SQL_ATTR_CURRENT_CATALOG
+        // p->setName( (stringCatalog.isEmpty()?"CATALOG":stringCatalog) );
     }
     else if ( stringClass == "DATAWSql" )        
         p = new DATAWSql( this );           

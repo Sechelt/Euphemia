@@ -479,8 +479,8 @@ protected:
 
     bool isAGSQLServer( const QString &stringTable, const QString &stringColumn );
     bool isAGAccess( DATAConnection *pConnection, const QString &stringTable, const QString &stringColumn );
-    bool isAGMariaDB( const QString &stringTable, const QString &stringColumn );
-    bool isAGMySQL( const QString &stringTable, const QString &stringColumn );
+    bool isAGMariaDB( DATAConnection *pConnection, const QString &stringSchema, const QString &stringTable, const QString &stringColumn );
+    bool isAGMySQL( DATAConnection *pConnection, const QString &stringSchema, const QString &stringTable, const QString &stringColumn );
     bool isAGSQLite( DATAConnection *pConnection, const QString &stringTable, const QString &stringColumn );
     bool isAGDB2( const QString &stringTable, const QString &stringColumn );
 

@@ -6,7 +6,13 @@
 class DATAConnection;
 
 /*!
- * \brief Catalog (database). 
+ * \brief Catalog
+ * 
+ * SQL_CATALOG_TERM will indicate how this is used. For example;
+ * 
+ * "database"       - is a database
+ * "directory"      - is a directory
+ * ""               - not supported
  *  
  * Possible children; 
  *  

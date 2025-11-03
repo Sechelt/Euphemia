@@ -88,7 +88,7 @@ void DATAWQueryCatalogs::doQuery()
             // prevent duplicate names
             if ( !l.contains( stringCatalog ) )
             {
-                // create schema object
+                // create catalog object
                 ADObject *p = getObject( "Catalog" );
                 p->setName( (stringCatalog.isEmpty()?"CATALOG":stringCatalog) );
                 p->setModified( false );

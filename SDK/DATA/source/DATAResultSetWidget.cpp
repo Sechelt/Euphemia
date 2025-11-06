@@ -1,6 +1,7 @@
 // #include <ctype.h>
 #include "LibInfo.h"
 #include "DATAResultSetWidget.h"
+#include "DATADataType.h"
 
 #include "DATAStatement.h"
 
@@ -15,9 +16,10 @@ DATAResultSetWidget::DATAResultSetWidget( QWidget *pParent )
     stringFileName          = "";
     nResultFormat           = ResultFormatGUIGrid;
     nRows                   = 0;
-    nLimit                = 5000;
+    nLimit                  = 5000;
     bFirstRowColumnNames    = false;
     stringDelimitChar       = "|";
+    bColumns                = false;
 
     // init GUI grid
     ptableResults = new QTableWidget( this );
@@ -111,8 +113,9 @@ void DATAResultSetWidget::doResult( DATAStatement *pStatement )
 
 void DATAResultSetWidget::doClear()
 {
-    nRows = 0;
-    pStatement = 0;
+    nRows       = 0;
+    bColumns    = false;
+    pStatement  = 0;
     ptableResults->setColumnCount( 0 );
     ptableResults->setRowCount( 0 );
     ptextbrowserResults->setText( "" );
@@ -366,14 +369,21 @@ void DATAResultSetWidget::doResultGUIGridHeader( SWORD nColumns )
     int             nCol;
     QStringList     stringlistHeader;
     QVariant        v;
+    bool            bColumnsCheckOne = false;
 
     for( nCol = 0; nCol < nColumns; nCol++ )
     {
         v = pStatement->getColAttribute( nCol+1, SQL_DESC_LABEL );
         QString stringLabel = v.toString();
+
         // get rid of any unicode null chars
         stringLabel = stringLabel.replace( '\u0000', ' ' );
-        stringlistHeader << stringLabel.trimmed();
+        stringLabel = stringLabel.trimmed();
+        stringlistHeader << stringLabel;
+
+        // a little trickery to determine if this is a result from SQLColumns
+        if ( nCol == 0 && stringLabel == "TABLE_CAT" ) bColumnsCheckOne = 1;
+        if ( nCol == 4 && stringLabel == "DATA_TYPE" && bColumnsCheckOne ) bColumns = 1;
     }
 
     ptableResults->setHorizontalHeaderLabels( stringlistHeader );
@@ -405,32 +415,10 @@ void DATAResultSetWidget::doResultGUIGridBody( SWORD nColumns )
         for( nCol = 0; nCol < nColumns; nCol++ )
         {
             v = pStatement->getData( nCol+1 );
-
-/*
-            QString resultPrintable = "";                                      
-            QString resultUnprintable = "";                                    
-            QString result;                                                    
-            bool isResultPrintable = true;                                     
-                                                                               
-            for(unsigned int i=0; szColumn[i] && i < sizeof(szColumn) - 1; i++)
-            {                                                                  
-                QString s;                                                     
-                                                                               
-                resultPrintable += szColumn[i];                                
-                                                                               
-                if(!isprint(szColumn[i]))                                      
-                    isResultPrintable = false;                                 
-                s.sprintf("\\%02d",(unsigned char)szColumn[i]);                
-                resultUnprintable += s;                                        
-            }                                                                  
-                                                                               
-            if(isResultPrintable)                                              
-                result = resultPrintable;                                      
-            else                                                               
-                result = resultUnprintable;                                    
-*/
-            
-            ptableResults->setItem( nRows, nCol, new QTableWidgetItem( v.toString() ) );
+            if ( (nCol == 4 || nCol == 13) && bColumns ) // DATA_TYPE and SQL_DATA_TYPE
+                ptableResults->setItem( nRows, nCol, new QTableWidgetItem( DATADataTypeSpec::getDataTypeStr( v.toInt() ) ) );
+            else
+                ptableResults->setItem( nRows, nCol, new QTableWidgetItem( v.toString() ) );
         }
         nRows++;
         if ( nLimit > 0 && nRows > nLimit )

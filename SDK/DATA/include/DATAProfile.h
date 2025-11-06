@@ -148,13 +148,19 @@ public:
     QString                         stringKey;
     QMap<QString,DATAInfo*>         mapInfo;            // key = QString; ie "SQL_DATA_SOURCE_NAME"; from SQLGetInfo
 
-    QMap<QString,DATADataTypeSpec*> mapDataTypes;       // key = TYPE_NAME; from SQLGetTypeInfo
+    // DATA TYPES
+    // Here we store supported data types as returned by SQLGetTypeInfo.
+    // TYPE_NAME is unique while DATA_TYPE can be duplicated so we use TYPE_NAME as our key.
+    // NOTE: Unfortunately; SQLColumns:TYPE_NAME may not always match SQLGetTypeInfo:TYPE_NAME (depends upon the driver) so a straight xref may not always be possible.
+    QMap<QString,DATADataTypeSpec*> mapDataTypes;       // key = SQLGetTypeInfo:TYPE_NAME
 
-    QMap<int,DATAFunction*>             mapFunctions;   // key = int; ie SQL_API_SQLCONNECT; from SQLGetFunctions (also includes DATAUnsupported)
-    QMap<QString,DATAAttr*>             mapAttr;        // key = QString; ie "SQL_ATTR_AUTOCOMMIT"; from SQLGetConnectAttr
+    QMap<int,DATAFunction*>         mapFunctions;       // key = int; ie SQL_API_SQLCONNECT; from SQLGetFunctions (also includes DATAUnsupported)
+    QMap<QString,DATAAttr*>         mapAttr;            // key = QString; ie "SQL_ATTR_AUTOCOMMIT"; from SQLGetConnectAttr
 
     void setModified( bool b = true ) { bModified = b; }
     bool isModified() { return bModified; }
+
+    DATADataTypeSpec *getDataTypeSpec( const QString &stringTYPE_NAME ); // usually better than going after mapDataTypes directly
 
     // save to profiles database
     bool doSave();

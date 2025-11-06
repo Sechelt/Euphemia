@@ -92,6 +92,7 @@ void DATADataTypesWidget::slotCopy()
         s += "{\n";
         s += "DATADataTypeSpec d;\n";
         s += "d.TYPE_NAME           = \"" + i.value()->TYPE_NAME + "\";\n";
+        s += "d.nDATA_TYPE          = \"" + QString::number( i.value()->nDATA_TYPE ) + "\";\n";
         s += "d.DATA_TYPE           = \"" + i.value()->DATA_TYPE + "\";\n";
         s += "d.COLUMN_SIZE         = \"" + i.value()->COLUMN_SIZE + "\";\n";
         s += "d.LITERAL_PREFIX      = \"" + i.value()->LITERAL_PREFIX + "\";\n";

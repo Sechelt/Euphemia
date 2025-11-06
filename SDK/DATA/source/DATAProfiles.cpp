@@ -265,6 +265,7 @@ sqlite3 *DATAProfiles::doCreateDatabase( const QString &stringFileName )
             "(                                              "\
             "  ProfileID integer NOT NULL,                  "\
             "  TYPE_NAME varchar(50) NOT NULL,              "\
+            "  nDATA_TYPE integer NOT NULL,                 "\
             "  DATA_TYPE varchar(50) NOT NULL,              "\
             "  COLUMN_SIZE varchar(50) NOT NULL,            "\
             "  LITERAL_PREFIX varchar(50),                  "\

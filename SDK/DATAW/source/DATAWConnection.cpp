@@ -8,6 +8,7 @@
 // data widgets
 #include <AWObjectNameWidget.h>
 
+#include <DATAProfile.h>
 #include <DATAProfileWidget.h>
 
 #include "DATAWConnectWizard.h"
@@ -346,7 +347,14 @@ void DATAWConnection::slotNewDATAWSql()
 void DATAWConnection::slotNewCatalogBrowser()
 {
     if ( !getObjects( QString(), QString(), "DATAWQueryCatalog" ).isEmpty() ) return;
-    getObject( "DATAWQueryCatalog" );
+    DATAWQueryCatalog *p = (DATAWQueryCatalog*)getObject( "DATAWQueryCatalog" );
+    Q_ASSERT( p );
+
+// is a catalog a database?
+//    DATAInfo *pSQL_CATALOG_TERM = (getConnection()->getProfile()->mapInfo)["SQL_CATALOG_TERM"]; Q_ASSERT( pSQL_CATALOG_TERM );
+//    if ( pSQL_CATALOG_TERM->vValue.toString() == "database" )
+
+    p->setName( pConnection->getAttrCurrentCatalog() );
     setModified( false );
 }
 

@@ -444,19 +444,28 @@ AWDataWidget *PMModel::getObjectWidget( QWidget *pWidgetParent )
 
 QList<QString> PMModel::getDataTypes() 
 { 
-    return pProfile->mapDataTypes.keys(); 
+    QList<QString> listDataTypes;
+
+    foreach( DATADataTypeSpec *p, pProfile->mapDataTypes )
+    {
+        listDataTypes << p->TYPE_NAME;
+    }
+
+    return listDataTypes;
 }
 
-DATADataTypeSpec *PMModel::getDataTypeSpec( const QString &stringName ) 
+DATADataTypeSpec *PMModel::getDataTypeSpec( const QString &stringTYPE_NAME ) 
 { 
-    DATADataTypeSpec *p = pProfile->mapDataTypes.value( stringName ); 
-    if ( !p )
+    foreach( DATADataTypeSpec *p, pProfile->mapDataTypes )
     {
-        // uncomment for debugging - too many messages to leave active
-        // printf( "[%s][%s][%d] Data type not in driver profile: %s\n", __FILE__, __FUNCTION__, __LINE__, stringName.toUtf8().constData() );
-        // eventOutputGeneral( "ERROR", QString( "Data type not in driver profile: %1" ).arg( stringName ) );
+        if ( p->TYPE_NAME == stringTYPE_NAME ) return p;
     }
-    return p;
+
+    // uncomment for debugging - too many messages to leave active
+    // printf( "[%s][%s][%d] Data type not in driver profile: %s\n", __FILE__, __FUNCTION__, __LINE__, stringName.toUtf8().constData() );
+    // eventOutputGeneral( "ERROR", QString( "Data type not in driver profile: %1" ).arg( stringName ) );
+
+    return nullptr;
 }
 
 /*!
@@ -505,11 +514,15 @@ PMDomain * PMModel::getDomain( const QString str, const bool cs )
 /*!
     getIsStandardDataType
     
-    Returns true if the given data type is a standard data type for an PMModel.
+    Returns true if the given data type is a standard data type for a PMModel.
 */
-bool PMModel::getIsStandardDataType( const QString &str )
+bool PMModel::getIsStandardDataType( const QString &stringTYPE_NAME )
 {
-    return pProfile->mapDataTypes.contains( str );
+    foreach( DATADataTypeSpec *p, pProfile->mapDataTypes )
+    {
+        if ( p->TYPE_NAME == stringTYPE_NAME ) return true;
+    }
+    return false;
 }
 
 /*!

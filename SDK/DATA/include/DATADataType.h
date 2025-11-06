@@ -73,8 +73,9 @@ public:
 
     bool isNull() { return TYPE_NAME.isEmpty(); }
 
-    QString TYPE_NAME;              // Data-type name. ie "INTERVAL DAY() TO SECOND()" Used for DDL. This is unique key for looking up data-type spec.
-    QString DATA_TYPE;              // SQL data type. ODBC type or driver specific.
+    int     nDATA_TYPE;             // SQL data type as numeric. ODBC type or driver specific. This is unique key for looking up data-type spec.
+    QString TYPE_NAME;              // Data-type name. ie "INTERVAL DAY() TO SECOND()" Used for DDL. 
+    QString DATA_TYPE;              // SQL data type as text (more readable for display). 
     QString COLUMN_SIZE;            // LongLong: Max precision or chars. isNull if not relevant for data type.
     QString LITERAL_PREFIX;         // String: Prefix for a literal. ie "'" for a string. isNull if not relevant.
     QString LITERAL_SUFFIX;         // String: Suffix for a literal. ie "'" for a string. isNull if not relevant.

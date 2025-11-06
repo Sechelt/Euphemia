@@ -89,7 +89,9 @@ void DATAWQueryCatalog::doQuery()
             {
                 // create schema object
                 ADObject *p = getObject( "Schema" );
-                p->setName( (stringSchema.isEmpty()?"SCHEMA":stringSchema) );
+                // Allow empty schema name - its significant.
+                // p->setName( (stringSchema.isEmpty()?"SCHEMA":stringSchema) );
+                p->setName( stringSchema );
                 p->setModified( false );
                 l << stringSchema;
             }

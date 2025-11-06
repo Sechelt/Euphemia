@@ -93,11 +93,11 @@ public:
     virtual AWDataWidget *      getObjectWidget( QWidget *pWidgetParent = nullptr );
     virtual QMenu *             getContextMenu( QWidget * );
     virtual QList<QString>      getDataTypes();
-    virtual DATADataTypeSpec *  getDataTypeSpec( const QString &stringName );
+    virtual DATADataTypeSpec *  getDataTypeSpec( const QString &stringTYPE_NAME );
     virtual QStringList         getDomains();
     virtual PMDomain *          getDomain( const QString str, const bool cs = false );
     virtual int                 getDisplayFlags() { return nDisplayFlags; }
-    virtual bool                getIsStandardDataType( const QString &string );
+    virtual bool                getIsStandardDataType( const QString &stringTYPE_NAME );
     virtual bool                getIsDomainDataType( const QString &string );
     virtual bool                getScriptCreateComments() { return bScriptCreateComments; }
     virtual bool                getScriptCreateScriptComments() { return bScriptCreateScriptComments; }

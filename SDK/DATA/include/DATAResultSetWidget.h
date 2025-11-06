@@ -67,6 +67,7 @@ protected:
     int                     nRows;
     int                     nLimit;
     bool                    bFirstRowColumnNames;
+    bool                    bColumns;                   // result set from SQLColumns
     QString                 stringDelimitChar;
 
     void resizeEvent( QResizeEvent * );

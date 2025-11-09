@@ -30,7 +30,7 @@ LMAttributesWidget::LMAttributesWidget( LMEntityBase *pEntity, QWidget *pwidgetP
     ptable->setHorizontalHeaderItem( 11, new QTableWidgetItem( tr("Hidden") ) );
                                                                                                                                                                     
     // ToolBar: adjust default
-    QAction *pActionNewDataItem = new QAction( QIcon( ":W/RowNewPlus16x16" ), tr("New Data Item"), this );
+    QAction *pActionNewDataItem = new QAction( QIcon( ":AW/RowNewPlus" ), tr("New Data Item"), this );
     connect( pActionNewDataItem, SIGNAL(triggered()), this, SLOT(slotNewDataItem()) );
     ptoolbar->addAction( pActionNewDataItem );
     setNew();
@@ -58,7 +58,7 @@ void LMAttributesWidget::slotNew()
 
     // create dialog                                                                             
     WTabDialog * pdialog = new WTabDialog( this, tr("Select Data Item..."), "SelectDataItem" );  
-    pdialog->setWindowIcon( QIcon( ":W/RowNew16x16" ) );                                                          
+    pdialog->setWindowIcon( QIcon( ":AW/RowNew" ) );                                                          
                                                                                                  
     AWObjectSelectWidget * pmultiselect = new AWObjectSelectWidget( pdialog, listModelsIn );     
     pdialog->getTabWidget()->addTab( pmultiselect, "Data Items" );                               

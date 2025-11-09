@@ -215,11 +215,11 @@ void AWDataTable::doInit()
     setCentralWidget( ptable );
 
     // TOOLBAR
-    pActionNew = new QAction( QIcon( ":W/RowNew16x16" ), tr("New"), this );
-    pActionEdit = new QAction( QIcon( ":W/RowEdit16x16" ), tr("Edit"), this );
-    pActionUp = new QAction( QIcon( ":W/RowUp16x16" ), tr("MoveUp"), this );
-    pActionDown = new QAction( QIcon( ":W/RowDown16x16" ), tr("MoveDown"), this );
-    pActionDelete = new QAction( QIcon( ":W/RowDelete16x16" ), tr("Delete"), this );
+    pActionNew = new QAction( QIcon( ":AW/RowNew" ), tr("New"), this );
+    pActionEdit = new QAction( QIcon( ":AW/RowEdit" ), tr("Edit"), this );
+    pActionUp = new QAction( QIcon( ":AW/RowUp" ), tr("MoveUp"), this );
+    pActionDown = new QAction( QIcon( ":AW/RowDown" ), tr("MoveDown"), this );
+    pActionDelete = new QAction( QIcon( ":AW/RowDelete" ), tr("Delete"), this );
 
     connect( pActionNew, SIGNAL(triggered()), this, SLOT(slotNew()) );
     connect( pActionEdit, SIGNAL(triggered()), this, SLOT(slotEdit()) );

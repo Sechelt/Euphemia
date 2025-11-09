@@ -44,7 +44,7 @@ void PMColumnsUsedWidget::slotNew()
                                                                                                 
     // create dialog                                                                            
     WTabDialog * pdialog = new WTabDialog( this, tr("Select Column..."), "SelectColumn" );
-    pdialog->setWindowIcon( QIcon( ":W/RowNew16x16" ) );
+    pdialog->setWindowIcon( QIcon( ":AW/RowNew" ) );
                                                                                                 
     AWObjectSelectWidget * pmultiselect = new AWObjectSelectWidget( pdialog, listModelsIn );    
     pdialog->getTabWidget()->addTab( pmultiselect, "Columns" );                              

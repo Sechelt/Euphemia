@@ -5560,7 +5560,7 @@ QMap<QString,DATADataTypeSpec*> DATAProfile::getDataTypes( DATAConnection *pConn
 
         if ( mapDataTypes.contains( pDataTypeSpec->TYPE_NAME ) )
         {
-            printf( "[PAH][%s][%s][%d] TYPE_NAME %s exists. Ignoring.\n", __FILE__, __FUNCTION__, __LINE__, pDataTypeSpec->TYPE_NAME.toUtf8().constData() );
+            printf( "[PAH][%s][%s][%d] TYPE_NAME %s exists. Details DATA_TYPE %s LOCAL_TYPE_NAME %s. Ignored.\n", __FILE__, __FUNCTION__, __LINE__, pDataTypeSpec->TYPE_NAME.toUtf8().constData(), pDataTypeSpec->DATA_TYPE.toUtf8().constData(), pDataTypeSpec->LOCAL_TYPE_NAME.toUtf8().constData() );
             delete pDataTypeSpec;
         }
         else 

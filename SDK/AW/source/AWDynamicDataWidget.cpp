@@ -92,8 +92,8 @@ void AWDynamicDataWidget::doInit()
     setCentralWidget( ptable );
 
     // TOOLBAR
-    pActionNew = new QAction( QIcon( ":W/RowNew16x16" ), tr("New"), this );
-    pActionDelete = new QAction( QIcon( ":W/RowDelete16x16" ), tr("Delete"), this );
+    pActionNew = new QAction( QIcon( ":AW/RowNew" ), tr("New"), this );
+    pActionDelete = new QAction( QIcon( ":AW/RowDelete" ), tr("Delete"), this );
 
     connect( pActionNew, SIGNAL(triggered()), this, SLOT(slotNew()) );
     connect( pActionDelete, SIGNAL(triggered()), this, SLOT(slotDelete()) ); 

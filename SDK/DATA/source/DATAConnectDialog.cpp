@@ -144,7 +144,7 @@ DATAConnectDialog::DATAConnectDialog( DATAConnection *pConnection, QWidget *pWid
     setModal( true );
     setSizeGripEnabled( true );
     setObjectName( "DATAConnectDialog" );
-    setWindowIcon( QPixmap( ":W/Properties" ) );
+    setWindowIcon( QPixmap( ":AW/Properties" ) );
     setWindowTitle( "Connect..." );
 
     QVBoxLayout *playoutTop = new QVBoxLayout;

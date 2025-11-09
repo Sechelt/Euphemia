@@ -77,6 +77,10 @@
 	<file alias="Replace">images/Replace.png</file>
 	<file alias="ReplaceAll">images/ReplaceAll.png</file>
 	<file alias="ResetToDefault">images/ResetToDefault.png</file>
+	<file alias="RowNew16x16">images/RowNew16x16.png</file>
+	<file alias="RowDelete16x16">images/RowDelete16x16.png</file>
+	<file alias="RowUp16x16">images/RowUp16x16.png</file>
+	<file alias="RowDown16x16">images/RowDown16x16.png</file>
 	<file alias="Save16x16">images/Save16x16.png</file>
 	<file alias="Save48x48">images/Save48x48.png</file>
 	<file alias="SaveAll16x16">images/SaveAll16x16.png</file>

@@ -3,14 +3,6 @@
 cd Euphemia-1.0
 
 echo "Removing build artifacts..."
-cd Classic-SDK
-make distclean
-cd ../Euphemia-SDK
-make distclean
-cd ../Euphemia
-make distclean
-cd ..
-
 find . -type d -name '.tmp' -exec rm -rf {} +
 find . -type d -name 'lib' -exec rm -rf {} +
 find . -type d -name 'bin' -exec rm -rf {} +

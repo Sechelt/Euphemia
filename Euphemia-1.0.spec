@@ -1,9 +1,9 @@
 #
 # Euphemia RPM spec 
 #
-Summary: A pixel editor.
+Summary: Design data structures and manage data.
 Name: Euphemia
-Icon: Euphemia.xpm
+Icon: Euphemia.png
 Version: 1.0
 Release: 1
 License: GPL
@@ -14,43 +14,28 @@ Vendor: CodeByDesign
 Packager: Peter Harvey <pharvey@codebydesign.com>
 
 %description
-For editing of images with an emphasis on detailed 
-pixel manipulation.
+Design data structures and manage data.
 
 %prep
 %setup
 
 %build
-cd Classic-SDK
-qmake-qt5
+qmake
 make 
-cd ../Euphemia-SDK
-qmake-qt5
-make
-cd ../Euphemia
-qmake-qt5
-make
-cd ..
 
 %install
 mkdir -p %{buildroot}%{_bindir}
-install -p -m 755 Euphemia/bin/euphemia %{buildroot}%{_bindir}/
+install -p -m 755 bin/euphemia %{buildroot}%{_bindir}/
 
 %files
-%doc Euphemia/LICENSE
-%doc Euphemia/CREDITS
+%doc LICENSE
+%doc CREDITS
 /usr/bin/euphemia
 
 %changelog
 
 %clean
-cd Classic-SDK
 make distclean
-cd ../Euphemia-SDK
-make distclean
-cd ../Euphemia
-make distclean
-cd ..
 
 find . -type d -name '.tmp' -exec rm -rf {} +
 find . -type d -name 'lib' -exec rm -rf {} +

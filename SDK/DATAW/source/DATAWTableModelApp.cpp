@@ -508,11 +508,11 @@ QString DATAWTableModelApp::getSQLColumnValues() const
 
         DATAWMetaColumn metaColumn = metaTable.mapColumns.value( stringCOLUMN_NAME );
 
-        // get LITERAL_PREFIX and LITERAL_SUFFIX for TYPE_NAME
-        DATADataTypeSpec *pTypeSpec = pProfile->getDataTypeSpec( metaColumn.stringTYPE_NAME );
+        // get LITERAL_PREFIX and LITERAL_SUFFIX for DATA_TYPE
+        DATADataTypeSpec *pTypeSpec = pProfile->vectorDataTypes[pProfile->mapDataTypeIndex.value( metaColumn.nDATA_TYPE )];
         if ( !pTypeSpec ) 
         {
-            qWarning( "[PAH][%s][%s][%d] WARNING: Could not find DATADataTypeSpec where TYPE_NAME %s.\n", __FILE__, __FUNCTION__, __LINE__, metaColumn.stringTYPE_NAME.toUtf8().constData() );
+            qWarning( "[PAH][%s][%s][%d] WARNING: Could not find DATADataTypeSpec where DATA_TYPE %d.\n", __FILE__, __FUNCTION__, __LINE__, metaColumn.nDATA_TYPE );
             return QString();
         }
 
@@ -572,11 +572,11 @@ QString DATAWTableModelApp::getSQLValues() const
         DATAWMetaColumn metaColumn = metaTable.mapColumns.value( stringCOLUMN_NAME );
         if ( metaColumn.bReadOnly ) continue;
 
-        // get LITERAL_PREFIX and LITERAL_SUFFIX for TYPE_NAME
-        DATADataTypeSpec *pTypeSpec = pProfile->getDataTypeSpec( metaColumn.stringTYPE_NAME );
+        // get LITERAL_PREFIX and LITERAL_SUFFIX for DATA_TYPE
+        DATADataTypeSpec *pTypeSpec = pProfile->vectorDataTypes[pProfile->mapDataTypeIndex.value( metaColumn.nDATA_TYPE )];
         if ( !pTypeSpec ) 
         {
-            qWarning( "[PAH][%s][%s][%d] Could not find DATADataTypeSpec where TYPE_NAME %s.\n", __FILE__, __FUNCTION__, __LINE__, metaColumn.stringTYPE_NAME.toUtf8().constData() );
+            qWarning( "[PAH][%s][%s][%d] Could not find DATADataTypeSpec where DATA_TYPE %d.\n", __FILE__, __FUNCTION__, __LINE__, metaColumn.nDATA_TYPE );
             return QString();
         }
 
@@ -632,8 +632,6 @@ QString DATAWTableModelApp::getSQLWhere( int nRow ) const
         if ( nCol ) stringSQL += " AND ";
         stringSQL += stringCOLUMN_NAME + " = ";
 
-        // get TYPE_NAME for COLUMN_NAME
-        QString     stringTYPE_NAME;
         SQLSMALLINT nDATA_TYPE;
         if ( metaTable.nUnique == DATAWMetaTable::UniqueRowId )
         {
@@ -643,8 +641,7 @@ QString DATAWTableModelApp::getSQLWhere( int nRow ) const
                 return QString();
             }
             QMap<QString,DATAWMetaSpecialColumn> mapColumns = metaTable.metaBestRowId.mapColumns;
-            stringTYPE_NAME = mapColumns.value( stringCOLUMN_NAME ).stringTYPE_NAME;
-            nDATA_TYPE      = mapColumns.value( stringCOLUMN_NAME ).nDATA_TYPE;
+            nDATA_TYPE = mapColumns.value( stringCOLUMN_NAME ).nDATA_TYPE;
         }
         else
         {
@@ -655,15 +652,14 @@ QString DATAWTableModelApp::getSQLWhere( int nRow ) const
                 return QString();
             }
             DATAWMetaColumn metaColumn = mapColumns.value( stringCOLUMN_NAME );
-            stringTYPE_NAME = metaColumn.stringTYPE_NAME;
             nDATA_TYPE = metaColumn.nDATA_TYPE;
         }
 
         // get LITERAL_PREFIX and LITERAL_SUFFIX for TYPE_NAME
-        DATADataTypeSpec *pTypeSpec = pProfile->getDataTypeSpec( stringTYPE_NAME );
+        DATADataTypeSpec *pTypeSpec = pProfile->vectorDataTypes[pProfile->mapDataTypeIndex.value( nDATA_TYPE )];
         if ( !pTypeSpec ) 
         {
-            qWarning( "[PAH][%s][%s][%d] Could not find DATADataTypeSpec where TYPE_NAME %s.\n", __FILE__, __FUNCTION__, __LINE__, stringTYPE_NAME.toUtf8().constData() );
+            qWarning( "[PAH][%s][%s][%d] Could not find DATADataTypeSpec where DATA_TYPE %d.\n", __FILE__, __FUNCTION__, __LINE__, nDATA_TYPE );
             return QString();
         }
 
@@ -719,10 +715,10 @@ QString DATAWTableModelApp::getSQLFilter() const
         DATAWMetaColumn metaColumn = metaTable.mapColumns.value( stringCOLUMN_NAME );
 
         // get LITERAL_PREFIX and LITERAL_SUFFIX for TYPE_NAME
-        DATADataTypeSpec *pTypeSpec = pProfile->getDataTypeSpec( metaColumn.stringTYPE_NAME );
+        DATADataTypeSpec *pTypeSpec = pProfile->vectorDataTypes[pProfile->mapDataTypeIndex.value( metaColumn.nDATA_TYPE )];
         if ( !pTypeSpec ) 
         {
-            qWarning( "[PAH][%s][%s][%d] Could not find DATADataTypeSpec where TYPE_NAME %s.\n", __FILE__, __FUNCTION__, __LINE__, metaColumn.stringTYPE_NAME.toUtf8().constData() );
+            qWarning( "[PAH][%s][%s][%d] Could not find DATADataTypeSpec where DATA_TYPE %d.\n", __FILE__, __FUNCTION__, __LINE__, metaColumn.nDATA_TYPE );
             return QString();
         }
 

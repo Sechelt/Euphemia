@@ -24,36 +24,32 @@ DATADataTypesWidget::DATADataTypesWidget( DATAProfile *pProfile, QWidget *pParen
     setSelectionBehavior( QAbstractItemView::SelectRows );
     setSelectionMode( QAbstractItemView::NoSelection );    
 
-    // COMPLETE THIS AFTER SWITCH DATA TO ALL QString (so its more readable)
     if ( pProfile )
     {
-        QMapIterator<QString,DATADataTypeSpec*> i( pProfile->mapDataTypes );
         int nRow = 0;
-        while ( i.hasNext() ) 
+        foreach(DATADataTypeSpec * p, pProfile->vectorDataTypes )
         {
-            i.next();
-
             setRowCount( nRow + 1 );
-            setItem( nRow, 0, new QTableWidgetItem( i.value()->TYPE_NAME ) );
-            setItem( nRow, 1, new QTableWidgetItem( i.value()->DATA_TYPE ) );
-            setItem( nRow, 2, new QTableWidgetItem( i.value()->COLUMN_SIZE ) );
-            setItem( nRow, 3, new QTableWidgetItem( i.value()->LITERAL_PREFIX ) );
-            setItem( nRow, 4, new QTableWidgetItem( i.value()->LITERAL_SUFFIX ) );
-            setItem( nRow, 5, new QTableWidgetItem( i.value()->CREATE_PARAMS ) );
-            setItem( nRow, 6, new QTableWidgetItem( i.value()->NULLABLE ) );
-            setItem( nRow, 7, new QTableWidgetItem( i.value()->CASE_SENSITIVE ) );
-            setItem( nRow, 8, new QTableWidgetItem( i.value()->SEARCHABLE ) );
-            setItem( nRow, 9, new QTableWidgetItem( i.value()->UNSIGNED_ATTRIBUTE ) );
-            setItem( nRow, 10, new QTableWidgetItem( i.value()->FIXED_PREC_SCALE ) );
-            setItem( nRow, 11, new QTableWidgetItem( i.value()->AUTO_UNIQUE_VALUE ) );
-            setItem( nRow, 12, new QTableWidgetItem( i.value()->LOCAL_TYPE_NAME ) );
-            setItem( nRow, 13, new QTableWidgetItem( i.value()->MINIMUM_SCALE ) );
-            setItem( nRow, 14, new QTableWidgetItem( i.value()->MAXIMUM_SCALE ) );
-            setItem( nRow, 15, new QTableWidgetItem( i.value()->SQL_DATA_TYPE ) );
-            setItem( nRow, 16, new QTableWidgetItem( i.value()->SQL_DATETIME_SUB ) );
-            setItem( nRow, 17, new QTableWidgetItem( i.value()->NUM_PREC_RADIX ) );
-            setItem( nRow, 18, new QTableWidgetItem( i.value()->INTERVAL_PRECISION ) );
-            setItem( nRow, 19, new QTableWidgetItem( i.value()->stringDescription ) );
+            setItem( nRow, 0, new QTableWidgetItem( p->TYPE_NAME ) );
+            setItem( nRow, 1, new QTableWidgetItem( p->DATA_TYPE ) );
+            setItem( nRow, 2, new QTableWidgetItem( p->COLUMN_SIZE ) );
+            setItem( nRow, 3, new QTableWidgetItem( p->LITERAL_PREFIX ) );
+            setItem( nRow, 4, new QTableWidgetItem( p->LITERAL_SUFFIX ) );
+            setItem( nRow, 5, new QTableWidgetItem( p->CREATE_PARAMS ) );
+            setItem( nRow, 6, new QTableWidgetItem( p->NULLABLE ) );
+            setItem( nRow, 7, new QTableWidgetItem( p->CASE_SENSITIVE ) );
+            setItem( nRow, 8, new QTableWidgetItem( p->SEARCHABLE ) );
+            setItem( nRow, 9, new QTableWidgetItem( p->UNSIGNED_ATTRIBUTE ) );
+            setItem( nRow, 10, new QTableWidgetItem( p->FIXED_PREC_SCALE ) );
+            setItem( nRow, 11, new QTableWidgetItem( p->AUTO_UNIQUE_VALUE ) );
+            setItem( nRow, 12, new QTableWidgetItem( p->LOCAL_TYPE_NAME ) );
+            setItem( nRow, 13, new QTableWidgetItem( p->MINIMUM_SCALE ) );
+            setItem( nRow, 14, new QTableWidgetItem( p->MAXIMUM_SCALE ) );
+            setItem( nRow, 15, new QTableWidgetItem( p->SQL_DATA_TYPE ) );
+            setItem( nRow, 16, new QTableWidgetItem( p->SQL_DATETIME_SUB ) );
+            setItem( nRow, 17, new QTableWidgetItem( p->NUM_PREC_RADIX ) );
+            setItem( nRow, 18, new QTableWidgetItem( p->INTERVAL_PRECISION ) );
+            setItem( nRow, 19, new QTableWidgetItem( p->stringDescription ) );
             nRow++;
         }
     }
@@ -85,33 +81,33 @@ void DATADataTypesWidget::slotCopy()
     if ( !pProfile ) return;
 
     QString s;
-    QMapIterator<QString,DATADataTypeSpec*> i( pProfile->mapDataTypes );
-    while ( i.hasNext() ) 
+
+    foreach( DATADataTypeSpec *p, pProfile->vectorDataTypes )
     {
-        i.next();
         s += "{\n";
         s += "DATADataTypeSpec d;\n";
-        s += "d.TYPE_NAME           = \"" + i.value()->TYPE_NAME + "\";\n";
-        s += "d.nDATA_TYPE          = \"" + QString::number( i.value()->nDATA_TYPE ) + "\";\n";
-        s += "d.DATA_TYPE           = \"" + i.value()->DATA_TYPE + "\";\n";
-        s += "d.COLUMN_SIZE         = \"" + i.value()->COLUMN_SIZE + "\";\n";
-        s += "d.LITERAL_PREFIX      = \"" + i.value()->LITERAL_PREFIX + "\";\n";
-        s += "d.LITERAL_SUFFIX      = \"" + i.value()->LITERAL_SUFFIX + "\";\n";
-        s += "d.CREATE_PARAMS       = \"" + i.value()->CREATE_PARAMS + "\";\n";
-        s += "d.NULLABLE            = \"" + i.value()->NULLABLE + "\";\n";
-        s += "d.CASE_SENSITIVE      = \"" + i.value()->CASE_SENSITIVE + "\";\n";
-        s += "d.SEARCHABLE          = \"" + i.value()->SEARCHABLE + "\";\n";
-        s += "d.UNSIGNED_ATTRIBUTE  = \"" + i.value()->UNSIGNED_ATTRIBUTE + "\";\n";
-        s += "d.FIXED_PREC_SCALE    = \"" + i.value()->FIXED_PREC_SCALE + "\";\n";
-        s += "d.AUTO_UNIQUE_VALUE   = \"" + i.value()->AUTO_UNIQUE_VALUE + "\";\n";
-        s += "d.LOCAL_TYPE_NAME     = \"" + i.value()->LOCAL_TYPE_NAME + "\";\n";
-        s += "d.MINIMUM_SCALE       = \"" + i.value()->MINIMUM_SCALE + "\";\n";
-        s += "d.MAXIMUM_SCALE       = \"" + i.value()->MAXIMUM_SCALE + "\";\n";
-        s += "d.SQL_DATA_TYPE       = \"" + i.value()->SQL_DATA_TYPE + "\";\n";
-        s += "d.SQL_DATETIME_SUB    = \"" + i.value()->SQL_DATETIME_SUB + "\";\n";
-        s += "d.NUM_PREC_RADIX      = \"" + i.value()->NUM_PREC_RADIX + "\";\n";
-        s += "d.INTERVAL_PRECISION  = \"" + i.value()->INTERVAL_PRECISION + "\";\n";
-        s += "d.stringDescription   = \"" + i.value()->stringDescription + "\";\n";
+        s += "d.TYPE_NAME           = \"" + p->TYPE_NAME + "\";\n";
+        s += "d.nDATA_TYPE          = \"" + QString::number( p->nDATA_TYPE ) + "\";\n";
+        s += "d.DATA_TYPE           = \"" + p->DATA_TYPE + "\";\n";
+        s += "d.COLUMN_SIZE         = \"" + p->COLUMN_SIZE + "\";\n";
+        s += "d.LITERAL_PREFIX      = \"" + p->LITERAL_PREFIX + "\";\n";
+        s += "d.LITERAL_SUFFIX      = \"" + p->LITERAL_SUFFIX + "\";\n";
+        s += "d.CREATE_PARAMS       = \"" + p->CREATE_PARAMS + "\";\n";
+        s += "d.NULLABLE            = \"" + p->NULLABLE + "\";\n";
+        s += "d.CASE_SENSITIVE      = \"" + p->CASE_SENSITIVE + "\";\n";
+        s += "d.SEARCHABLE          = \"" + p->SEARCHABLE + "\";\n";
+        s += "d.UNSIGNED_ATTRIBUTE  = \"" + p->UNSIGNED_ATTRIBUTE + "\";\n";
+        s += "d.FIXED_PREC_SCALE    = \"" + p->FIXED_PREC_SCALE + "\";\n";
+        s += "d.AUTO_UNIQUE_VALUE   = \"" + p->AUTO_UNIQUE_VALUE + "\";\n";
+        s += "d.LOCAL_TYPE_NAME     = \"" + p->LOCAL_TYPE_NAME + "\";\n";
+        s += "d.MINIMUM_SCALE       = \"" + p->MINIMUM_SCALE + "\";\n";
+        s += "d.MAXIMUM_SCALE       = \"" + p->MAXIMUM_SCALE + "\";\n";
+        s += "d.nSQL_DATA_TYPE      = \"" + QString::number( p->nSQL_DATA_TYPE ) + "\";\n";
+        s += "d.SQL_DATA_TYPE       = \"" + p->SQL_DATA_TYPE + "\";\n";
+        s += "d.SQL_DATETIME_SUB    = \"" + p->SQL_DATETIME_SUB + "\";\n";
+        s += "d.NUM_PREC_RADIX      = \"" + p->NUM_PREC_RADIX + "\";\n";
+        s += "d.INTERVAL_PRECISION  = \"" + p->INTERVAL_PRECISION + "\";\n";
+        s += "d.stringDescription   = \"" + p->stringDescription + "\";\n";
         s += "d.vectorSyntax        = DATADataTypeSpec::getSyntaxVector( d.TYPE_NAME );\n";
         s += "mapDataTypes[d.TYPE_NAME] = d;\n";
         s += "}\n";

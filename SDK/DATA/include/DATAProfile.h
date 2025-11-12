@@ -148,19 +148,17 @@ public:
     QString                         stringKey;
     QMap<QString,DATAInfo*>         mapInfo;            // key = QString; ie "SQL_DATA_SOURCE_NAME"; from SQLGetInfo
 
-    // DATA TYPES
-    // Here we store supported data types as returned by SQLGetTypeInfo.
-    // TYPE_NAME is unique while DATA_TYPE can be duplicated so we use TYPE_NAME as our key.
-    // NOTE: Unfortunately; SQLColumns:TYPE_NAME may not always match SQLGetTypeInfo:TYPE_NAME (depends upon the driver) so a straight xref may not always be possible.
-    QMap<QString,DATADataTypeSpec*> mapDataTypes;       // key = SQLGetTypeInfo:TYPE_NAME
+    QVector<DATADataTypeSpec*>      vectorDataTypes;    // All rows from SQLGetTypeInfo. 
+                                                        // NOTE:    No unique key that works with all drivers so no key.
+    QMap<int,int>                   mapDataTypeIndex;   // We can use this to xref DATA_TYPE to index in vectorDataTypes (will take last when duplicates).
+                                                        // NOTE:    TYPE_NAME is not consistent between SQLGetTypeInfo and SQLColumns (with some drivers) so not good for xref.
+                                                        //          SQLSpecialColumns has DATA_TYPE but not SQL_DATA_TYPE so SQL_DATA_TYPE is not always usable for an xref.
 
     QMap<int,DATAFunction*>         mapFunctions;       // key = int; ie SQL_API_SQLCONNECT; from SQLGetFunctions (also includes DATAUnsupported)
     QMap<QString,DATAAttr*>         mapAttr;            // key = QString; ie "SQL_ATTR_AUTOCOMMIT"; from SQLGetConnectAttr
 
     void setModified( bool b = true ) { bModified = b; }
     bool isModified() { return bModified; }
-
-    DATADataTypeSpec *getDataTypeSpec( const QString &stringTYPE_NAME ); // usually better than going after mapDataTypes directly
 
     // save to profiles database
     bool doSave();
@@ -204,7 +202,7 @@ protected:
 
     QMap<QString,DATAInfo*>         getInfo( DATAConnection *pConnection );
     DATAInfo *                      getInfoData( DATAConnection *pConnection, SQLUSMALLINT nInfoType, SQLRETURN *pnReturn = nullptr );
-    QMap<QString,DATADataTypeSpec*> getDataTypes( DATAConnection *pConnection );
+    bool doLoadDataTypes( DATAConnection *pConnection );
     QMap<int,DATAFunction*>         getFunctions( DATAConnection *pConnection, SQLRETURN *pnReturn = nullptr );
     QMap<QString,DATAAttr*>         getAttr( DATAConnection *pConnection );
     DATAAttr *                      getAttrData( DATAConnection *pConnection, SQLUSMALLINT nAttrType, SQLRETURN *pnReturn = nullptr );

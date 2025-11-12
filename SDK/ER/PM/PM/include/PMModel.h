@@ -92,7 +92,7 @@ public:
     virtual AWClassWidget *     getClassWidget( QWidget *pWidgetParent = nullptr );
     virtual AWDataWidget *      getObjectWidget( QWidget *pWidgetParent = nullptr );
     virtual QMenu *             getContextMenu( QWidget * );
-    virtual QList<QString>      getDataTypes();
+    virtual QList<QString>      getTypeNames();
     virtual DATADataTypeSpec *  getDataTypeSpec( const QString &stringTYPE_NAME );
     virtual QStringList         getDomains();
     virtual PMDomain *          getDomain( const QString str, const bool cs = false );

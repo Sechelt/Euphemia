@@ -770,13 +770,21 @@ bool DATAWMetaTable::isAGAccess( DATAConnection *pConnection, const QString &str
     if ( metaColumn.stringTYPE_NAME == "COUNTER" ) return true;
 
     DATAProfile *pProfile = pConnection->getProfile();
-    DATADataTypeSpec *pDataTypeSpec = pProfile->mapDataTypes.value( metaColumn.stringTYPE_NAME );
-    if ( !pDataTypeSpec )
+
+    if ( !pProfile->mapDataTypeIndex.contains( metaColumn.nDATA_TYPE ) )
     {
-        qWarning( "[PAH][%s][%s][%d] Could not find type name %s in profile.\n", __FILE__, __FUNCTION__, __LINE__, metaColumn.stringTYPE_NAME.toUtf8().constData() );
+        qWarning( "[PAH][%s][%s][%d] Could not find DATA_TYPE (%d) in profile.\n", __FILE__, __FUNCTION__, __LINE__, metaColumn.nDATA_TYPE );
         return false;
     }
 
+    DATADataTypeSpec *pDataTypeSpec = pProfile->vectorDataTypes[pProfile->mapDataTypeIndex.value( metaColumn.nDATA_TYPE )];
+    if ( !pDataTypeSpec )
+    {
+        qWarning( "[PAH][%s][%s][%d] Could not find DATA_TYPE (%d) in profile.\n", __FILE__, __FUNCTION__, __LINE__, metaColumn.nDATA_TYPE );
+        return false;
+    }
+
+printf( "[PAH][%s][%s][%d] Not likley to work as is.\n", __FILE__, __FUNCTION__, __LINE__ );
     // SQLGetTypeInfo:AUTO_UNIQUE_VALUE
     if ( pDataTypeSpec->AUTO_UNIQUE_VALUE.toInt() ) return true;
 

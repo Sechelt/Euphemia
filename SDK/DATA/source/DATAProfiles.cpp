@@ -280,6 +280,7 @@ sqlite3 *DATAProfiles::doCreateDatabase( const QString &stringFileName )
             "  LOCAL_TYPE_NAME varchar(50),                 "\
             "  MINIMUM_SCALE varchar(50),                   "\
             "  MAXIMUM_SCALE varchar(50),                   "\
+            "  nSQL_DATA_TYPE integer NOT NULL,             "\
             "  SQL_DATA_TYPE varchar(50) NOT NULL,          "\
             "  SQL_DATETIME_SUB varchar(50),                "\
             "  NUM_PREC_RADIX varchar(50),                  "\
@@ -545,24 +546,30 @@ bool DATAProfiles::doLoadODBCMin( DATAProfile *pProfile )
     pProfile->mapInfo["SQL_TABLE_TERM"]                       = new DATAInfo( SQL_TABLE_TERM, "SQL_TABLE_TERM", "TABLE" );
 
     // configure data-types
+    int nRow = 0;
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "CHAR";
-        pDataTypeSpec->DATA_TYPE         = "SQL_CHAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_CHAR; 
+        pDataTypeSpec->DATA_TYPE         = "SQL_CHAR"; 
         pDataTypeSpec->COLUMN_SIZE       = "256";
         pDataTypeSpec->CREATE_PARAMS     = "length";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_TRUE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>CHAR(n)</B><P>Character string of fixed string length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "CHAR(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "VARCHAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_VARCHAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_VARCHAR";
         pDataTypeSpec->COLUMN_SIZE       = "256";
         pDataTypeSpec->CREATE_PARAMS     = "length";
@@ -570,24 +577,31 @@ bool DATAProfiles::doLoadODBCMin( DATAProfile *pProfile )
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_TRUE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>VARCHAR(n)</B><P>Variable-length character string with a maximum string length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "VARCHAR(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "LONG VARCHAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_LONGVARCHAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_LONGVARCHAR";
         pDataTypeSpec->COLUMN_SIZE       = "32768";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_TRUE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>LONG VARCHAR</B><P>Variable length character data. Maximum length is data source-dependent.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     return true;
 }
@@ -643,9 +657,11 @@ bool DATAProfiles::doLoadODBCCor( DATAProfile *pProfile )
 
     // configure data-types
     // - add more data-types
+    int nRow = 0;
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "DECIMAL";
+        pDataTypeSpec->nDATA_TYPE        = SQL_DECIMAL;
         pDataTypeSpec->DATA_TYPE         = "SQL_DECIMAL";
         pDataTypeSpec->COLUMN_SIZE       = "10";
         pDataTypeSpec->CREATE_PARAMS     = "precision,scale";
@@ -655,15 +671,19 @@ bool DATAProfiles::doLoadODBCCor( DATAProfile *pProfile )
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_FALSE";
         pDataTypeSpec->MINIMUM_SCALE     = "0";
         pDataTypeSpec->MAXIMUM_SCALE     = "2";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->NUM_PREC_RADIX    = "10";
         pDataTypeSpec->stringDescription = "<B>DECIMAL(p,s)</B><P>Signed, exact, numeric value with a precision of at least <B>p</B> and scale s. (The maximum precision is driver-defined.) (1 &lt;= <B>p</B> &lt;= 15; <B>s</B> &lt;= <B>p</B>).</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "DECIMAL(p,s)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "NUMERIC";
+        pDataTypeSpec->nDATA_TYPE        = SQL_DECIMAL;
         pDataTypeSpec->DATA_TYPE         = "SQL_DECIMAL";
         pDataTypeSpec->COLUMN_SIZE       = "10";
         pDataTypeSpec->CREATE_PARAMS     = "precision,scale";
@@ -673,54 +693,70 @@ bool DATAProfiles::doLoadODBCCor( DATAProfile *pProfile )
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_FALSE";
         pDataTypeSpec->MINIMUM_SCALE     = "0";
         pDataTypeSpec->MAXIMUM_SCALE     = "2";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->NUM_PREC_RADIX    = "10";
         pDataTypeSpec->stringDescription = "<B>NUMERIC(p,s)</B><P>Signed, exact, numeric value with a precision <B>p</B> and scale <B>s</B> (1 &lt;= <B>p</B> &lt;= 15; <B>s</B> &lt;= <B>p</B>).</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "NUMERIC(p,s)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "SMALLINT";
+        pDataTypeSpec->nDATA_TYPE        = SQL_SMALLINT;
         pDataTypeSpec->DATA_TYPE         = "SQL_SMALLINT";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>SMALLINT</B><P>Exact numeric value with precision 5 and scale 0 (signed: -32,768 &lt;= <B>n</B> &lt;= 32,767, unsigned: 0 &lt;= <B>n</B> &lt;= 65,535).</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTEGER";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTEGER;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTEGER";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTEGER</B><P>Exact numeric value with precision 10 and scale 0 (signed: -2[31] &lt;= <B>n</B> &lt;= 2[31] - 1, unsigned: 0 &lt;= <B>n</B> &lt;= 2[32] - 1).</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "REAL";
+        pDataTypeSpec->nDATA_TYPE        = SQL_REAL;
         pDataTypeSpec->DATA_TYPE         = "SQL_REAL";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>REAL</B><P>Signed, approximate, numeric value with a binary precision 24 (zero or absolute value 10[-38] to 10[38]).</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "FLOAT";
+        pDataTypeSpec->nDATA_TYPE        = SQL_FLOAT;
         pDataTypeSpec->DATA_TYPE         = "SQL_FLOAT";
         pDataTypeSpec->COLUMN_SIZE       = "10";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
@@ -728,24 +764,31 @@ bool DATAProfiles::doLoadODBCCor( DATAProfile *pProfile )
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_FALSE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->NUM_PREC_RADIX    = "10";
         pDataTypeSpec->stringDescription = "<B>FLOAT(p)</B><P>Signed, approximate, numeric value with a binary precision of at least <B>p</B>. (The maximum precision is driver-defined.)";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "FLOAT(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "DOUBLE PRECISION";
+        pDataTypeSpec->nDATA_TYPE        = SQL_DOUBLE;
         pDataTypeSpec->DATA_TYPE         = "SQL_DOUBLE";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>DOUBLE PRECISION</B><P>Signed, approximate, numeric value with a binary precision 53 (zero or absolute value 10[-308] to 10[308]).</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     return true;
 }
@@ -784,9 +827,11 @@ bool DATAProfiles::doLoadODBCExt( DATAProfile *pProfile )
 
     // configure data-types
     // - add more data-types
+    int nRow = 0;
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "WCHAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_WCHAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_WCHAR";
         pDataTypeSpec->COLUMN_SIZE       = "256";
         pDataTypeSpec->CREATE_PARAMS     = "length";
@@ -794,14 +839,18 @@ bool DATAProfiles::doLoadODBCExt( DATAProfile *pProfile )
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_TRUE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>WCHAR(n)</B><P>Unicode character string of fixed string length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "WCHAR(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "VARWCHAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_WVARCHAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_WVARCHAR";
         pDataTypeSpec->COLUMN_SIZE       = "256";
         pDataTypeSpec->CREATE_PARAMS     = "length";
@@ -809,366 +858,473 @@ bool DATAProfiles::doLoadODBCExt( DATAProfile *pProfile )
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_TRUE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>VARWCHAR(n)</B><P>Unicode variable-length character string with a maximum string length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "VARWCHAR(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "LONG VARWCHAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_WLONGVARCHAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_WLONGVARCHAR";
         pDataTypeSpec->COLUMN_SIZE       = "32768";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_TRUE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>LONG VARWCHAR</B><P>Unicode variable-length character data. Maximum length is data source-dependent.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "BIT";
+        pDataTypeSpec->nDATA_TYPE        = SQL_BIT;
         pDataTypeSpec->DATA_TYPE         = "SQL_BIT";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>BIT</B><P>Single bit binary data.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "TINYINT";
+        pDataTypeSpec->nDATA_TYPE        = SQL_TINYINT;
         pDataTypeSpec->DATA_TYPE         = "SQL_TINYINT";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>TINYINT</B><P>Exact numeric value with precision 3 and scale 0 (signed: -128 &lt;= <B>n</B> &lt;= 127, unsigned: 0 &lt;= <B>n</B> &lt;= 255)";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "BIGINT";
+        pDataTypeSpec->nDATA_TYPE        = SQL_BIGINT;
         pDataTypeSpec->DATA_TYPE         = "SQL_BIGINT";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>BIGINT</B><P>Exact numeric value with precision 19 (if signed) or 20 (if unsigned) and scale 0 (signed: -2[63] &lt;= <B>n</B> &lt;= 2[63] - 1, unsigned: 0 &lt;= <B>n</B> &lt;= 2[64] - 1.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "BINARY";
+        pDataTypeSpec->nDATA_TYPE        = SQL_BINARY;
         pDataTypeSpec->DATA_TYPE         = "SQL_BINARY";
         pDataTypeSpec->CREATE_PARAMS     = "length";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>BINARY(n)</B><P>Binary data of fixed length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "BINARY(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "VARBINARY";
+        pDataTypeSpec->nDATA_TYPE        = SQL_VARBINARY;
         pDataTypeSpec->DATA_TYPE         = "SQL_VARBINARY";
         pDataTypeSpec->CREATE_PARAMS     = "length";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>VARBINARY(n)</B><P>Variable length binary data of maximum length <B>n</B>. The maximum is set by the user.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "VARBINARY(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "LONG VARBINARY";
+        pDataTypeSpec->nDATA_TYPE        = SQL_LONGVARBINARY;
         pDataTypeSpec->DATA_TYPE         = "SQL_LONGVARBINARY";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>LONG VARBINARY</B><P>Variable length binary data. Maximum length is data source-dependent.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "DATE";
+        pDataTypeSpec->nDATA_TYPE        = SQL_LONGVARBINARY;
         pDataTypeSpec->DATA_TYPE         = "SQL_LONGVARBINARY";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>DATE</B><P>Year, month, and day fields, conforming to the rules of the Gregorian calendar.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "TIME";
+        pDataTypeSpec->nDATA_TYPE        = SQL_TIME;
         pDataTypeSpec->DATA_TYPE         = "SQL_TIME";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>TIME(p)</B><P>Hour, minute, and second fields, with valid values for hours of 00 to 23, valid values for minutes of 00 to 59, and valid values for seconds of 00 to 61. Precision <B>p</B> indicates the seconds precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "TIME(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "TIMESTAMP";
+        pDataTypeSpec->nDATA_TYPE        = SQL_TIMESTAMP;
         pDataTypeSpec->DATA_TYPE         = "SQL_TIMESTAMP";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>TIMESTAMP(p)</B><P>Year, month, day, hour, minute, and second fields, with valid values as defined for the DATE and TIME data types.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "TIMESTAMP(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "UTCDATETIME";
+        pDataTypeSpec->nDATA_TYPE        = SQL_TIMESTAMP;
         pDataTypeSpec->DATA_TYPE         = "SQL_TIMESTAMP";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>UTCDATETIME</B><P>Year, month, day, hour, minute, second, utchour, and utcminute fields. The utchour and utcminute fields have 1/10th microsecond precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "UTCTIME";
+        pDataTypeSpec->nDATA_TYPE        = SQL_TIMESTAMP;
         pDataTypeSpec->DATA_TYPE         = "SQL_TIMESTAMP";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>UTCTIME</B><P>Hour, minute, second, utchour, and utcminute fields. The utchour and utcminute fields have 1/10th microsecond precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL MONTH";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_MONTH;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_MONTH";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL MONTH(p)</B><P>Number of months between two dates; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL MONTH(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL YEAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_YEAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_YEAR";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL YEAR(p)</B><P>Number of years between two dates; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL YEAR(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL YEAR TO MONTH";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_YEAR_TO_MONTH;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_YEAR_TO_MONTH";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL YEAR(p) TO MONTH</B><P>Number of years and months between two dates; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL YEAR(p) TO MONTH" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL DAY";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_DAY;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_DAY";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL DAY(p)</B><P>Number of days between two dates; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL DAY(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL HOUR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_HOUR;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_HOUR";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL HOUR(p)</B><P>Number of hours between two date/times; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL HOUR(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL MINUTE";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_MINUTE;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_MINUTE";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL MINUTE(p)</B><P>Number of minutes between two date/times; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL MINUTE(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL SECOND";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_SECOND;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_SECOND";
         pDataTypeSpec->CREATE_PARAMS     = "precision1,precision2";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL SECOND(p,q)</B><P>Number of seconds between two date/times; <B>p</B> is the interval leading precision and <B>q</B> is the interval seconds precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL SECOND(p,q)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL DAY TO HOUR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_DAY_TO_HOUR;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_DAY_TO_HOUR";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL DAY(p) TO HOUR</B><P>Number of days/hours between two date/times; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL DAY(p) TO HOUR" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL DAY TO MINUTE";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_DAY_TO_MINUTE;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_DAY_TO_MINUTE";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL DAY(p) TO MINUTE</B><P>Number of days/hours/minutes between two date/times; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL DAY(p) TO MINUTE" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL DAY TO SECOND";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_DAY_TO_SECOND;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_DAY_TO_SECOND";
         pDataTypeSpec->CREATE_PARAMS     = "precision1,precision2";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL DAY(p) TO SECOND(q)</B><P>Number of days/hours/minutes/seconds between two date/times; <B>p</B> is the interval leading precision and <B>q</B> is the interval seconds precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL DAY(p) TO SECOND(q)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL HOUR TO MINUTE";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_HOUR_TO_MINUTE;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_HOUR_TO_MINUTE";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL HOUR(p) TO MINUTE</B><P>Number of hours/minutes between two date/times; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL HOUR(p) TO MINUTE" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL HOUR TO SECOND";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_HOUR_TO_SECOND;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_HOUR_TO_SECOND";
         pDataTypeSpec->CREATE_PARAMS     = "precision1,precision2";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL HOUR(p) TO SECOND(q)</B><P>Number of hours/minutes/seconds between two date/times; <B>p</B> is the interval leading precision and <B>q</B> is the interval seconds precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL HOUR(p) TO SECOND(q)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL MINUTE TO SECOND";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_MINUTE_TO_SECOND;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_MINUTE_TO_SECOND";
         pDataTypeSpec->CREATE_PARAMS     = "precision1,precision2";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL MINUTE(p) TO SECOND(q)</B><P>Number of minutes/seconds between two date/times; <B>p</B> is the interval leading precision and <B>q</B> is the interval seconds precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL MINUTE(p) TO SECOND(q)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "GUID";
+        pDataTypeSpec->nDATA_TYPE        = SQL_GUID;
         pDataTypeSpec->DATA_TYPE         = "SQL_GUID";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>GUID</B><P>Fixed length Globally Unique Identifier.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     return true;
 }
@@ -1180,10 +1336,12 @@ bool DATAProfiles::doLoadSQL92()
     //
     // DATA TYPES
     //
+    int nRow = 0;
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
-        pDataTypeSpec->TYPE_NAME         = "CHAR";
-        pDataTypeSpec->DATA_TYPE         = "SQL_CHAR";
+        pDataTypeSpec->TYPE_NAME            = "CHAR";
+        pDataTypeSpec->nDATA_TYPE           = SQL_CHAR;
+        pDataTypeSpec->DATA_TYPE            = "SQL_CHAR";
         pDataTypeSpec->COLUMN_SIZE         = "255";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
         pDataTypeSpec->LITERAL_SUFFIX      = "'";
@@ -1197,17 +1355,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_CHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>CHAR(n)</B><P>Character string of fixed string length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "CHAR(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "VARCHAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_VARCHAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_VARCHAR";
         pDataTypeSpec->COLUMN_SIZE         = "255";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -1222,31 +1384,39 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_VARCHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>VARCHAR(n)</B><P>Variable-length character string with a maximum string length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "VARCHAR(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "LONG VARCHAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_LONGVARCHAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_LONGVARCHAR";
         pDataTypeSpec->COLUMN_SIZE       = "32768";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_TRUE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>LONG VARCHAR</B><P>Variable length character data. Maximum length is data source-dependent.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "DECIMAL";
+        pDataTypeSpec->nDATA_TYPE          = SQL_DECIMAL;
         pDataTypeSpec->DATA_TYPE           = "SQL_DECIMAL";
         pDataTypeSpec->COLUMN_SIZE         = "19";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -1261,17 +1431,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "4";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_DECIMAL";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "10";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>DECIMAL(p,s)</B><P>Signed, exact, numeric value with a precision of at least <B>p</B> and scale s. (The maximum precision is driver-definepDataTypeSpec->) (1 &lt;= <B>p</B> &lt;= 15; <B>s</B> &lt;= <B>p</B>).</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( "DECIMAL(p,s)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "NUMERIC";
+        pDataTypeSpec->nDATA_TYPE          = SQL_NUMERIC;
         pDataTypeSpec->DATA_TYPE           = "SQL_NUMERIC";
         pDataTypeSpec->COLUMN_SIZE         = "19";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -1286,17 +1460,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "4";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_NUMERIC";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "10";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>NUMERIC(p,s)</B><P>Signed, exact, numeric value with a precision <B>p</B> and scale <B>s</B> (1 &lt;= <B>p</B> &lt;= 15; <B>s</B> &lt;= <B>p</B>).</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "NUMERIC(p,s)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "SMALLINT";
+        pDataTypeSpec->nDATA_TYPE          = SQL_SMALLINT;
         pDataTypeSpec->DATA_TYPE           = "SQL_SMALLINT";
         pDataTypeSpec->COLUMN_SIZE         = "5";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -1311,17 +1489,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "0";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_SMALLINT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "10";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>SMALLINT</B><P>Exact numeric value with precision 5 and scale 0 (signed: -32,768 &lt;= <B>n</B> &lt;= 32,767, unsigned: 0 &lt;= <B>n</B> &lt;= 65,535).</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "INTEGER";
+        pDataTypeSpec->nDATA_TYPE          = SQL_INTEGER;
         pDataTypeSpec->DATA_TYPE           = "SQL_INTEGER";
         pDataTypeSpec->COLUMN_SIZE         = "10";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -1336,17 +1518,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "0";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_INTEGER";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "10";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>INTEGER</B><P>Exact numeric value with precision 10 and scale 0 (signed: -2[31] &lt;= <B>n</B> &lt;= 2[31] - 1, unsigned: 0 &lt;= <B>n</B> &lt;= 2[32] - 1).</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "REAL";
+        pDataTypeSpec->nDATA_TYPE          = SQL_REAL;
         pDataTypeSpec->DATA_TYPE           = "SQL_REAL";
         pDataTypeSpec->COLUMN_SIZE         = "24";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -1361,17 +1547,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_REAL";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "2";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>REAL</B><P>Signed, approximate, numeric value with a binary precision 24 (zero or absolute value 10[-38] to 10[38]).</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "FLOAT";
+        pDataTypeSpec->nDATA_TYPE        = SQL_FLOAT;
         pDataTypeSpec->DATA_TYPE         = "SQL_FLOAT";
         pDataTypeSpec->COLUMN_SIZE       = "10";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
@@ -1379,15 +1569,19 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_FALSE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->NUM_PREC_RADIX    = "10";
         pDataTypeSpec->stringDescription = "<B>FLOAT(p)</B><P>Signed, approximate, numeric value with a binary precision of at least <B>p</B>. (The maximum precision is driver-definepDataTypeSpec->)";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "FLOAT(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "DOUBLE PRECISION";
+        pDataTypeSpec->nDATA_TYPE          = SQL_DOUBLE;
         pDataTypeSpec->DATA_TYPE           = "SQL_DOUBLE";
         pDataTypeSpec->COLUMN_SIZE         = "53";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -1402,17 +1596,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_DOUBLE";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "2";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>DOUBLE PRECISION</B><P>Signed, approximate, numeric value with a binary precision 53 (zero or absolute value 10[-308] to 10[308]).</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "WCHAR";
+        pDataTypeSpec->nDATA_TYPE          = SQL_WCHAR;
         pDataTypeSpec->DATA_TYPE           = "SQL_WCHAR";
         pDataTypeSpec->COLUMN_SIZE         = "255";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -1427,17 +1625,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_WCHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>WCHAR(n)</B><P>Unicode character string of fixed string length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( "WCHAR(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "VARWCHAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_WVARCHAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_WVARCHAR";
         pDataTypeSpec->COLUMN_SIZE       = "256";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -1451,17 +1653,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_WLONGVARCHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>VARWCHAR(n)</B><P>Unicode variable-length character string with a maximum string length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "VARWCHAR(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "LONG VARWCHAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_WLONGVARCHAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_WLONGVARCHAR";
         pDataTypeSpec->COLUMN_SIZE       = "32768";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -1476,16 +1682,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_WLONGVARCHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>LONG VARWCHAR</B><P>Unicode variable-length character data. Maximum length is data source-dependent.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
+        pDataTypeSpec->TYPE_NAME           = "BIT";
+        pDataTypeSpec->nDATA_TYPE          = SQL_BIT;
         pDataTypeSpec->DATA_TYPE           = "SQL_BIT";
         pDataTypeSpec->COLUMN_SIZE         = "1";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -1500,17 +1711,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "0";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_BIT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>BIT</B><P>Single bit binary data.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "TINYINT";
+        pDataTypeSpec->nDATA_TYPE          = SQL_TINYINT;
         pDataTypeSpec->DATA_TYPE           = "SQL_TINYINT";
         pDataTypeSpec->COLUMN_SIZE         = "3";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -1525,30 +1740,38 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "0";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_TINYINT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "10";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>TINYINT</B><P>Exact numeric value with precision 3 and scale 0 (signed: -128 &lt;= <B>n</B> &lt;= 127, unsigned: 0 &lt;= <B>n</B> &lt;= 255)";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "BIGINT";
+        pDataTypeSpec->nDATA_TYPE        = SQL_BIGINT;
         pDataTypeSpec->DATA_TYPE         = "SQL_BIGINT";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>BIGINT</B><P>Exact numeric value with precision 19 (if signed) or 20 (if unsigned) and scale 0 (signed: -2[63] &lt;= <B>n</B> &lt;= 2[63] - 1, unsigned: 0 &lt;= <B>n</B> &lt;= 2[64] - 1.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "BINARY";
+        pDataTypeSpec->nDATA_TYPE          = SQL_BINARY;
         pDataTypeSpec->DATA_TYPE           = "SQL_BINARY";
         pDataTypeSpec->COLUMN_SIZE         = "510";
         pDataTypeSpec->LITERAL_PREFIX      = "0x";
@@ -1563,17 +1786,21 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_BINARY";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>BINARY(n)</B><P>Binary data of fixed length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "BINARY(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "VARBINARY";
+        pDataTypeSpec->nDATA_TYPE          = SQL_VARBINARY;
         pDataTypeSpec->DATA_TYPE           = "SQL_VARBINARY";
         pDataTypeSpec->COLUMN_SIZE         = "510";
         pDataTypeSpec->LITERAL_PREFIX      = "0x";
@@ -1588,57 +1815,73 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_VARBINARY";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>VARBINARY(n)</B><P>Variable length binary data of maximum length <B>n</B>. The maximum is set by the user.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "VARBINARY(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "LONG VARBINARY";
+        pDataTypeSpec->nDATA_TYPE        = SQL_LONGVARBINARY;
         pDataTypeSpec->DATA_TYPE         = "SQL_LONGVARBINARY";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>LONG VARBINARY</B><P>Variable length binary data. Maximum length is data source-dependent.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "DATE";
+        pDataTypeSpec->nDATA_TYPE        = SQL_DATE;
         pDataTypeSpec->DATA_TYPE         = "SQL_DATE";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>DATE</B><P>Year, month, and day fields, conforming to the rules of the Gregorian calendar.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "TIME";
+        pDataTypeSpec->nDATA_TYPE        = SQL_TIME;
         pDataTypeSpec->DATA_TYPE         = "SQL_TIME";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>TIME(p)</B><P>Hour, minute, and second fields, with valid values for hours of 00 to 23, valid values for minutes of 00 to 59, and valid values for seconds of 00 to 61. Precision <B>p</B> indicates the seconds precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "TIME(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "TIMESTAMP";
+        pDataTypeSpec->nDATA_TYPE          = SQL_TYPE_TIMESTAMP;
         pDataTypeSpec->DATA_TYPE           = "SQL_TYPE_TIMESTAMP";
         pDataTypeSpec->COLUMN_SIZE         = "19";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -1659,11 +1902,14 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>TIMESTAMP(p)</B><P>Year, month, day, hour, minute, and second fields, with valid values as defined for the DATE and TIME data types. Optional (p) is precision in seconds - 0 = default. </P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "TIMESTAMP(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "UTCDATETIME";
+        pDataTypeSpec->nDATA_TYPE          = SQL_TYPE_TIMESTAMP;
         pDataTypeSpec->DATA_TYPE           = "SQL_TYPE_TIMESTAMP";
         pDataTypeSpec->COLUMN_SIZE         = "19";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -1684,11 +1930,14 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>UTCDATETIME</B><P>Year, month, day, hour, minute, second, utchour, and utcminute fields. The utchour and utcminute fields have 1/10th microsecond precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "UTCTIME";
+        pDataTypeSpec->nDATA_TYPE          = SQL_TYPE_TIMESTAMP;
         pDataTypeSpec->DATA_TYPE           = "SQL_TYPE_TIMESTAMP";
         pDataTypeSpec->COLUMN_SIZE         = "19";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -1709,193 +1958,248 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>UTCTIME</B><P>Hour, minute, second, utchour, and utcminute fields. The utchour and utcminute fields have 1/10th microsecond precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL MONTH";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_MONTH;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_MONTH";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL MONTH(p)</B><P>Number of months between two dates; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL MONTH(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL YEAR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_YEAR;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_YEAR";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL YEAR(p)</B><P>Number of years between two dates; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL YEAR(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL YEAR TO MONTH";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_YEAR_TO_MONTH;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_YEAR_TO_MONTH";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL YEAR(p) TO MONTH</B><P>Number of years and months between two dates; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL YEAR(p) TO MONTH" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL DAY";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_DAY;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_DAY";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL DAY(p)</B><P>Number of days between two dates; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL DAY(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL HOUR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_HOUR;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_HOUR";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL HOUR(p)</B><P>Number of hours between two date/times; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL HOUR(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL MINUTE";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_MINUTE;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_MINUTE";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL MINUTE(p)</B><P>Number of minutes between two date/times; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL MINUTE(p)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL SECOND";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_SECOND;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_SECOND";
         pDataTypeSpec->CREATE_PARAMS     = "precision1,precision2";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL SECOND(p,q)</B><P>Number of seconds between two date/times; <B>p</B> is the interval leading precision and <B>q</B> is the interval seconds precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL SECOND(p,q)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL DAY TO HOUR";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_DAY_TO_HOUR;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_DAY_TO_HOUR";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL DAY(p) TO HOUR</B><P>Number of days/hours between two date/times; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL DAY(p) TO HOUR" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL DAY TO MINUTE";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_DAY_TO_MINUTE;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_DAY_TO_MINUTE";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL DAY(p) TO MINUTE</B><P>Number of days/hours/minutes between two date/times; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL DAY(p) TO MINUTE" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL DAY TO SECOND";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_DAY_TO_SECOND;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_DAY_TO_SECOND";
         pDataTypeSpec->CREATE_PARAMS     = "precision1,precision2";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL DAY(p) TO SECOND(q)</B><P>Number of days/hours/minutes/seconds between two date/times; <B>p</B> is the interval leading precision and <B>q</B> is the interval seconds precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL DAY(p) TO SECOND(q)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL HOUR TO MINUTE";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_HOUR_TO_MINUTE;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_HOUR_TO_MINUTE";
         pDataTypeSpec->CREATE_PARAMS     = "precision";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL HOUR(p) TO MINUTE</B><P>Number of hours/minutes between two date/times; <B>p</B> is the interval leading precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL HOUR(p) TO MINUTE" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL HOUR TO SECOND";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_HOUR_TO_SECOND;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_HOUR_TO_SECOND";
         pDataTypeSpec->CREATE_PARAMS     = "precision1,precision2";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL HOUR(p) TO SECOND(q)</B><P>Number of hours/minutes/seconds between two date/times; <B>p</B> is the interval leading precision and <B>q</B> is the interval seconds precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL HOUR(p) TO SECOND(q)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "INTERVAL MINUTE TO SECOND";
+        pDataTypeSpec->nDATA_TYPE        = SQL_INTERVAL_MINUTE_TO_SECOND;
         pDataTypeSpec->DATA_TYPE         = "SQL_INTERVAL_MINUTE_TO_SECOND";
         pDataTypeSpec->CREATE_PARAMS     = "precision1,precision2";
         pDataTypeSpec->NULLABLE          = "SQL_NULLABLE_UNKNOWN";
         pDataTypeSpec->CASE_SENSITIVE    = "SQL_FALSE";
         pDataTypeSpec->SEARCHABLE        = "SQL_PRED_NONE";
         pDataTypeSpec->FIXED_PREC_SCALE  = "SQL_TRUE";
-        pDataTypeSpec->SQL_DATA_TYPE     = pDataTypeSpec->DATA_TYPE;
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->stringDescription = "<B>INTERVAL MINUTE(p) TO SECOND(q)</B><P>Number of minutes/seconds between two date/times; <B>p</B> is the interval leading precision and <B>q</B> is the interval seconds precision.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( "INTERVAL MINUTE(p) TO SECOND(q)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME         = "GUID";
+        pDataTypeSpec->nDATA_TYPE          = SQL_GUID;
         pDataTypeSpec->DATA_TYPE           = "SQL_GUID";
         pDataTypeSpec->COLUMN_SIZE         = "36";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -1910,13 +2214,16 @@ bool DATAProfiles::doLoadSQL92()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_GUID";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription = "<B>GUID</B><P>Fixed length Globally Unique Identifier.</P>";
         pDataTypeSpec->vectorSyntax      = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
 
     mapProfiles["SQL92"] = pProfile;
@@ -1938,9 +2245,11 @@ bool DATAProfiles::doLoadSQLite()
     //
     // DATA TYPES
     // - this is how the ODBC driver wants us to see things
+    int nRow = 0;
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "bigint";
+        pDataTypeSpec->nDATA_TYPE          = SQL_BIGINT;
         pDataTypeSpec->DATA_TYPE           = "SQL_BIGINT";
         pDataTypeSpec->COLUMN_SIZE         = "19";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -1955,17 +2264,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "bigint";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_BIGINT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "bit";
+        pDataTypeSpec->nDATA_TYPE          = SQL_BIT;
         pDataTypeSpec->DATA_TYPE           = "SQL_BIT";
         pDataTypeSpec->COLUMN_SIZE         = "1";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -1980,17 +2293,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "bit";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_BIT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "char";
+        pDataTypeSpec->nDATA_TYPE          = SQL_CHAR;
         pDataTypeSpec->DATA_TYPE           = "SQL_CHAR";
         pDataTypeSpec->COLUMN_SIZE         = "255";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2005,17 +2322,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "char";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_CHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( "char(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "date";
+        pDataTypeSpec->nDATA_TYPE          = SQL_TYPE_DATE;
         pDataTypeSpec->DATA_TYPE           = "SQL_TYPE_DATE";
         pDataTypeSpec->COLUMN_SIZE         = "10";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2030,17 +2351,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "date";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_TYPE_DATE";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "double";
+        pDataTypeSpec->nDATA_TYPE          = SQL_DOUBLE;
         pDataTypeSpec->DATA_TYPE           = "SQL_DOUBLE";
         pDataTypeSpec->COLUMN_SIZE         = "15";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2055,17 +2380,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "double";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_DOUBLE";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "float";
+        pDataTypeSpec->nDATA_TYPE          = SQL_FLOAT;
         pDataTypeSpec->DATA_TYPE           = "SQL_FLOAT";
         pDataTypeSpec->COLUMN_SIZE         = "7";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2080,17 +2409,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "float";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_FLOAT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "integer";
+        pDataTypeSpec->nDATA_TYPE          = SQL_INTEGER;
         pDataTypeSpec->DATA_TYPE           = "SQL_INTEGER";
         pDataTypeSpec->COLUMN_SIZE         = "9";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2105,17 +2438,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "integer";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_INTEGER";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "longvarbinary";
+        pDataTypeSpec->nDATA_TYPE          = SQL_LONGVARBINARY;
         pDataTypeSpec->DATA_TYPE           = "SQL_LONGVARBINARY";
         pDataTypeSpec->COLUMN_SIZE         = "65536";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2130,17 +2467,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "longvarbinary";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_LONGVARBINARY";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "longvarchar";
+        pDataTypeSpec->nDATA_TYPE          = SQL_LONGVARCHAR;
         pDataTypeSpec->DATA_TYPE           = "SQL_LONGVARCHAR";
         pDataTypeSpec->COLUMN_SIZE         = "65536";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2155,17 +2496,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "longvarchar";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_LONGVARCHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( "longvarchar(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "numeric";
+        pDataTypeSpec->nDATA_TYPE          = SQL_DOUBLE;
         pDataTypeSpec->DATA_TYPE           = "SQL_DOUBLE";
         pDataTypeSpec->COLUMN_SIZE         = "15";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2180,17 +2525,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "numeric";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_DOUBLE";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "smallint";
+        pDataTypeSpec->nDATA_TYPE          = SQL_SMALLINT;
         pDataTypeSpec->DATA_TYPE           = "SQL_SMALLINT";
         pDataTypeSpec->COLUMN_SIZE         = "5";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2205,17 +2554,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "smallint";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_SMALLINT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "text";
+        pDataTypeSpec->nDATA_TYPE          = SQL_LONGVARCHAR;
         pDataTypeSpec->DATA_TYPE           = "SQL_LONGVARCHAR";
         pDataTypeSpec->COLUMN_SIZE         = "65536";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2230,17 +2583,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "text";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_LONGVARCHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( "text(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "time";
+        pDataTypeSpec->nDATA_TYPE          = SQL_TYPE_TIME;
         pDataTypeSpec->DATA_TYPE           = "SQL_TYPE_TIME";
         pDataTypeSpec->COLUMN_SIZE         = "8";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2255,17 +2612,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "time";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_TYPE_TIME";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "timestamp";
+        pDataTypeSpec->nDATA_TYPE          = SQL_TYPE_TIMESTAMP;
         pDataTypeSpec->DATA_TYPE           = "SQL_TYPE_TIMESTAMP";
         pDataTypeSpec->COLUMN_SIZE         = "32";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2280,17 +2641,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "timestamp";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "3";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_TYPE_TIMESTAMP";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "tinyint";
+        pDataTypeSpec->nDATA_TYPE          = SQL_TINYINT;
         pDataTypeSpec->DATA_TYPE           = "SQL_TINYINT";
         pDataTypeSpec->COLUMN_SIZE         = "3";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2305,24 +2670,29 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "tinyint";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_TINYINT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "varbinary";
+        pDataTypeSpec->nDATA_TYPE          = SQL_VARBINARY;
         pDataTypeSpec->DATA_TYPE           = "SQL_VARBINARY";
         pDataTypeSpec->COLUMN_SIZE         = "255";
         pDataTypeSpec->LITERAL_PREFIX      = "";
         pDataTypeSpec->LITERAL_SUFFIX      = "";
         pDataTypeSpec->CREATE_PARAMS       = "";
         pDataTypeSpec->NULLABLE            = "SQL_NULLABLE";
-        pDataTypeSpec->CASE_SENSITIVE      = "SQL_FALSE";
+        pDataTypeSpec->CASE_SENSITIVE      = "SQL_FALSE";        pDataTypeSpec->DATA_TYPE           = "SQL_GUID";
+
         pDataTypeSpec->SEARCHABLE          = "SQL_SEARCHABLE";
         pDataTypeSpec->UNSIGNED_ATTRIBUTE  = "SQL_FALSE";
         pDataTypeSpec->FIXED_PREC_SCALE    = "SQL_FALSE";
@@ -2330,17 +2700,21 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "varbinary";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_VARBINARY";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "varchar";
+        pDataTypeSpec->nDATA_TYPE          = SQL_VARCHAR;
         pDataTypeSpec->DATA_TYPE           = "SQL_VARCHAR";
         pDataTypeSpec->COLUMN_SIZE         = "255";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2355,13 +2729,16 @@ bool DATAProfiles::doLoadSQLite()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "varchar";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_VARCHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( "varchar(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
 
     mapProfiles["SQLite"] = pProfile;
@@ -2372,10 +2749,11 @@ bool DATAProfiles::doLoadSQLite()
 bool DATAProfiles::doLoadMSA()
 {
     DATAProfile *pProfile = new DATAProfile( pDatabase, "MSA" );
-
+    int nRow = 0;
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "BINARY";
+        pDataTypeSpec->nDATA_TYPE          = SQL_BINARY;
         pDataTypeSpec->DATA_TYPE           = "SQL_BINARY";
         pDataTypeSpec->COLUMN_SIZE         = "510";
         pDataTypeSpec->LITERAL_PREFIX      = "0x";
@@ -2390,17 +2768,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_BINARY";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>BINARY(n)</B><P>Binary data of fixed length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( "BINARY(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "BIT";
+        pDataTypeSpec->nDATA_TYPE          = SQL_BIT;
         pDataTypeSpec->DATA_TYPE           = "SQL_BIT";
         pDataTypeSpec->COLUMN_SIZE         = "1";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2415,17 +2797,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "0";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_BIT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>BIT</B><P>Single bit binary data.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "BYTE";
+        pDataTypeSpec->nDATA_TYPE          = SQL_TINYINT;
         pDataTypeSpec->DATA_TYPE           = "SQL_TINYINT";
         pDataTypeSpec->COLUMN_SIZE         = "3";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2440,17 +2826,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "0";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_TINYINT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "10";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>BYTE</B><P>Exact numeric value with precision 3 and scale 0 (signed: -128 &lt;= <B>n</B> &lt;= 127, unsigned: 0 &lt;= <B>n</B> &lt;= 255)";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "CHAR";
+        pDataTypeSpec->nDATA_TYPE          = SQL_WCHAR;
         pDataTypeSpec->DATA_TYPE           = "SQL_WCHAR";
         pDataTypeSpec->COLUMN_SIZE         = "255";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2465,17 +2855,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_WCHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>CHAR(n)</B><P>Character string of fixed string length <B>n</B> to maximum of 255.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( "CHAR(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "COUNTER";
+        pDataTypeSpec->nDATA_TYPE          = SQL_INTEGER;
         pDataTypeSpec->DATA_TYPE           = "SQL_INTEGER";
         pDataTypeSpec->COLUMN_SIZE         = "10";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2490,17 +2884,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "0";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_INTEGER";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "10";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>COUNTER</B><P>Auto incremented value based upon an INTEGER.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "CURRENCY";
+        pDataTypeSpec->nDATA_TYPE          = SQL_NUMERIC;
         pDataTypeSpec->DATA_TYPE           = "SQL_NUMERIC";
         pDataTypeSpec->COLUMN_SIZE         = "19";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2515,17 +2913,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "4";
         pDataTypeSpec->MAXIMUM_SCALE       = "4";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_NUMERIC";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "10";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>CURRENCY</B><P>For storing a currency value. A SQL_NUMERIC with pre-determined precision and scale.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "DATETIME";
+        pDataTypeSpec->nDATA_TYPE          = SQL_TYPE_TIMESTAMP;
         pDataTypeSpec->DATA_TYPE           = "SQL_TYPE_TIMESTAMP";
         pDataTypeSpec->COLUMN_SIZE         = "19";
         pDataTypeSpec->LITERAL_PREFIX      = "#";
@@ -2540,17 +2942,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "0";
+        pDataTypeSpec->nSQL_DATA_TYPE      = SQL_DATETIME;
         pDataTypeSpec->SQL_DATA_TYPE       = "SQL_DATETIME";
         pDataTypeSpec->SQL_DATETIME_SUB    = "SQL_CODE_TIMESTAMP";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>DATETIME</B><P>Year, month, and day fields, conforming to the rules of the Gregorian calendar. Combined with TIME.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "DOUBLE";
+        pDataTypeSpec->nDATA_TYPE          = SQL_DOUBLE;
         pDataTypeSpec->DATA_TYPE           = "SQL_DOUBLE";
         pDataTypeSpec->COLUMN_SIZE         = "53";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2565,17 +2971,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_DOUBLE";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "2";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>DOUBLE</B><P>Signed, approximate, numeric value with a binary precision 53 (zero or absolute value 10[-308] to 10[308]).</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "GUID";
+        pDataTypeSpec->nDATA_TYPE          = SQL_GUID;
         pDataTypeSpec->DATA_TYPE           = "SQL_GUID";
         pDataTypeSpec->COLUMN_SIZE         = "36";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2590,17 +3000,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_GUID";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>GUID</B><P>Fixed length Globally Unique Identifier.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "INTEGER";
+        pDataTypeSpec->nDATA_TYPE          = SQL_INTEGER;
         pDataTypeSpec->DATA_TYPE           = "SQL_INTEGER";
         pDataTypeSpec->COLUMN_SIZE         = "10";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2615,17 +3029,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "0";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_INTEGER";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "10";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>INTEGER</B><P>Exact numeric value with precision 10 and scale 0 (signed: -2[31] &lt;= <B>n</B> &lt;= 2[31] - 1, unsigned: 0 &lt;= <B>n</B> &lt;= 2[32] - 1).</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "LONGBINARY";
+        pDataTypeSpec->nDATA_TYPE          = SQL_LONGVARBINARY;
         pDataTypeSpec->DATA_TYPE           = "SQL_LONGVARBINARY";
         pDataTypeSpec->COLUMN_SIZE         = "1073741823";
         pDataTypeSpec->LITERAL_PREFIX      = "0x";
@@ -2640,17 +3058,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_LONGVARBINARY";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>LONGBINARY</B><P>Variable length binary data. Maximum length is data source-dependent.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "LONGCHAR";
+        pDataTypeSpec->nDATA_TYPE          = SQL_WLONGVARCHAR;
         pDataTypeSpec->DATA_TYPE           = "SQL_WLONGVARCHAR";
         pDataTypeSpec->COLUMN_SIZE         = "1073741823";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2665,17 +3087,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_WLONGVARCHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>LONGCHAR</B><P>Unicode variable-length character data. Maximum length is data source-dependent.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "REAL";
+        pDataTypeSpec->nDATA_TYPE          = SQL_REAL;
         pDataTypeSpec->DATA_TYPE           = "SQL_REAL";
         pDataTypeSpec->COLUMN_SIZE         = "24";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2690,17 +3116,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_REAL";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "2";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>REAL</B><P>Signed, approximate, numeric value with a binary precision 24 (zero or absolute value 10[-38] to 10[38]).</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "SMALLINT";
+        pDataTypeSpec->nDATA_TYPE          = SQL_SMALLINT;
         pDataTypeSpec->DATA_TYPE           = "SQL_SMALLINT";
         pDataTypeSpec->COLUMN_SIZE         = "5";
         pDataTypeSpec->LITERAL_PREFIX      = "";
@@ -2715,17 +3145,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "0";
         pDataTypeSpec->MAXIMUM_SCALE       = "0";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_SMALLINT";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "10";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>SMALLINT</B><P>Exact numeric value with precision 5 and scale 0 (signed: -32,768 &lt;= <B>n</B> &lt;= 32,767, unsigned: 0 &lt;= <B>n</B> &lt;= 65,535).</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( pDataTypeSpec->TYPE_NAME );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "VARBINARY";
+        pDataTypeSpec->nDATA_TYPE          = SQL_VARBINARY;
         pDataTypeSpec->DATA_TYPE           = "SQL_VARBINARY";
         pDataTypeSpec->COLUMN_SIZE         = "510";
         pDataTypeSpec->LITERAL_PREFIX      = "0x";
@@ -2740,17 +3174,21 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_VARBINARY";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>VARBINARY(n)</B><P>Variable length binary data of maximum length <B>n</B>. The maximum is set by the user.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( "VARBINARY(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
         pDataTypeSpec->TYPE_NAME           = "VARCHAR";
+        pDataTypeSpec->nDATA_TYPE          = SQL_WVARCHAR;
         pDataTypeSpec->DATA_TYPE           = "SQL_WVARCHAR";
         pDataTypeSpec->COLUMN_SIZE         = "255";
         pDataTypeSpec->LITERAL_PREFIX      = "'";
@@ -2765,13 +3203,16 @@ bool DATAProfiles::doLoadMSA()
         pDataTypeSpec->LOCAL_TYPE_NAME     = "";
         pDataTypeSpec->MINIMUM_SCALE       = "";
         pDataTypeSpec->MAXIMUM_SCALE       = "";
-        pDataTypeSpec->SQL_DATA_TYPE       = "SQL_WVARCHAR";
+        pDataTypeSpec->nSQL_DATA_TYPE      = pDataTypeSpec->nDATA_TYPE;
+        pDataTypeSpec->SQL_DATA_TYPE       = pDataTypeSpec->DATA_TYPE;
         pDataTypeSpec->SQL_DATETIME_SUB    = "0";
         pDataTypeSpec->NUM_PREC_RADIX      = "";
         pDataTypeSpec->INTERVAL_PRECISION  = "";
         pDataTypeSpec->stringDescription   = "<B>VARCHAR(n)</B><P>Unicode variable-length character string with a maximum string length <B>n</B>.</P>";
         pDataTypeSpec->vectorSyntax        = DATADataTypeSpec::getSyntaxVector( "VARCHAR(n)" );
-        pProfile->mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
+        pProfile->vectorDataTypes << pDataTypeSpec; 
+        pProfile->mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; 
+        nRow++;
     }
 
     mapProfiles["MSA"] = pProfile;

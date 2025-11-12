@@ -442,11 +442,11 @@ AWDataWidget *PMModel::getObjectWidget( QWidget *pWidgetParent )
     return p;
 }
 
-QList<QString> PMModel::getDataTypes() 
+QList<QString> PMModel::getTypeNames() 
 { 
     QList<QString> listDataTypes;
 
-    foreach( DATADataTypeSpec *p, pProfile->mapDataTypes )
+    foreach( DATADataTypeSpec *p, pProfile->vectorDataTypes )
     {
         listDataTypes << p->TYPE_NAME;
     }
@@ -454,16 +454,26 @@ QList<QString> PMModel::getDataTypes()
     return listDataTypes;
 }
 
+/*!
+ * \brief Get DATADataTypeSpec for the given TYPE_NAME.
+ * 
+ * Here we use TYPE_NAME instead of DATA_TYPE.
+ * Its ok *in this case* as we do not need to worry about inconsistent values between SQLGetTypeInfo and SQLColumns - we are not using SQLColumns.
+ * 
+ * \author pharvey (2025-11-12)
+ * 
+ * \param stringTYPE_NAME 
+ * 
+ * \return DATADataTypeSpec* 
+ */
 DATADataTypeSpec *PMModel::getDataTypeSpec( const QString &stringTYPE_NAME ) 
 { 
-    foreach( DATADataTypeSpec *p, pProfile->mapDataTypes )
+    Q_ASSERT( pProfile );
+
+    foreach( DATADataTypeSpec *p, pProfile->vectorDataTypes )
     {
         if ( p->TYPE_NAME == stringTYPE_NAME ) return p;
     }
-
-    // uncomment for debugging - too many messages to leave active
-    // printf( "[%s][%s][%d] Data type not in driver profile: %s\n", __FILE__, __FUNCTION__, __LINE__, stringName.toUtf8().constData() );
-    // eventOutputGeneral( "ERROR", QString( "Data type not in driver profile: %1" ).arg( stringName ) );
 
     return nullptr;
 }
@@ -518,7 +528,7 @@ PMDomain * PMModel::getDomain( const QString str, const bool cs )
 */
 bool PMModel::getIsStandardDataType( const QString &stringTYPE_NAME )
 {
-    foreach( DATADataTypeSpec *p, pProfile->mapDataTypes )
+    foreach( DATADataTypeSpec *p, pProfile->vectorDataTypes )
     {
         if ( p->TYPE_NAME == stringTYPE_NAME ) return true;
     }

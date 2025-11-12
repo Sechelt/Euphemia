@@ -73,7 +73,6 @@ public:
 
     bool isNull() { return TYPE_NAME.isEmpty(); }
 
-    int     nDATA_TYPE;             // SQL data type as numeric. ODBC type or driver specific. This is unique key for looking up data-type spec.
     QString TYPE_NAME;              // Data-type name. ie "INTERVAL DAY() TO SECOND()" Used for DDL. 
     QString DATA_TYPE;              // SQL data type as text (more readable for display). 
     QString COLUMN_SIZE;            // LongLong: Max precision or chars. isNull if not relevant for data type.
@@ -93,6 +92,9 @@ public:
     QString SQL_DATETIME_SUB;       // Int: datetime/interval sub code else isNull
     QString NUM_PREC_RADIX;         // LonLong: 2 = COLUMN_SIZE as bits, 10 = COLUMN_SIZE as decimal digits, else isNull
     QString INTERVAL_PRECISION;     // Int: Interval leading precision else isNull 
+
+    int     nDATA_TYPE;
+    int     nSQL_DATA_TYPE;
 
     QString stringDescription;      // HTML formatted description to help User understand data-type.
 

@@ -50,7 +50,7 @@ void DATAWQueryEIDataTypes::doQuery()
     bLoadingChildren = true;
 
     DATADataTypeSpec *pDataTypeSpec;                                                           
-    foreach( pDataTypeSpec, pConnection->getProfile()->mapDataTypes )                                                               
+    foreach( pDataTypeSpec, pConnection->getProfile()->vectorDataTypes )                                                               
     {                                                                             
         ADObject * pChild = getObject( "DATAWQueryExtendedInfoItem" );
         pChild->setName( pDataTypeSpec->TYPE_NAME );

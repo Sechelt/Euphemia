@@ -402,7 +402,7 @@ void DATAWQueryConnection::slotGenerateProfile()
     {
         s += "\nDataTypes\n";                                                                 
         DATADataTypeSpec *pDataTypeSpec;                                                                    
-        foreach( pDataTypeSpec, pConnection->getProfile()->mapDataTypes )                                                                        
+        foreach( pDataTypeSpec, pConnection->getProfile()->vectorDataTypes )                                                                        
         {                                                                                      
             s += "'" + pDataTypeSpec->TYPE_NAME + "',";                 
             s += pDataTypeSpec->DATA_TYPE + ",";                 

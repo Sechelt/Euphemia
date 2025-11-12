@@ -157,7 +157,7 @@ DATAProfile::DATAProfile( sqlite3 *p, DATAConnection *pConnection )
     // currently get a segfault (on free of statement) when we call SQLGetTypeInfo with sqlite 
     // hopefully this gets resolved but for now we avoid calling it
 //    if ( mapInfo.value( "SQL_DBMS_NAME" )->vValue.toString() != "SQLite" )
-    mapDataTypes    = getDataTypes( pConnection );
+    doLoadDataTypes( pConnection );
     mapFunctions    = getFunctions( pConnection );
     mapAttr         = getAttr( pConnection );
 }
@@ -177,27 +177,6 @@ DATAProfile::DATAProfile( sqlite3 *p, int nID )
 DATAProfile::~DATAProfile()
 {
     doClear();
-}
-
-DATADataTypeSpec *DATAProfile::getDataTypeSpec( const QString &stringTYPE_NAME )
-{
-    DATADataTypeSpec *pTypeSpec = mapDataTypes.value( stringTYPE_NAME );
-    if ( pTypeSpec ) return pTypeSpec;
-     
-    printf( "[PAH][%s][%s][%d] Could not find DATADataTypeSpec for TYPE_NAME %s. Attempting to make it work anyway.\n", __FILE__, __FUNCTION__, __LINE__, stringTYPE_NAME.toUtf8().constData() );
-    DATAInfo *pInfo = mapInfo.value( "SQL_DBMS_NAME" );
-    Q_ASSERT( pInfo );
-    // SQLite
-    if ( pInfo->vValue.toString().contains( "SQLite", Qt::CaseInsensitive ) )
-    {
-        // SQColumns:TYPE_NAME can return NCHAR but SQLGetTypeInfo:TYPE_NAME does not so map to CHAR and get details from there. 
-        if ( stringTYPE_NAME.left( 5 ) == "NCHAR" )
-            pTypeSpec = mapDataTypes.value( "CHAR" );
-        else if ( stringTYPE_NAME.left( 8 ) == "NVARCHAR" )
-            pTypeSpec = mapDataTypes.value( "VARCHAR" );
-    }
-
-    return pTypeSpec;
 }
 
 bool DATAProfile::doSave()
@@ -289,33 +268,30 @@ QDomElement DATAProfile::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemPar
     // data types
     {
         QDomElement domElem = pdomDoc->createElement( "DataTypes" );
-        QMapIterator<QString,DATADataTypeSpec*> i(mapDataTypes);
-        while ( i.hasNext() ) 
+        foreach( DATADataTypeSpec *p, vectorDataTypes )
         {
-            i.next();
-            QDomElement Elem = pdomDoc->createElement( i.key() );
-            DATADataTypeSpec *pDataTypeSpec = i.value();
-
-            Elem.setAttribute( "TYPE_NAME", pDataTypeSpec->TYPE_NAME );
-            Elem.setAttribute( "nDATA_TYPE", pDataTypeSpec->nDATA_TYPE );
-            Elem.setAttribute( "DATA_TYPE", pDataTypeSpec->DATA_TYPE );
-            Elem.setAttribute( "COLUMN_SIZE", pDataTypeSpec->COLUMN_SIZE );
-            Elem.setAttribute( "LITERAL_PREFIX", pDataTypeSpec->LITERAL_PREFIX );
-            Elem.setAttribute( "LITERAL_SUFFIX", pDataTypeSpec->LITERAL_SUFFIX );
-            Elem.setAttribute( "CREATE_PARAMS", pDataTypeSpec->CREATE_PARAMS );
-            Elem.setAttribute( "NULLABLE", pDataTypeSpec->NULLABLE );
-            Elem.setAttribute( "CASE_SENSITIVE", pDataTypeSpec->CASE_SENSITIVE );
-            Elem.setAttribute( "SEARCHABLE", pDataTypeSpec->SEARCHABLE );
-            Elem.setAttribute( "UNSIGNED_ATTRIBUTE", pDataTypeSpec->UNSIGNED_ATTRIBUTE );
-            Elem.setAttribute( "FIXED_PREC_SCALE", pDataTypeSpec->FIXED_PREC_SCALE );
-            Elem.setAttribute( "AUTO_UNIQUE_VALUE", pDataTypeSpec->AUTO_UNIQUE_VALUE );
-            Elem.setAttribute( "LOCAL_TYPE_NAME", pDataTypeSpec->LOCAL_TYPE_NAME );
-            Elem.setAttribute( "MINIMUM_SCALE", pDataTypeSpec->MINIMUM_SCALE );
-            Elem.setAttribute( "MAXIMUM_SCALE", pDataTypeSpec->MAXIMUM_SCALE );
-            Elem.setAttribute( "SQL_DATA_TYPE", pDataTypeSpec->SQL_DATA_TYPE );
-            Elem.setAttribute( "SQL_DATETIME_SUB", pDataTypeSpec->SQL_DATETIME_SUB );
-            Elem.setAttribute( "NUM_PREC_RADIX", pDataTypeSpec->NUM_PREC_RADIX );
-            Elem.setAttribute( "INTERVAL_PRECISION", pDataTypeSpec->INTERVAL_PRECISION );
+            QDomElement Elem = pdomDoc->createElement( "DataType" );
+            Elem.setAttribute( "TYPE_NAME", p->TYPE_NAME );
+            Elem.setAttribute( "nDATA_TYPE", p->nDATA_TYPE );
+            Elem.setAttribute( "DATA_TYPE", p->DATA_TYPE );
+            Elem.setAttribute( "COLUMN_SIZE", p->COLUMN_SIZE );
+            Elem.setAttribute( "LITERAL_PREFIX", p->LITERAL_PREFIX );
+            Elem.setAttribute( "LITERAL_SUFFIX", p->LITERAL_SUFFIX );
+            Elem.setAttribute( "CREATE_PARAMS", p->CREATE_PARAMS );
+            Elem.setAttribute( "NULLABLE", p->NULLABLE );
+            Elem.setAttribute( "CASE_SENSITIVE", p->CASE_SENSITIVE );
+            Elem.setAttribute( "SEARCHABLE", p->SEARCHABLE );
+            Elem.setAttribute( "UNSIGNED_ATTRIBUTE", p->UNSIGNED_ATTRIBUTE );
+            Elem.setAttribute( "FIXED_PREC_SCALE", p->FIXED_PREC_SCALE );
+            Elem.setAttribute( "AUTO_UNIQUE_VALUE", p->AUTO_UNIQUE_VALUE );
+            Elem.setAttribute( "LOCAL_TYPE_NAME", p->LOCAL_TYPE_NAME );
+            Elem.setAttribute( "MINIMUM_SCALE", p->MINIMUM_SCALE );
+            Elem.setAttribute( "MAXIMUM_SCALE", p->MAXIMUM_SCALE );
+            Elem.setAttribute( "nSQL_DATA_TYPE", p->nSQL_DATA_TYPE );
+            Elem.setAttribute( "SQL_DATA_TYPE", p->SQL_DATA_TYPE );
+            Elem.setAttribute( "SQL_DATETIME_SUB", p->SQL_DATETIME_SUB );
+            Elem.setAttribute( "NUM_PREC_RADIX", p->NUM_PREC_RADIX );
+            Elem.setAttribute( "INTERVAL_PRECISION", p->INTERVAL_PRECISION );
 
             domElem.appendChild( Elem );
         }
@@ -354,7 +330,7 @@ void DATAProfile::doClear()
 {
     // leave stringKey alone
     qDeleteAll( mapInfo ); mapInfo.clear();
-    qDeleteAll( mapDataTypes ); mapDataTypes.clear();
+    qDeleteAll( vectorDataTypes ); vectorDataTypes.clear();
     qDeleteAll( mapFunctions ); mapFunctions.clear();
     qDeleteAll( mapAttr ); mapAttr.clear();
     bModified = false;
@@ -478,6 +454,7 @@ bool DATAProfile::doLoadInfo( int nID )
 
 bool DATAProfile::doLoadDataTypes( int nID )
 {
+    Q_ASSERT( !vectorDataTypes.count() );
     sqlite3_stmt *pStatement;
     QString stringSQL = QString( "SELECT * FROM DataTypes WHERE ProfileID = %1" ).arg( nID );
     int nRetCode = sqlite3_prepare_v2( pDatabase, stringSQL.toLatin1().constData(), -1, &pStatement, NULL );
@@ -488,6 +465,7 @@ bool DATAProfile::doLoadDataTypes( int nID )
     }
 
     // process results
+    int nRow = 0;
     nRetCode = sqlite3_step( pStatement );
     while ( nRetCode != SQLITE_DONE )
     {
@@ -520,16 +498,19 @@ bool DATAProfile::doLoadDataTypes( int nID )
         pDataTypeSpec->LOCAL_TYPE_NAME          = (const char *)sqlite3_column_text( pStatement, 14 );    
         pDataTypeSpec->MINIMUM_SCALE            = (const char *)sqlite3_column_text( pStatement, 15 );      
         pDataTypeSpec->MAXIMUM_SCALE            = (const char *)sqlite3_column_text( pStatement, 16 );      
-        pDataTypeSpec->SQL_DATA_TYPE            = (const char *)sqlite3_column_text( pStatement, 17 );      
-        pDataTypeSpec->SQL_DATETIME_SUB         = (const char *)sqlite3_column_text( pStatement, 18 );   
-        pDataTypeSpec->NUM_PREC_RADIX           = (const char *)sqlite3_column_text( pStatement, 19 );     
-        pDataTypeSpec->INTERVAL_PRECISION       = (const char *)sqlite3_column_text( pStatement, 20 ); 
-        pDataTypeSpec->stringDescription        = (const char *)sqlite3_column_text( pStatement, 21 );  
-        pDataTypeSpec->vectorSyntax             = DATADataTypeSpec::getSyntaxDecoded( (const char *)sqlite3_column_text( pStatement, 22 ) );
+        pDataTypeSpec->nSQL_DATA_TYPE           = sqlite3_column_int( pStatement, 17 );          
+        pDataTypeSpec->SQL_DATA_TYPE            = (const char *)sqlite3_column_text( pStatement, 18 );      
+        pDataTypeSpec->SQL_DATETIME_SUB         = (const char *)sqlite3_column_text( pStatement, 19 );   
+        pDataTypeSpec->NUM_PREC_RADIX           = (const char *)sqlite3_column_text( pStatement, 20 );     
+        pDataTypeSpec->INTERVAL_PRECISION       = (const char *)sqlite3_column_text( pStatement, 21 ); 
+        pDataTypeSpec->stringDescription        = (const char *)sqlite3_column_text( pStatement, 22 );  
+        pDataTypeSpec->vectorSyntax             = DATADataTypeSpec::getSyntaxDecoded( (const char *)sqlite3_column_text( pStatement, 23 ) );
 
-        mapDataTypes[pDataTypeSpec->TYPE_NAME]  = pDataTypeSpec;
+        vectorDataTypes << pDataTypeSpec;
+        mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow;
 
         // next
+        nRow++;
         nRetCode = sqlite3_step( pStatement );
     }
 
@@ -606,6 +587,9 @@ bool DATAProfile::doLoadInfo( QDomElement *pdomElem )
 
 bool DATAProfile::doLoadDataTypes( QDomElement *pdomElem )
 {
+    Q_ASSERT( !vectorDataTypes.count() );
+
+    int nRow = 0;
     QDomElement         domElem;
     QDomNode            domNode;
     domNode = pdomElem->firstChild();
@@ -636,13 +620,15 @@ bool DATAProfile::doLoadDataTypes( QDomElement *pdomElem )
         pDataTypeSpec->LOCAL_TYPE_NAME    = domElem.attribute( "LOCAL_TYPE_NAME"    );
         pDataTypeSpec->MINIMUM_SCALE      = domElem.attribute( "MINIMUM_SCALE"      );
         pDataTypeSpec->MAXIMUM_SCALE      = domElem.attribute( "MAXIMUM_SCALE"      );
+        pDataTypeSpec->nSQL_DATA_TYPE     = domElem.attribute( "nSQL_DATA_TYPE"     ).toInt();
         pDataTypeSpec->SQL_DATA_TYPE      = domElem.attribute( "SQL_DATA_TYPE"      );
         pDataTypeSpec->SQL_DATETIME_SUB   = domElem.attribute( "SQL_DATETIME_SUB"   );
         pDataTypeSpec->NUM_PREC_RADIX     = domElem.attribute( "NUM_PREC_RADIX"     );
         pDataTypeSpec->INTERVAL_PRECISION = domElem.attribute( "INTERVAL_PRECISION" );
         pDataTypeSpec->vectorSyntax       = DATADataTypeSpec::getSyntaxVector( DATADataTypeSpec::getSyntaxString( pDataTypeSpec->TYPE_NAME ) );
-        mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
-
+        vectorDataTypes << pDataTypeSpec;
+        mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow;
+        nRow++;
         domNode = domNode.nextSibling();
     }
 
@@ -671,13 +657,14 @@ bool DATAProfile::doInsertDataTypes( int nID )
                         "LOCAL_TYPE_NAME,   "\
                         "MINIMUM_SCALE,     "\
                         "MAXIMUM_SCALE,     "\
+                        "nSQL_DATA_TYPE,    "\
                         "SQL_DATA_TYPE,     "\
                         "SQL_DATETIME_SUB,  "\
                         "NUM_PREC_RADIX,    "\
                         "INTERVAL_PRECISION,"\
                         "Desc,              "\
                         "Syntax )           "\
-                        "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+                        "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
     nRetCode = sqlite3_prepare_v2( pDatabase, szSQL, -1, &pStatement, NULL );
     if ( nRetCode != SQLITE_OK ) 
@@ -686,40 +673,38 @@ bool DATAProfile::doInsertDataTypes( int nID )
         return false;
     }
 
-    QMapIterator<QString,DATADataTypeSpec*> i( mapDataTypes );
-    while ( i.hasNext() ) 
+    foreach( DATADataTypeSpec *p, vectorDataTypes )
     {
-        i.next();
-
         nRetCode = sqlite3_bind_int( pStatement, 1, nID );
         if ( nRetCode != SQLITE_OK ) 
         {
             qDebug() << "[PAH]" << __FILE__ << __FUNCTION__ << __LINE__ << nRetCode << sqlite3_errmsg( pDatabase );
             return false;
         }
-        nRetCode = sqlite3_bind_text( pStatement, 2, i.value()->TYPE_NAME.toUtf8().constData(), i.value()->TYPE_NAME.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_int( pStatement, 3, i.value()->nDATA_TYPE );
-        nRetCode = sqlite3_bind_text( pStatement, 4, i.value()->DATA_TYPE.toUtf8().constData(), i.value()->DATA_TYPE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 5, i.value()->COLUMN_SIZE.toUtf8().constData(), i.value()->COLUMN_SIZE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 6, i.value()->LITERAL_PREFIX.toUtf8().constData(), i.value()->LITERAL_PREFIX.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 7, i.value()->LITERAL_SUFFIX.toUtf8().constData(), i.value()->LITERAL_SUFFIX.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 8, i.value()->CREATE_PARAMS.toUtf8().constData(), i.value()->CREATE_PARAMS.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 9, i.value()->NULLABLE.toUtf8().constData(), i.value()->NULLABLE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 10, i.value()->CASE_SENSITIVE.toUtf8().constData(), i.value()->CASE_SENSITIVE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 11, i.value()->SEARCHABLE.toUtf8().constData(), i.value()->SEARCHABLE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 12, i.value()->UNSIGNED_ATTRIBUTE.toUtf8().constData(), i.value()->UNSIGNED_ATTRIBUTE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 13, i.value()->FIXED_PREC_SCALE.toUtf8().constData(), i.value()->FIXED_PREC_SCALE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 14, i.value()->AUTO_UNIQUE_VALUE.toUtf8().constData(), i.value()->AUTO_UNIQUE_VALUE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 15, i.value()->LOCAL_TYPE_NAME.toUtf8().constData(), i.value()->LOCAL_TYPE_NAME.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 16, i.value()->MINIMUM_SCALE.toUtf8().constData(), i.value()->MINIMUM_SCALE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 17, i.value()->MAXIMUM_SCALE.toUtf8().constData(), i.value()->MAXIMUM_SCALE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 18, i.value()->SQL_DATA_TYPE.toUtf8().constData(), i.value()->SQL_DATA_TYPE.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 19, i.value()->SQL_DATETIME_SUB.toUtf8().constData(), i.value()->SQL_DATETIME_SUB.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 20, i.value()->NUM_PREC_RADIX.toUtf8().constData(), i.value()->NUM_PREC_RADIX.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 21, i.value()->INTERVAL_PRECISION.toUtf8().constData(), i.value()->INTERVAL_PRECISION.size(), SQLITE_TRANSIENT );
-        nRetCode = sqlite3_bind_text( pStatement, 22, i.value()->stringDescription.toUtf8().constData(), i.value()->stringDescription.size(), SQLITE_TRANSIENT );
-        QString stringSyntax = DATADataTypeSpec::getSyntaxEncoded( i.value() );
-        nRetCode = sqlite3_bind_text( pStatement, 23, stringSyntax.toUtf8().constData(), stringSyntax.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 2, p->TYPE_NAME.toUtf8().constData(), p->TYPE_NAME.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_int( pStatement, 3, p->nDATA_TYPE );
+        nRetCode = sqlite3_bind_text( pStatement, 4, p->DATA_TYPE.toUtf8().constData(), p->DATA_TYPE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 5, p->COLUMN_SIZE.toUtf8().constData(), p->COLUMN_SIZE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 6, p->LITERAL_PREFIX.toUtf8().constData(), p->LITERAL_PREFIX.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 7, p->LITERAL_SUFFIX.toUtf8().constData(), p->LITERAL_SUFFIX.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 8, p->CREATE_PARAMS.toUtf8().constData(), p->CREATE_PARAMS.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 9, p->NULLABLE.toUtf8().constData(), p->NULLABLE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 10, p->CASE_SENSITIVE.toUtf8().constData(), p->CASE_SENSITIVE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 11, p->SEARCHABLE.toUtf8().constData(), p->SEARCHABLE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 12, p->UNSIGNED_ATTRIBUTE.toUtf8().constData(), p->UNSIGNED_ATTRIBUTE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 13, p->FIXED_PREC_SCALE.toUtf8().constData(), p->FIXED_PREC_SCALE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 14, p->AUTO_UNIQUE_VALUE.toUtf8().constData(), p->AUTO_UNIQUE_VALUE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 15, p->LOCAL_TYPE_NAME.toUtf8().constData(), p->LOCAL_TYPE_NAME.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 16, p->MINIMUM_SCALE.toUtf8().constData(), p->MINIMUM_SCALE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 17, p->MAXIMUM_SCALE.toUtf8().constData(), p->MAXIMUM_SCALE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_int( pStatement, 18, p->nSQL_DATA_TYPE );
+        nRetCode = sqlite3_bind_text( pStatement, 19, p->SQL_DATA_TYPE.toUtf8().constData(), p->SQL_DATA_TYPE.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 20, p->SQL_DATETIME_SUB.toUtf8().constData(), p->SQL_DATETIME_SUB.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 21, p->NUM_PREC_RADIX.toUtf8().constData(), p->NUM_PREC_RADIX.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 22, p->INTERVAL_PRECISION.toUtf8().constData(), p->INTERVAL_PRECISION.size(), SQLITE_TRANSIENT );
+        nRetCode = sqlite3_bind_text( pStatement, 23, p->stringDescription.toUtf8().constData(), p->stringDescription.size(), SQLITE_TRANSIENT );
+        QString stringSyntax = DATADataTypeSpec::getSyntaxEncoded( p );
+        nRetCode = sqlite3_bind_text( pStatement, 24, stringSyntax.toUtf8().constData(), stringSyntax.size(), SQLITE_TRANSIENT );
 
         // Evaluate the prepared SQL statement.
         nRetCode = sqlite3_step( pStatement );
@@ -5515,28 +5500,26 @@ DATAInfo *DATAProfile::getInfoData( DATAConnection *pConnection, SQLUSMALLINT nI
     return pInfoParent;
 }
 
-QMap<QString,DATADataTypeSpec*> DATAProfile::getDataTypes( DATAConnection *pConnection )
+bool DATAProfile::doLoadDataTypes( DATAConnection *pConnection )
 {
-    QMap<QString,DATADataTypeSpec*> mapDataTypes;
-    DATAStatement *                 pStatement = 0;
-    SQLRETURN                       nReturn;
-
+    Q_ASSERT( !vectorDataTypes.count() );
     Q_ASSERT( pConnection->isConnected() );
 
-    pStatement = new DATAStatement( pConnection );
+    int             nRow        = 0;
+    DATAStatement * pStatement  = new DATAStatement( pConnection );
+    SQLRETURN       nReturn     = pStatement->doTypeInfo();
 
-    nReturn = pStatement->doTypeInfo();
     if ( !SQL_SUCCEEDED( nReturn ) )
     {
         delete pStatement;
-        return mapDataTypes;
+        return false;
     }
 
     nReturn = pStatement->doFetch();
     while ( SQL_SUCCEEDED( nReturn ) )
     {
         DATADataTypeSpec *pDataTypeSpec = new DATADataTypeSpec();
-        pDataTypeSpec->TYPE_NAME                 = pStatement->getData( 1 ).toString().toUpper(); // ensures its always upper as we use it as a key
+        pDataTypeSpec->TYPE_NAME                 = pStatement->getData( 1 ).toString();
         pDataTypeSpec->nDATA_TYPE                = pStatement->getData( 2 ).toInt();
         pDataTypeSpec->DATA_TYPE                 = DATADataTypeSpec::getDataTypeStr( pDataTypeSpec->nDATA_TYPE );
         pDataTypeSpec->COLUMN_SIZE               = pStatement->getData( 3 ).toString();
@@ -5552,26 +5535,22 @@ QMap<QString,DATADataTypeSpec*> DATAProfile::getDataTypes( DATAConnection *pConn
         pDataTypeSpec->LOCAL_TYPE_NAME           = pStatement->getData( 13 ).toString();
         pDataTypeSpec->MINIMUM_SCALE             = pStatement->getData( 14 ).toString();
         pDataTypeSpec->MAXIMUM_SCALE             = pStatement->getData( 15 ).toString();
-        pDataTypeSpec->SQL_DATA_TYPE             = DATADataTypeSpec::getSqlDataTypeStr( pStatement->getData( 16 ).toInt() );
+        pDataTypeSpec->nSQL_DATA_TYPE            = pStatement->getData( 16 ).toInt();
+        pDataTypeSpec->SQL_DATA_TYPE             = DATADataTypeSpec::getSqlDataTypeStr( pDataTypeSpec->nSQL_DATA_TYPE );
         pDataTypeSpec->SQL_DATETIME_SUB          = DATADataTypeSpec::getSqlDateTimeSubStr( pStatement->getData( 17 ).toInt() );
         pDataTypeSpec->NUM_PREC_RADIX            = pStatement->getData( 18 ).toString();
         pDataTypeSpec->INTERVAL_PRECISION        = pStatement->getData( 19 ).toString();
         pDataTypeSpec->vectorSyntax              = DATADataTypeSpec::getSyntaxVector( DATADataTypeSpec::getSyntaxString( pDataTypeSpec->TYPE_NAME ) );
 
-        if ( mapDataTypes.contains( pDataTypeSpec->TYPE_NAME ) )
-        {
-            printf( "[PAH][%s][%s][%d] TYPE_NAME %s exists. Details DATA_TYPE %s LOCAL_TYPE_NAME %s. Ignored.\n", __FILE__, __FUNCTION__, __LINE__, pDataTypeSpec->TYPE_NAME.toUtf8().constData(), pDataTypeSpec->DATA_TYPE.toUtf8().constData(), pDataTypeSpec->LOCAL_TYPE_NAME.toUtf8().constData() );
-            delete pDataTypeSpec;
-        }
-        else 
-            mapDataTypes[pDataTypeSpec->TYPE_NAME] = pDataTypeSpec;
-
+        vectorDataTypes << pDataTypeSpec;
+        mapDataTypeIndex[pDataTypeSpec->nDATA_TYPE] = nRow; // add/replace 
+        nRow++;
         nReturn = pStatement->doFetch();
     }
 
     delete pStatement;
 
-    return mapDataTypes;
+    return true;
 }
 
 QMap<int,DATAFunction*> DATAProfile::getFunctions( DATAConnection *pConnection, SQLRETURN *pnReturn )

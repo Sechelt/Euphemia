@@ -23,7 +23,7 @@ PMDataTypeWidget::PMDataTypeWidget( PMDomain *pDomain, QWidget *pParent )
         {
             pLayout->addWidget( new QLabel( tr("Data Type"), this ) );                                                                                                            
             pComboBoxDataType = new QComboBox( this );                                                                   
-            pComboBoxDataType->addItems( pModel->getDataTypes() );
+            pComboBoxDataType->addItems( pModel->getTypeNames() );
             pComboBoxDataType->addItem( "" );
 
             if ( !pDomain->getDataType().isEmpty() ) pComboBoxDataType->setCurrentText( pDomain->getDataType() );
@@ -88,7 +88,7 @@ PMDataTypeWidget::PMDataTypeWidget( PMColumn *pColumn, QWidget *pParent )
         {
             pLayout->addWidget( new QLabel( tr("Data Type"), this ) );                                                                                                            
             pComboBoxDataType = new QComboBox( this );                                                                   
-            pComboBoxDataType->addItems( pModel->getDataTypes() );
+            pComboBoxDataType->addItems( pModel->getTypeNames() );
             pComboBoxDataType->addItem( "" );
 
             if ( !pColumn->getDataType().isEmpty() ) pComboBoxDataType->setCurrentText( pColumn->getDataType() );

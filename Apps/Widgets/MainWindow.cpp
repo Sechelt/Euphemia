@@ -132,8 +132,12 @@ QWidget *MainWindow::getDoubleSpinBox()
 
 QWidget *MainWindow::getFrame()
 {
-    QWidget *p = new QFrame( this );
-    return p;
+//    QWidget *p = new QWidget( this );
+//    QVBoxLayout *pLayout = new QVBoxLayout( p );
+    QFrame *pFrame = new QFrame( this );
+//    pLayout->addWidget( pFrame );
+    pFrame->setFrameShape( QFrame::Panel );
+    return pFrame;
 }
 
 QWidget *MainWindow::getGroupBox()
@@ -286,7 +290,7 @@ QWidget *MainWindow::getStackedWidget()
 QWidget *MainWindow::getTableWidget()
 {
 printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-    QTableWidget *p = new QTableWidget( this );
+    QTableWidget *p = new QTableWidget( 2, 2, this );
     p->setHorizontalHeaderItem( 0, new QTableWidgetItem( "Product" ) );
     p->setHorizontalHeaderItem( 1, new QTableWidgetItem( "Cost" ) );
     p->setItem( 0, 0, new QTableWidgetItem( "Mineral" ) );

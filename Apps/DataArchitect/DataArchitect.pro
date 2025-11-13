@@ -1,4 +1,4 @@
-TARGET      = da
+TARGET      = euphemia
 DESTDIR     = ../../bin
 TEMPLATE    = app
 

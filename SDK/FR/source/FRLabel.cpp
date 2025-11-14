@@ -14,6 +14,19 @@ FRLabel::~FRLabel()
 {
 }
 
+void FRLabel::setName( const QString &s )                   
+{
+    DRectangle::setName( s );  
+
+    FRGraphicsProxyObject *pProxy = (FRGraphicsProxyObject*)getProxy();  
+    Q_ASSERT( pProxy );
+
+    QLabel *pLabel = (QLabel*)pProxy->widget();
+    Q_ASSERT( pLabel );
+
+    pLabel->setText( s );
+}                                                              
+                                                               
 void FRLabel::setProxy( DGraphicsProxyItem *p )
 {
     Q_ASSERT( p ); 
@@ -29,5 +42,18 @@ void FRLabel::setProxy( DGraphicsProxyItem *p )
 QPixmap FRLabel::getIcon()
 {
     return QPixmap( ":FR/Label" );
+}
+
+AWPropWidget *FRLabel::getPropWidget( QWidget *pWidgetParent )
+{
+    AWPropWidget *pPropWidget = DRectangle::getPropWidget( pWidgetParent );
+
+    pPropWidget->removeWidget( tr("Font") );                                                                                 
+    pPropWidget->removeWidget( tr("Pen") );                                                                                 
+    pPropWidget->removeWidget( tr("Brush") );                                                                                 
+    pPropWidget->removeWidget( tr("Text") );                                                                                 
+
+    return pPropWidget;
+
 }
 

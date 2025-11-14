@@ -289,7 +289,6 @@ QWidget *MainWindow::getStackedWidget()
 
 QWidget *MainWindow::getTableWidget()
 {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     QTableWidget *p = new QTableWidget( 2, 2, this );
     p->setHorizontalHeaderItem( 0, new QTableWidgetItem( "Product" ) );
     p->setHorizontalHeaderItem( 1, new QTableWidgetItem( "Cost" ) );

@@ -32,6 +32,9 @@ ADObject *DLayoutLinear::getObject( const QString &stringClass, ADObject * )
     if ( !pObject ) return nullptr;
     Q_ASSERT( pObject->inherits( "DRectangleBase" ) );
 
+    // we take ownership of objects we manage
+    ((DObject*)pObject)->doReparent( this );
+
     return pObject;
 }
 
@@ -132,18 +135,14 @@ bool DLayoutLinear::doLoad( QDomElement *pdomElemObject )
 
     QString stringOrder = pdomElemObject->attribute( "Order", "" );
 
-#if QT_VERSION < 0x060000
-    QStringList sl = stringOrder.split( '|', QString::SkipEmptyParts );
-#else
     QStringList sl = stringOrder.split( '|', Qt::SkipEmptyParts );
-#endif
     QString s;
     vectorContents.clear();
     foreach( s, sl )
     {
         int nOID = s.toInt();
         ADObject *p = ADObject::getObject( nOID );
-        Q_ASSERT( p );
+        Q_ASSERT(p);
         Q_ASSERT( p->inherits( "DRectangleBase" ) );
         // add to layout - without firing off signals - we do not want calls to doLayout etc
         DRectangleBase *pRectangleBase = (DRectangleBase*)p;

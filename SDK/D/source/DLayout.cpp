@@ -1,6 +1,9 @@
 #include "LibInfo.h"
 #include "DLayout.h"
 
+#include <WGeometryWidget.h>
+#include <WLayoutWidget.h>
+
 #include "DDiagram.h"
 #include "DGraphicsProxyItem.h"
 
@@ -46,6 +49,55 @@ void DLayout::setSelected( bool b )
    getProxy()->update();
 }
 
+AWDataWidget *DLayout::getObjectWidget( QWidget *pWidgetParent )
+{
+    AWDataWidget *p = AWObject::getObjectWidget( pWidgetParent );
+
+    return p;
+}
+
+AWPropWidget *DLayout::getPropWidget( QWidget *pWidgetParent )
+{
+    AWPropWidget *pPropWidget = AWObject::getPropWidget( pWidgetParent );
+
+    // geometry
+    {
+        WGeometryWidget *p = new WGeometryWidget( getPos(), getSize(), pPropWidget );
+        // pos
+        connect( p, SIGNAL(signalChangedPos(const QPointF &)), this, SLOT(slotPos(const QPointF &)) );
+        connect( this, SIGNAL(signalChangedPos(const QPointF &)), p, SLOT(slotPos(const QPointF &)) );
+        // size
+        connect( p, SIGNAL(signalChangedSize(const QSizeF &)), this, SLOT(slotSize(const QSizeF &)) );
+        connect( this, SIGNAL(signalChangedSize(const QSizeF &)), p, SLOT(slotSize(const QSizeF &)) );
+
+        pPropWidget->addWidget( tr("Geometry"), p );
+    }
+    // layout
+    {
+        WLayoutWidget *p = new WLayoutWidget( pPropWidget );
+        // size hint
+        p->setSizeHint( getSizeHint() );
+        connect( p, SIGNAL(signalChangedSizeHint(const QSizeF &)), this, SLOT(slotSizeHint(const QSizeF &)) );
+        connect( this, SIGNAL(signalChangedSizeHint(const QSizeF &)), p, SLOT(slotSizeHint(const QSizeF &)) );
+        // margins
+        p->setMargins( margins );
+        connect( p, SIGNAL(signalChangedMargins(const QMargins &)), this, SLOT(slotMargins(const QMargins &)) );
+        connect( this, SIGNAL(signalChangedMargins(const QMargins &)), p, SLOT(slotMargins(const QMargins &)) );
+        // constraints
+        p->setSizeConstraints( getSizeMinimum(), getSizeMaximum() );
+        connect( p, SIGNAL(signalChangedSizeConstraints(const QSizeF &,const QSizeF &)), this, SLOT(slotSizeConstraints(const QSizeF &,const QSizeF &)) );
+        connect( this, SIGNAL(signalChangedSizeConstraints(const QSizeF &,const QSizeF &)), p, SLOT(slotSizeConstraints(const QSizeF &,const QSizeF &)) );
+        // stretch
+        p->setStretch( getStretch() );
+        connect( p, SIGNAL(signalChangedStretch(const QSizeF &)), this, SLOT(slotStretch(const QSizeF &)) );
+        connect( this, SIGNAL(signalChangedStretch(const QSizeF &)), p, SLOT(slotStretch(const QSizeF &)) );
+
+        pPropWidget->addWidget( tr("Layout"), p );
+    }
+
+    return pPropWidget;
+}
+
 void DLayout::doGroupSync()
 {
     QObjectList l = children();
@@ -72,6 +124,8 @@ void DLayout::slotSizeHint( const QSizeF &size )
 {
     if ( !children().count() ) return DRectangleBase::slotSizeHint( size );
 
+    doMessage( "ERROR", tr("Size hint is currently controlled/calculated by a layout.") );
+
     // let controller know request failed
     emit signalChangedSizeHint( sizeHint );
 }
@@ -89,6 +143,8 @@ void DLayout::slotSizeConstraints( const QSizeF &sizeMin, const QSizeF &sizeMax 
 {
     if ( !children().count() ) return DRectangleBase::slotSizeConstraints( sizeMin, sizeMax );
 
+    doMessage( "ERROR", tr("Size constraint is currently controlled/calculated by a layout.") );
+
     // let controller know request failed
     emit signalChangedSizeConstraints( sizeMinimum, sizeMaximum );
 }
@@ -102,8 +158,10 @@ void DLayout::slotSizeConstraints( const QSizeF &sizeMin, const QSizeF &sizeMax 
  *  
  * \author pharvey (9/9/20)
  */
-void DLayout::slotDeleted( ADObject * )
+void DLayout::slotDeleted( ADObject *p )
 {
+    // default is same as child removed
+    slotChildRemoved( p );
 }
 
 /*!
@@ -117,11 +175,12 @@ void DLayout::slotDeleted( ADObject * )
  */
 void DLayout::slotChildRemoved( ADObject * )
 {
+    // derived classes will; remove from our content and update layout
 }
 
 void DLayout::slotChangedContent()
 {
-    doUpdateSelf();
+    doInitLayout();
     doLayout();
     emit signalChangedLayout();
 }

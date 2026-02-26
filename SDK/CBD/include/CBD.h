@@ -22,6 +22,24 @@ namespace CBD
 		StandardODBC
 	};
 
+    // 
+    enum Edges
+    {
+        EdgeLeft = 0,
+        EdgeRight,
+        EdgeTop,
+        EdgeBottom
+    };
+
+    enum EdgeCenters
+    {
+        EdgeCenterLeft = 0,
+        EdgeCenterRight,
+        EdgeCenterTop,
+        EdgeCenterBottom,
+        EdgeCenterCenter
+    };
+
 	// resize
 	enum RectangleCorners
 	{
@@ -78,3 +96,4 @@ namespace CBD
 };
 
 #endif
+

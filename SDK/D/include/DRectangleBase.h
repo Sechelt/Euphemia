@@ -32,7 +32,7 @@ public:
     virtual void setPosRaw( const QPointF &point );
     virtual void setStretch( const QSizeF & );
     virtual void setSizeHint( const QSizeF & );
-    virtual void setSizeConstraints( const QSizeF &, const QSizeF & );
+    virtual void setSizeConstraints( const QSizeF &sizeMin, const QSizeF &sizeMax );
     virtual void setSizeIncrement( const QSizeF & );
     virtual void setMargins( const QMargins & );
 

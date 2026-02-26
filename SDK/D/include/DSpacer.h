@@ -29,6 +29,7 @@ public:
 
     virtual void setSizeType( SizeTypes n );
 
+    virtual AWDataWidget *  getObjectWidget( QWidget *pWidgetParent = nullptr );
     virtual AWPropWidget *  getPropWidget( QWidget *pWidgetParent = nullptr );
     virtual SizeTypes       getSizeType() { return nSizeType; }
 

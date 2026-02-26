@@ -20,9 +20,16 @@ void DSpacer::setSizeType( DSpacer::SizeTypes n )
     emit signalChangedSizeType( nSizeType );
 }
 
+AWDataWidget *DSpacer::getObjectWidget( QWidget *pWidgetParent )
+{
+    AWDataWidget *p = AWObject::getObjectWidget( pWidgetParent );
+
+    return p;
+}
+
 AWPropWidget *DSpacer::getPropWidget( QWidget *pWidgetParent )
 {
-    AWPropWidget *pPropWidget = DRectangleBase::getPropWidget( pWidgetParent );
+    AWPropWidget *pPropWidget = AWObject::getPropWidget( pWidgetParent );
 
     pPropWidget->removeWidget( tr( "Layout" ) );
 

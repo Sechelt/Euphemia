@@ -4,9 +4,15 @@
 #include "DDiagram.h"
 #include "DGraphicsProxyItem.h"
 
+#define DLAYOUTCELL_MIN 48
+
 DLayoutLinear::DLayoutLinear( ADObject *pObjectParent, const QString &stringName )
     : DLayout( pObjectParent, stringName )
 {
+    // init a single cell (we always have at least one cell even if its empty)
+    QVector<DLayoutContent> l;
+    l.append( DLayoutContent( nullptr, QRectF( 0, 0, DLAYOUTCELL_MIN, DLAYOUTCELL_MIN ) ) );
+    vectorContents.append( l );
 }
 
 DLayoutLinear::~DLayoutLinear()
@@ -45,9 +51,12 @@ bool DLayoutLinear::doEnter( DRectangleBase *p, const QPointF &pointScene )
 
     doInitResize();
 
-    QPointF pointEdge = getEdge( pointScene );
+    QPointF             pointItem       = getProxy()->mapFromScene( pointScene );
+    DLayoutContentIndex indexContent    = getIndex( pointItem );
+    CBD::EdgeCenters    nEdge           = getEdge( indexContent, pointItem );
+    QPointF             pointEdge       = getEdgePoint( indexContent, nEdge );
 
-    pHandleInsert = new DHandle( this, DHandle::FunctionInsertLayout, DHandle::ConnectTypeNone, pointEdge );
+    pHandleInsert = new DHandle( this, DHandle::FunctionInsertLayout, DHandle::ConnectTypeNone, getProxy()->mapToScene( pointEdge ) );
     getProxy()->scene()->addItem( pHandleInsert );
 
     return true;
@@ -58,7 +67,12 @@ bool DLayoutLinear::doOver( DRectangleBase *p, const QPointF &pointScene )
     Q_UNUSED( p );
     Q_ASSERT( pHandleInsert );
 
-    pHandleInsert->setPos( getEdge( pointScene ) );
+    QPointF             pointItem       = getProxy()->mapFromScene( pointScene );
+    DLayoutContentIndex indexContent    = getIndex( pointItem );
+    CBD::EdgeCenters    nEdge           = getEdge( indexContent, pointItem );
+    QPointF             pointEdge       = getEdgePoint( indexContent, nEdge );
+
+    pHandleInsert->setPos( getProxy()->mapToScene( pointEdge ) );
 
     return true;
 }
@@ -86,7 +100,15 @@ void DLayoutLinear::doDrag( DRectangleBase *p )
 
 bool DLayoutLinear::doDrop( DRectangleBase *p, const QPointF &pointScene )
 {
-    doInsert( p, indexOf( pointScene ) );
+    QPointF             pointItem       = getProxy()->mapFromScene( pointScene );
+    DLayoutContentIndex indexContent    = getIndex( pointItem );
+    CBD::EdgeCenters    nEdge           = getEdge( indexContent, pointItem );
+    bool                b;
+
+    if ( nEdge == CBD::EdgeCenterCenter ) 
+        b = doSet( p, indexContent );
+    else
+        b = doInsert( p, indexContent, nEdge );
 
     // change selection from selection with resize
     getSelectionManager()->setSelected( p, false );
@@ -96,11 +118,10 @@ bool DLayoutLinear::doDrop( DRectangleBase *p, const QPointF &pointScene )
     {
         delete pHandleInsert;
         pHandleInsert = nullptr;
-
         doFiniResize();
     }
 
-    return true;
+    return b;
 }
 
 QDomElement DLayoutLinear::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent )
@@ -146,46 +167,52 @@ bool DLayoutLinear::doLoad( QDomElement *pdomElemObject )
         Q_ASSERT( p->inherits( "DRectangleBase" ) );
         // add to layout - without firing off signals - we do not want calls to doLayout etc
         DRectangleBase *pRectangleBase = (DRectangleBase*)p;
-        vectorContents.append( DLayoutCell( pRectangleBase ) );
+        vectorContents.append( DLayoutContent( pRectangleBase ) );
         connect( pRectangleBase, SIGNAL(signalChangedLayout()), this, SLOT(slotChangedContent()) );
     }
 
-    // update presentation - we should not have to do this as load restores state
-    // doUpdateSelf();
-    // we do this to calc layout cell rects to be used during paint()
+    doInitLayout();
     doLayout();
 
     return true;
 }
 
 /*!
- * \brief Remove the object. 
- *  
- * Respond to signalDeleted (one of our children has been deleted) by removing 
- * from this layout. 
+ * \brief Determine if contents is empty.
  * 
- * \author pharvey (9/25/20)
+ * The contents is empty when there is just one cell and it has no pObject in it.
  * 
- * \param p 
+ * \note There will always be at least 1 row and 1 col (one cell).
+ * \note Empty cells are not allowed except when there is only one cell.
+ * 
+ * \author pharvey (2026-02-21)
+ * 
+ * \return bool 
  */
-void DLayoutLinear::slotDeleted( ADObject *p )
+bool DLayoutLinear::isEmpty()
 {
-    Q_ASSERT( p );
-
-    // avoid accessing the object
-    // Q_ASSERT( p->inherits( "DRectangleBase" ) );
-
-    // remove from our list
-    int nIndex = indexOf( (DRectangleBase*)p );
-    Q_ASSERT( nIndex >= 0 );
-    vectorContents.remove( nIndex );
-
-    // update presentation
-    doUpdateSelf();
-    doLayout();
-    emit signalChangedLayout(); 
+    return ( isSingleCell() && vectorContents[0].pObject == nullptr );
 }
 
+/*!
+ * \brief Determine if contents has a single cell.
+ * 
+ * \author pharvey (2026-02-23)
+ * 
+ * \return bool 
+ */
+bool DLayoutLinear::isSingleCell()
+{
+    return ( vectorContents.size() == 1 );
+}
+
+/*!
+ * \brief Remove object.
+ * 
+ * \author pharvey (2026-02-19)
+ * 
+ * \param p      
+ */
 void DLayoutLinear::slotChildRemoved( ADObject *p )
 {
     Q_ASSERT( p );
@@ -194,64 +221,92 @@ void DLayoutLinear::slotChildRemoved( ADObject *p )
     DRectangleBase *pRectangleBase = (DRectangleBase*)p;
 
     // remove from our list
-    int nIndex = indexOf( (DRectangleBase*)p );
-    Q_ASSERT( nIndex >= 0 );
-    vectorContents.remove( nIndex );
-
-    // we no longer need to know when its layout details change 
+    DLayoutContentIndex indexContent = getIndex( (DRectangleBase*)p );
+    Q_ASSERT( !indexContent.isNull() );
     disconnect( pRectangleBase, SIGNAL(signalChangedLayout()), this, SLOT(slotChangedContent()) );
 
-    // update presentation
-    doUpdateSelf();
+    if ( isSingleCell() )
+        vectorContents[0].pObject = nullptr;
+    else
+        vectorContents.remove( getIndex( indexContent ) );
+
+    doInitLayout();
     doLayout();
     emit signalChangedLayout(); 
 }
 
 /*!
- * \brief Return index of cell containing object.
+ * \brief Get index at given point.
+ * 
+ * \author pharvey (9/24/20)
+ * 
+ * \param pointItem 
+ * 
+ * \return DLayoutContentIndex 
+ */
+DLayoutContentIndex DLayoutLinear::getIndex( const QPointF &pointItem )
+{
+//    QPointF pointItem = getProxy()->mapFromScene( pointScene );                                         
+
+    for ( int nIndex = 0; nIndex < vectorContents.count(); nIndex++ )
+    {
+        if ( vectorContents.at( nIndex ).rect.contains( pointItem ) ) return DLayoutContentIndex( nIndex, 0 );
+    }
+
+    return DLayoutContentIndex(); ///< null
+}
+
+/*!
+ * \brief Get index to given object.
  *  
- * Scans vectorContents looking for object. Returns index or, if not found, -1. 
+ * Scans vectorContents looking for object. Returns index which can be null.
  *  
  * \author pharvey (9/25/20)
  * 
  * \param p 
  * 
- * \return int 
+ * \return DLayoutContentIndex 
  */
-int DLayoutLinear::indexOf( DRectangleBase *p )
+DLayoutContentIndex DLayoutLinear::getIndex( DRectangleBase *p )
 {
     for ( int nIndex = 0; nIndex < vectorContents.count(); nIndex++ )
     {
-        if ( vectorContents.at( nIndex ).pObject == p ) return nIndex;
+        if ( vectorContents.at( nIndex ).pObject == p ) return DLayoutContentIndex( nIndex, 0 );
     }
 
-    return -1;
+    return DLayoutContentIndex();
 }
 
-void DLayoutLinear::doInsert( DRectangleBase *p, int nIndex )
+/*!
+ * \brief Set the cell object.
+ * 
+ * In this class it is only valid to call this when single cell with no object.
+ * 
+ * \author pharvey (2026-02-21)
+ * 
+ * \param p         
+ * \param indexCell 
+ * 
+ * \return bool 
+ */
+bool DLayoutLinear::doSet( DRectangleBase *p, DLayoutContentIndex indexCell )
 {
+    // this not for removing content
     Q_ASSERT( p );
-
+    // we can not set when an object is already in the cell
+    Q_ASSERT( vectorContents[indexCell.nRow].pObject == nullptr );
     // we take ownership of objects we manage
     p->doReparent( this );
-    // insert to desired index
-    Q_ASSERT( nIndex >= 0 );
-    Q_ASSERT( nIndex <= vectorContents.count() );
-    vectorContents.insert( nIndex, DLayoutCell( p ) );
-    // update our geometry based upon content
-    doUpdateSelf();
-    // we may need to be larger to fit content
-    QSizeF size = getSize();
-    if ( sizeMinimum.width() > size.width() ) size.setWidth( sizeMinimum.width() );
-    if ( sizeMinimum.height() > size.height() ) size.setHeight( sizeMinimum.height() );
-    if ( size != getSize() )
-        setSize( size ); // this will resize self and call doLayout
-    else 
-        doLayout();
+    // set 
+    vectorContents[getIndex( indexCell )] = DLayoutContent( p );
+    connect( p, SIGNAL(signalChangedLayout()), this, SLOT(slotChangedContent()) );
+    // adjust layout
+    doInitLayout();
+    doLayout();
 
     emit signalChangedLayout();
 
-    return;
+    return true;
 }
 
 void DLayoutLinear::doRemove( DRectangleBase *p )
@@ -262,5 +317,6 @@ void DLayoutLinear::doRemove( DRectangleBase *p )
     // this will trigger our slotChildRemoved
     p->doReparent( nullptr );
 }
+
 
 

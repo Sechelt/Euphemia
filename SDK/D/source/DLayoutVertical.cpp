@@ -3,9 +3,23 @@
 
 #include "DGraphicsProxyItem.h"
 
+/*!
+ * \brief Vertical layout.
+ * 
+ * Lays out objects in a single, vertical, column.
+ * The top row is index 0.
+ * Empty cells are removed unless there is only one cell left.
+ * The is always at least one cell.
+ * 
+ * \author pharvey (2026-02-24)
+ * 
+ * \param pObjectParent 
+ * \param stringName    
+ */
 DLayoutVertical::DLayoutVertical( ADObject *pObjectParent, const QString &stringName )
     : DLayoutLinear( pObjectParent, stringName )
 {
+    // single cell init in DLayoutLinear
 }
 
 DLayoutVertical::~DLayoutVertical()
@@ -21,7 +35,6 @@ void DLayoutVertical::paintAt( QPainter *pPainter, const QPointF &pointPos )
 {
     pPainter->setPen( pen );
     pPainter->setBrush( brush );
-    pPainter->setFont( font.font );
 
     QRectF rect;
     rect.setTopLeft( pointPos );
@@ -41,84 +54,119 @@ void DLayoutVertical::paintAt( QPainter *pPainter, const QPointF &pointPos )
 }
 
 /*!
- * \brief Get closest layout cell edge.
- *  
- * This is so we can indicate possible insertion point. 
- * Is is also used to get insertion index. 
- *  
- * \author pharvey (9/24/20)
+ * \brief Get edge for drop indicator.
  * 
- * \param pointScene 
+ * \author pharvey (2026-02-20)
  * 
- * \return QPointF 
+ * \param indexContent 
+ * \param pointItem 
+ * 
+ * \return CBD::EdgeCenters 
  */
-QPointF DLayoutVertical::getEdge( const QPointF &pointScene )
+CBD::EdgeCenters DLayoutVertical::getEdge( const DLayoutContentIndex &indexContent, const QPointF &pointItem )
 {
-    QPointF pointItem = getProxy()->mapFromScene( pointScene );                                         
-    int nCell = 0;
+//    Q_ASSERT( !indexContent.isNull() );
+    Q_ASSERT( vectorContents[indexContent.nRow].rect.contains( pointItem ) );
 
-    for ( ; nCell < vectorContents.count(); nCell++ )
-    {
-        QRectF r = vectorContents.at( nCell ).rect;
-        // in cell?
-        if ( r.contains( pointItem ) )
-        {
-            // top or bottom edge?
-            if ( pointItem.y() <= r.height() / 2 )
-                return getProxy()->mapToScene( QPointF( r.width() / 2, r.top() ) );                                    
-            else
-                return getProxy()->mapToScene( QPointF( r.width() / 2, r.bottom() ) );
-        }
-    }
+    // force center if we are empty
+    if ( isEmpty() ) return CBD::EdgeCenterCenter;
 
-    // no cells so use layout rect
-    if ( pointItem.y() <= rect.height() / 2 )                                        
-        return getProxy()->mapToScene( QPointF( rect.width() / 2, rect.top() ) );                                    
+    // we are vertical so; top or bottom
+    QRectF r = vectorContents[indexContent.nRow].rect;
+    if ( pointItem.y() - r.top() <= r.bottom() - pointItem.y() ) return CBD::EdgeCenterTop; 
 
-    return getProxy()->mapToScene( QPointF( rect.width() / 2, rect.bottom() ) );
+    return CBD::EdgeCenterBottom;
 }
 
 /*!
- * \brief Get index (among layout cells) for given point.
+ * \brief Get point (in item coordinates) to place drop indicator.
  * 
- * \author pharvey (9/24/20)
+ * \author pharvey (2026-02-20)
  * 
- * \param pointScene 
+ * \param indexContent 
+ * \param nEdge        
  * 
- * \return int 
+ * \return QPointF in item coordinates
  */
-int DLayoutVertical::indexOf( const QPointF &pointScene )
+QPointF DLayoutVertical::getEdgePoint( const DLayoutContentIndex &indexContent, CBD::EdgeCenters nEdge )
 {
-    QPointF pointItem = getProxy()->mapFromScene( pointScene );                                         
-    int nCell = 0;
-
-    for ( ; nCell < vectorContents.count(); nCell++ )
+    switch ( nEdge )
     {
-        QRectF r = vectorContents.at( nCell ).rect;
-        // in cell?
-        if ( r.contains( pointItem ) )
-        {
-            // top or bottom edge?
-            if ( pointItem.y() <= r.height() / 2 )
-                return nCell;
-            else
-                return nCell + 1;
-        }
+        case CBD::EdgeCenterLeft:
+            qFatal( "CBD::EdgeCenterLeft is invalid here." );
+//            return QPointF( vectorContents[indexContent.nRow].rect.left(), vectorContents[indexContent.nRow].rect.center().y() );
+        case CBD::EdgeCenterRight:
+            qFatal( "CBD::EdgeCenterRight is invalid here." );
+//            return QPointF( vectorContents[indexContent.nRow].rect.right(), vectorContents[indexContent.nRow].rect.center().y() );
+        case CBD::EdgeCenterTop:
+            return QPointF( vectorContents[indexContent.nRow].rect.center().x(), vectorContents[indexContent.nRow].rect.top() );
+        case CBD::EdgeCenterBottom:
+            return QPointF( vectorContents[indexContent.nRow].rect.center().x(), vectorContents[indexContent.nRow].rect.bottom() );
+        case CBD::EdgeCenterCenter:
+            return vectorContents[indexContent.nRow].rect.center();
     }
 
-    // append
-    return nCell;
+    return QPointF();
 }
 
+bool DLayoutVertical::doInsert( DRectangleBase *p, DLayoutContentIndex indexContent, CBD::EdgeCenters nEdge )
+{
+    Q_ASSERT( p );
+
+    // we take ownership of objects we manage
+    p->doReparent( this );
+    // insert to desired index
+    Q_ASSERT( indexContent.nRow >= 0 );
+    Q_ASSERT( indexContent.nRow <= vectorContents.count() );
+    if ( nEdge == CBD::EdgeCenterBottom )
+        vectorContents.insert( indexContent.nRow + 1, DLayoutContent( p ) );
+    else
+        vectorContents.insert( indexContent.nRow, DLayoutContent( p ) );
+    connect( p, SIGNAL(signalChangedLayout()), this, SLOT(slotChangedContent()) );
+    // update our geometry based upon content
+    doInitLayout();
+    // we may need to be larger to fit content
+    QSizeF size = getSize();
+    if ( sizeMinimum.width() > size.width() ) size.setWidth( sizeMinimum.width() );
+    if ( sizeMinimum.height() > size.height() ) size.setHeight( sizeMinimum.height() );
+    if ( size != getSize() )
+        setSize( size ); // this will resize self and call doLayout
+    else 
+        doLayout();
+
+    emit signalChangedLayout();
+
+    return true;
+}
+
+/*!
+ * \brief Update contents.
+ * 
+ * When content changed; doInitLayout + doLayout.
+ * When layout resized; doLayout.
+ * 
+ * This means updating each;
+ *  - cell rect
+ *  - cell object geometry
+ * 
+ * \author pharvey (2026-02-24)
+ */
 void DLayoutVertical::doLayout()
 {
+    // single cell and empty?
+    if ( isEmpty() )
+    {
+        vectorContents[0].rect = QRectF( 0, 0, rect.width(), rect.height() );
+        return;
+    }
+
     // Update our layout cell rects. This does not update y pos. 
     // Determining the cell heights is the bulk of what happens in this layout.
     doUpdateCellHeights();
 
     // Set size and pos of objects given the cell height.
     // Also; set the cell rect y pos.
-    DLayoutCell cell;
+    DLayoutContent cell;
     qreal nY = 0;
     for ( int n = 0; n < vectorContents.count(); n++ )
     {
@@ -153,13 +201,35 @@ void DLayoutVertical::doLayout()
 
 /*!
  * \brief Update our layout info based upon our content.
+ * 
+ * When content changed; doInitLayout + doLayout.
+ * When layout resized; doLayout.
+ * 
+ * sizeHint 
  *  
+ * x. We adopt the highest object value.
+ * y. We add all object sizeHints to come up with our own. 
+ *  
+ * sizeMinimum 
+ *  
+ * x. We adopt the highest object value.
+ * y. We add all object sizeMinimum to come up with our own. 
+ *  
+ * sizeMaximum 
+ *  
+ * x. We adopt the lowest object value > 0. Will be 0 if all objects are 0.
+ * y. We add all object sizeMaximum to come up with our own. 
+ *    BUT if we have an object (even just 1) with unlimited size (sizeMaximum.x = 0) - we have unlimited stretch.
+ * 
  * \note Margins are factored in. 
  *  
  * \author pharvey (9/21/20)
  */
-void DLayoutVertical::doUpdateSelf()
+void DLayoutVertical::doInitLayout()
 {
+    // single cell and empty? nothing to do
+    if ( isEmpty() ) return;
+
     // Layout MaxHeight will be 0 if *any* object MaxHeight is 0. This indicates unlimited stretch.
     bool bUnlimitedStretchY = false;
 
@@ -171,7 +241,7 @@ void DLayoutVertical::doUpdateSelf()
     qreal nMaxHeight    = 0;
 
     DRectangleBase *pRectangleBase;
-    DLayoutCell cell;
+    DLayoutContent cell;
     foreach( cell, vectorContents )
     {
         pRectangleBase = cell.pObject;
@@ -263,7 +333,7 @@ void DLayoutVertical::doUpdateCellHeights()
     // set everything to size hint or minimum
     for ( int n = 0; n < vectorContents.count(); n++ )
     {
-        DLayoutCell cell = vectorContents.at( n );
+        DLayoutContent cell = vectorContents.at( n );
 
         // create index on vectorContents ordered by Stretch - we will need it later
         mapStretchFactors.insert( cell.pObject->getStretch().height(), n );
@@ -296,7 +366,7 @@ void DLayoutVertical::doUpdateCellHeights()
  * false and the call will continue to recurse - this time considering all cells. 
  *  
  * The recursion will end when nAdjust==0 or cells can not be adjusted anymore. It 
- * should end when nAdjust==0 because of the work done in \sa doUpdateSelf.
+ * should end when nAdjust==0 because of the work done in \sa doInitLayout.
  *  
  * Cells are adjusted iteratively by 1 pixel or nStretch (if set). 
  *  
@@ -308,16 +378,12 @@ void DLayoutVertical::doUpdateCellHeights()
 void DLayoutVertical::doShrinkCells( qreal nAdjust, bool bStretch )
 {
     qreal               nAdjusted   = nAdjust;
-    DLayoutCell         cell;
+    DLayoutContent         cell;
     qreal               nMinimum;
     qreal               nStretch;                                                                                                                                                
     int                 nIndex;                                                                                                                                                  
                 
-#if QT_VERSION < 0x060000
-    QMapIterator<int,int> i(mapStretchFactors);                                                                                                                                  
-#else
     QMultiMapIterator<int,int> i(mapStretchFactors);                                                                                                                                  
-#endif
     i.toBack();                                                                                                                                                                  
     while ( i.hasPrevious() )                                                                                                                                                    
     {                                                                                                                                                                            
@@ -388,7 +454,7 @@ void DLayoutVertical::doShrinkCells( qreal nAdjust, bool bStretch )
  * false and the call will continue to recurse - this time considering all cells. 
  *  
  * The recursion will end when nAdjust==0 or cells can not be adjusted anymore. It 
- * should end when nAdjust==0 because of the work done in \sa doUpdateSelf.
+ * should end when nAdjust==0 because of the work done in \sa doInitLayout.
  *  
  * Cells are adjusted iteratively by 1 pixel or nStretch (if set). 
  *  
@@ -400,16 +466,12 @@ void DLayoutVertical::doShrinkCells( qreal nAdjust, bool bStretch )
 void DLayoutVertical::doExpandCells( qreal nAdjust, bool bStretch )
 {
     qreal               nAdjusted   = nAdjust;                                                                                                                                   
-    DLayoutCell         cell;
+    DLayoutContent         cell;
     qreal               nMaximum;
     qreal               nStretch;                                                                                                                                                
     int                 nIndex;                                                                                                                                                  
                                                                                                                                                                                  
-#if QT_VERSION < 0x060000
-    QMapIterator<int,int> i(mapStretchFactors);                                                                                                                                  
-#else
     QMultiMapIterator<int,int> i(mapStretchFactors);                                                                                                                                  
-#endif
     i.toBack();                                                                                                                                                                  
     while ( i.hasPrevious() )                                                                                                                                                    
     {                                                                                                                                                                            
@@ -462,4 +524,19 @@ void DLayoutVertical::doExpandCells( qreal nAdjust, bool bStretch )
     doExpandCells( nAdjusted, bStretch );                                                                                                                                  
 }
 
+/*!
+ * \brief Get the coordinate (row or col) that matters.
+ * 
+ * This allows many methods to be generalized into DLayoutLinear.
+ * 
+ * \author pharvey (2026-02-26)
+ * 
+ * \param indexContent 
+ * 
+ * \return int 
+ */
+int DLayoutVertical::getIndex( const DLayoutContentIndex &indexContent )
+{
+    return indexContent.nRow;
+}
 

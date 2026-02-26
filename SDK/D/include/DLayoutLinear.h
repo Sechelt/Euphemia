@@ -2,52 +2,19 @@
 #define H_DLayoutLinear
 
 #include "DLayout.h"
-
 #include "DSpacer.h"
 
 /*!
- * \brief Layout cell. 
- *  
- * A layout can have 0-n cells. Each cell contains a reference to an object (pObject)
- * and a seperate rectangle (rect). 
- *  
- * pObject 
- *  
- * pObject is a reference to an object the layout is managing (a child of the layout). 
- *  
- * rect 
- *  
- * rect is the pos/size of the cell. All cells reside within the layout rect. 
- * The cell rect is larger than pObject when pObject has margins. 
- * The bulk of what a layout does is to calc the cell rect. This is then used to; 
- *  
- * 1. determine the pos/size of the pObject
- * 2. paint the layout 
- * 3. calc pos of an insert indicator 
- *  
- * \author pharvey (9/25/20)
- */
-class DLayoutCell
-{
-public:
-    DLayoutCell( DRectangleBase *p = nullptr, QRectF r = QRectF() )
-    {
-        pObject = p;
-        rect = r;
-    }
-
-    DRectangleBase *pObject;    // reference to a child object
-    QRectF          rect;       // cell pos/size in item coords
-};
-
-/*!
- * \brief Base class for all linear diagram layouts.
+ * \brief Base class for all linear (single row or single column) layouts.
  *  
  * This manages pos/size (layout) of child objects. All child objects are assumed to be derived from 
  * DRectangleBase. It is a fatal error for others to be children here. 
  *  
- * All linear layouts work with a vector of DLayoutCell's. 
- *  
+ * Content is stored in a vector (\sa vectorContents) of cells (\sa DLayoutContent) and this could be empty.
+ * The layout will *appear* to have have a single, empty, cell when no content.
+ * 
+ * Cells are added to accomodate a new object and removed when the cell is empty.
+ * 
  * This is an asbtract base class. 
  *  
  * \sa DLayoutVertical 
@@ -73,12 +40,14 @@ public:
     virtual QDomElement doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent );
     virtual bool doLoad( QDomElement *pdomElem );
 
+    virtual bool isEmpty();
+    virtual bool isSingleCell();
+
 public slots:
-    virtual void slotDeleted( ADObject * );
     virtual void slotChildRemoved( ADObject * );
 
 protected:
-    // We manage layout by using a vector of DLayoutCell's. This vector indicates the order of the
+    // We manage layout by using a vector of DLayoutContent's. This vector indicates the order of the
     // objects and provides a geometry for each layout cell. The order, as maintained by QObject, of 
     // the children objects and the order of their proxy is of no concern here. It is enough to simply
     // know that all of the objects to be managed are children of the layout.
@@ -100,7 +69,7 @@ protected:
     //      \sa slotDeleted         - object is removed from vectorObjects 
     //      \sa slotChildRemoved    - object is removed from vectorObjects
     //  
-    QVector<DLayoutCell> vectorContents;
+    QVector<DLayoutContent> vectorContents;
 
     // We need to have an index of objects, based upon stretch factor, when we aportion space. 
     // This is ordered lowest to highest.
@@ -109,12 +78,14 @@ protected:
     // <stretch,index> - where index is into vectorContents
     QMultiMap<int,int> mapStretchFactors;
 
-    virtual QPointF     getEdge( const QPointF &pointScene ) = 0;
-    virtual int         indexOf( const QPointF &pointScene ) = 0;
-    virtual int         indexOf( DRectangleBase * );
+    virtual DLayoutContentIndex getIndex( DRectangleBase * );
+    virtual DLayoutContentIndex getIndex( const QPointF &pointItem );
+    virtual int                 getIndex( const DLayoutContentIndex & ) = 0;
 
-    virtual void doInsert( DRectangleBase *p, int nIndex );
+    virtual bool doInsert( DRectangleBase *p, DLayoutContentIndex indexCell, CBD::EdgeCenters nEdge ) = 0;
+    virtual bool doSet( DRectangleBase *p, DLayoutContentIndex indexCell );
     virtual void doRemove( DRectangleBase *p );
+
 };
  
 #endif

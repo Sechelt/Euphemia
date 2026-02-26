@@ -3,9 +3,23 @@
 
 #include "DGraphicsProxyItem.h"
 
+/*!
+ * \brief Horizontal layout.
+ * 
+ * Lays out objects in a single, horizontal, row.
+ * The left col is index 0.
+ * Empty cells are removed unless there is only one cell left.
+ * The is always at least one cell.
+ * 
+ * \author pharvey (2026-02-24)
+ * 
+ * \param pObjectParent 
+ * \param stringName    
+ */
 DLayoutHorizontal::DLayoutHorizontal( ADObject *pObjectParent, const QString &stringName )
     : DLayoutLinear( pObjectParent, stringName )
 {
+    // single cell init in DLayoutLinear
 }
 
 DLayoutHorizontal::~DLayoutHorizontal()
@@ -40,76 +54,94 @@ void DLayoutHorizontal::paintAt( QPainter *pPainter, const QPointF &pointPos )
 }
 
 /*!
- * \brief Get closest layout cell edge.
- *  
- * This is so we can indicate possible insertion point. 
- * Is is also used to get insertion index. 
- *  
- * \author pharvey (9/24/20)
+ * \brief Get edge for drop indicator.
  * 
- * \param pointScene 
+ * \author pharvey (2026-02-20)
+ * 
+ * \param indexContent 
+ * \param pointItem 
+ * 
+ * \return CBD::EdgeCenters 
+ */
+CBD::EdgeCenters DLayoutHorizontal::getEdge( const DLayoutContentIndex &indexContent, const QPointF &pointItem )
+{
+    // Q_ASSERT( !indexContent.isNull() );
+    Q_ASSERT( vectorContents[indexContent.nCol].rect.contains( pointItem ) );
+
+    // force center if we are empty
+    if ( isEmpty() ) return CBD::EdgeCenterCenter;
+
+    // we are horizontal so left or right
+    QRectF r = vectorContents[indexContent.nCol].rect;
+    if ( pointItem.x() - r.left() <= r.right() - pointItem.x() ) return CBD::EdgeCenterLeft; 
+
+    return CBD::EdgeCenterRight;
+}
+
+/*!
+ * \brief Get point (in item coordinates) to place drop indicator.
+ * 
+ * \author pharvey (2026-02-20)
+ * 
+ * \param indexContent 
+ * \param nEdge        
  * 
  * \return QPointF 
  */
-QPointF DLayoutHorizontal::getEdge( const QPointF &pointScene )
+QPointF DLayoutHorizontal::getEdgePoint( const DLayoutContentIndex &indexContent, CBD::EdgeCenters nEdge )
 {
-    QPointF pointItem = getProxy()->mapFromScene( pointScene );                                         
-    int nCell = 0;
-
-    for ( ; nCell < vectorContents.count(); nCell++ )
+    switch ( nEdge )
     {
-        QRectF r = vectorContents.at( nCell ).rect;
-        // in cell?
-        if ( r.contains( pointItem ) )
-        {
-            // left or right edge?
-            if ( pointItem.x() <= r.width() / 2 )
-                return getProxy()->mapToScene( QPointF( r.left(), r.height() / 2 ) );                                    
-            else
-                return getProxy()->mapToScene( QPointF( r.right(), r.height() / 2 ) );
-        }
+        case CBD::EdgeCenterLeft:
+            return QPointF( vectorContents[indexContent.nCol].rect.left(), vectorContents[indexContent.nCol].rect.center().y() );
+        case CBD::EdgeCenterRight:
+            return QPointF( vectorContents[indexContent.nCol].rect.right(), vectorContents[indexContent.nCol].rect.center().y() );
+        case CBD::EdgeCenterTop:
+            qFatal( "CBD::EdgeCenterTop is invalid here." );
+        case CBD::EdgeCenterBottom:
+            qFatal( "CBD::EdgeCenterBottom is invalid here." );
+        case CBD::EdgeCenterCenter:
+            return vectorContents[indexContent.nCol].rect.center();
     }
 
-    if ( pointItem.x() <= rect.width() / 2 )                                        
-        return getProxy()->mapToScene( QPointF( rect.left(), rect.height() / 2 ) );                                    
+    return QPointF();
+}
 
-    return getProxy()->mapToScene( QPointF( rect.right(), rect.height() / 2 ) );
+bool DLayoutHorizontal::doInsert( DRectangleBase *p, DLayoutContentIndex indexContent, CBD::EdgeCenters nEdge )
+{
+    Q_ASSERT( p );
+
+    // we take ownership of objects we manage
+    p->doReparent( this );
+    // insert to desired index
+    Q_ASSERT( indexContent.nCol >= 0 );
+    Q_ASSERT( indexContent.nCol <= vectorContents.count() );
+    if ( nEdge == CBD::EdgeCenterRight )
+        vectorContents.insert( indexContent.nCol + 1, DLayoutContent( p ) );
+    else
+        vectorContents.insert( indexContent.nCol, DLayoutContent( p ) );
+    connect( p, SIGNAL(signalChangedLayout()), this, SLOT(slotChangedContent()) );
+    // update our geometry based upon content
+    doInitLayout();
+    // we may need to be larger to fit content
+    QSizeF size = getSize();
+    if ( sizeMinimum.width() > size.width() ) size.setWidth( sizeMinimum.width() );
+    if ( sizeMinimum.height() > size.height() ) size.setHeight( sizeMinimum.height() );
+    if ( size != getSize() )
+        setSize( size ); // this will resize self and call doLayout
+    else 
+        doLayout();
+
+    emit signalChangedLayout();
+
+    return true;
 }
 
 /*!
- * \brief Get index (among layout cells) for given point.
+ * \brief Update contents.
  * 
- * \author pharvey (9/24/20)
- * 
- * \param pointScene 
- * 
- * \return int 
- */
-int DLayoutHorizontal::indexOf( const QPointF &pointScene )
-{
-    QPointF pointItem = getProxy()->mapFromScene( pointScene );                                         
-    int nCell = 0;
-
-    for ( ; nCell < vectorContents.count(); nCell++ )
-    {
-        QRectF r = vectorContents.at( nCell ).rect;
-        // in cell?
-        if ( r.contains( pointItem ) )
-        {
-            // left or right edge?
-            if ( pointItem.x() <= r.width() / 2 )
-                return nCell;
-            else
-                return nCell + 1;
-        }
-    }
-
-    // append
-    return nCell;
-}
-
-/*!
- * \brief Adjust pos and size of objects. 
+ * When content changed; doInitLayout + doLayout.
+ * When layout resized; doLayout.
  *  
  * The layout is calculated in two ways; 
  *  
@@ -132,13 +164,20 @@ int DLayoutHorizontal::indexOf( const QPointF &pointScene )
  */
 void DLayoutHorizontal::doLayout()
 {
+    // single cell and empty?
+    if ( isEmpty() )
+    {
+        vectorContents[0].rect = QRectF( 0, 0, rect.width(), rect.height() );
+        return;
+    }
+
     // Update our layout cell rects. This does not update x pos. 
     // Determining the cell widths is the bulk of what happens in this layout.
     doUpdateCellWidths();
 
     // Set size and pos of objects given the cell width.
     // Also; set the cell rect x pos.
-    DLayoutCell cell;
+    DLayoutContent cell;
     qreal nX = 0;
     for ( int n = 0; n < vectorContents.count(); n++ )
     {
@@ -174,6 +213,9 @@ void DLayoutHorizontal::doLayout()
 /*!
  * \brief Update our layout info based upon our content.
  *  
+ * When content changed; doInitLayout + doLayout.
+ * When layout resized; doLayout.
+ * 
  * sizeHint 
  *  
  * x. We add all object sizeHints to come up with our own. 
@@ -194,9 +236,11 @@ void DLayoutHorizontal::doLayout()
  *  
  * \author pharvey (9/21/20)
  */
-void DLayoutHorizontal::doUpdateSelf()
+void DLayoutHorizontal::doInitLayout()
 {
-// qDebug() << __FILE__ << __FUNCTION__ << __LINE__;
+    // single cell and empty? nothing to do
+    if ( isEmpty() ) return;
+
     // Layout MaxWidth will be 0 if *any* object MaxWidth is 0. This indicates unlimited stretch.
     bool bUnlimitedStretchX = false;
 
@@ -208,7 +252,7 @@ void DLayoutHorizontal::doUpdateSelf()
     qreal nMaxHeight    = 0;
 
     DRectangleBase *pRectangleBase;
-    DLayoutCell cell;
+    DLayoutContent cell;
     foreach( cell, vectorContents )
     {
         pRectangleBase = cell.pObject;
@@ -295,21 +339,19 @@ void DLayoutHorizontal::doUpdateSelf()
  */
 void DLayoutHorizontal::doUpdateCellWidths()
 {
-// qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << vectorContents.count();
     mapStretchFactors.clear();
     qreal nWidthTotal = 0;
 
     // set everything to size hint or minimum
     for ( int n = 0; n < vectorContents.count(); n++ )
     {
-        DLayoutCell cell = vectorContents.at( n );
+        DLayoutContent cell = vectorContents.at( n );
 
         // create index on vectorContents ordered by Stretch - we will need it later
         mapStretchFactors.insert( cell.pObject->getStretch().width(), n );
         // determine cell width - hopefully sizehint and/or min are set!
         qreal nWidth = cell.pObject->getSizeHint().width();
         if ( !nWidth ) nWidth = cell.pObject->getSizeMinimum().width();
-// qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "cell width:" << nWidth;
         // save cell rect
         cell.rect = QRectF( 0, 0, nWidth, rect.height() );                        
         vectorContents[n] = cell;
@@ -318,7 +360,6 @@ void DLayoutHorizontal::doUpdateCellWidths()
 
     // stretch/shrink content?
     qreal nAdjust = rect.width() - nWidthTotal;
-// qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << "width current:" << rect.width() << " - " << "width desired: " << nWidthTotal << " = " << nAdjust;
     if ( nAdjust < 0 ) doShrinkCells( nAdjust, true );
     else if ( nAdjust > 0 ) doExpandCells( nAdjust, true );
 }
@@ -337,7 +378,7 @@ void DLayoutHorizontal::doUpdateCellWidths()
  * false and the call will continue to recurse - this time considering all cells. 
  *  
  * The recursion will end when nAdjust==0 or cells can not be adjusted anymore. It 
- * should end when nAdjust==0 because of the work done in \sa doUpdateSelf.
+ * should end when nAdjust==0 because of the work done in \sa doInitLayout.
  *  
  * Cells are adjusted iteratively by 1 pixel or nStretch (if set). 
  *  
@@ -349,17 +390,12 @@ void DLayoutHorizontal::doUpdateCellWidths()
 void DLayoutHorizontal::doShrinkCells( qreal nAdjust, bool bStretch )
 {
     qreal               nAdjusted   = nAdjust;
-    DLayoutCell         cell;
+    DLayoutContent         cell;
     qreal               nMinimum;
     qreal               nStretch;                                                                                                                                                
     int                 nIndex;                                                                                                                                                  
-// qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << nAdjust;
                 
-#if QT_VERSION < 0x060000
-    QMapIterator<int,int> i(mapStretchFactors);                                                                                                                                  
-#else
     QMultiMapIterator<int,int> i(mapStretchFactors);                                                                                                                                  
-#endif
     i.toBack();                                                                                                                                                                  
     while ( i.hasPrevious() )                                                                                                                                                    
     {                                                                                                                                                                            
@@ -430,7 +466,7 @@ void DLayoutHorizontal::doShrinkCells( qreal nAdjust, bool bStretch )
  * false and the call will continue to recurse - this time considering all cells. 
  *  
  * The recursion will end when nAdjust==0 or cells can not be adjusted anymore. It 
- * should end when nAdjust==0 because of the work done in \sa doUpdateSelf.
+ * should end when nAdjust==0 because of the work done in \sa doInitLayout.
  *  
  * Cells are adjusted iteratively by 1 pixel or nStretch (if set). 
  *  
@@ -442,17 +478,12 @@ void DLayoutHorizontal::doShrinkCells( qreal nAdjust, bool bStretch )
 void DLayoutHorizontal::doExpandCells( qreal nAdjust, bool bStretch )
 {
     qreal               nAdjusted   = nAdjust;                                                                                                                                   
-    DLayoutCell         cell;
+    DLayoutContent         cell;
     qreal               nMaximum;
     qreal               nStretch;                                                                                                                                                
     int                 nIndex;                                                                                                                                                  
-// qDebug() << __FILE__ << __FUNCTION__ << __LINE__ << nAdjust;
                                                                                                                                                                                  
-#if QT_VERSION < 0x060000
-    QMapIterator<int,int> i(mapStretchFactors);                                                                                                                                  
-#else
     QMultiMapIterator<int,int> i(mapStretchFactors);                                                                                                                                  
-#endif
     i.toBack();                                                                                                                                                                  
     while ( i.hasPrevious() )                                                                                                                                                    
     {                                                                                                                                                                            
@@ -505,4 +536,19 @@ void DLayoutHorizontal::doExpandCells( qreal nAdjust, bool bStretch )
     doExpandCells( nAdjusted, bStretch );                                                                                                                                  
 }
 
+/*!
+ * \brief Get the coordinate (row or col) that matters.
+ * 
+ * This allows many methods to be generalized into DLayoutLinear.
+ * 
+ * \author pharvey (2026-02-26)
+ * 
+ * \param indexContent 
+ * 
+ * \return int 
+ */
+int DLayoutHorizontal::getIndex( const DLayoutContentIndex &indexContent )
+{
+    return indexContent.nCol;
+}
 

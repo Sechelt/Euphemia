@@ -69,7 +69,9 @@ class DLayoutGrid : public DLayout
 public:
     explicit DLayoutGrid( ADObject *pObjectParent, const QString &stringName = QString() );
     virtual ~DLayoutGrid();
- 
+
+    virtual void setSize( const QSizeF &size ) override;
+
     virtual QPixmap         getIcon() override;
     virtual QString         getFriendlyClassName() override { return tr( "Layout Grid" ); }
     virtual ADObject *      getObject( const QString &stringClass, ADObject *pObjectParent = nullptr ) override;

@@ -43,6 +43,57 @@ DLayoutGrid::~DLayoutGrid()
 {
 }
 
+void DLayoutGrid::setSize( const QSizeF &size )
+{
+    // do self
+    DRectangleBase::setSize( size );
+    // do content
+    // we may need to be larger to fit content
+    {
+        QSizeF size = getSize();
+        if ( sizeMinimum.width() > size.width() ) size.setWidth( sizeMinimum.width() );
+        if ( sizeMinimum.height() > size.height() ) size.setHeight( sizeMinimum.height() );
+        // set size without calling doLayout
+        if ( size != getSize() ) DRectangleBase::setSize( size );
+
+        //
+        // SET ROW HEIGHTS
+        //
+        doUpdateRowHeights();
+
+        //
+        // SET COL HEIGHTS
+        //
+        doUpdateColWidths();
+
+        //
+        // Set cell rect for all cells.
+        //
+        int nRows = getRows();
+        int nCols = getCols();
+        {
+            qreal nRowY = 0;
+            for ( int nRow = 0; nRow < nRows; nRow++ )
+            {
+                qreal nColX = 0;
+                DLayoutGeometry geometryRow = vectorRowGeometries[nRow];
+                for ( int nCol = 0; nCol < nCols; nCol++ )
+                {
+                    DLayoutGeometry geometryCol = vectorColGeometries[nCol];
+
+                    // set cell rect
+                    vectorContents[nRow][nCol].rect = QRectF( QPointF( nColX, nRowY ), QSizeF( geometryCol.WH.nWidth, geometryRow.WH.nHeight ) );
+
+                    nColX += geometryCol.WH.nWidth;
+                }
+                nRowY += geometryRow.WH.nHeight;
+            }
+        }
+    }
+
+    doLayout();
+}
+
 QPixmap DLayoutGrid::getIcon()
 {
     return QPixmap( ":D/GLayout" );
@@ -247,53 +298,74 @@ bool DLayoutGrid::doDrop( DRectangleBase *p, const QPointF &pointScene )
 QDomElement DLayoutGrid::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent )
 {
     QDomElement domElemThis = DRectangleBase::doSave( pdomDoc, pdomElemParent );
-/*
-    // Any temp OID's should have been turned to OID's for persistence at this point.
-    // Create a string with OID's in the correct order and delimited. 
-    QString stringOrder;
-    for ( int n = 0; n < vectorContents.count(); n++ )
+    int nRows = getRows();
+    int nCols = getCols();
+
+    domElemThis.setAttribute( "Rows", nRows );
+    domElemThis.setAttribute( "Columns", nCols );
+
+    for ( int nRow = 0; nRow < nRows; nRow++ )
     {
-        if ( !stringOrder.isEmpty() ) stringOrder += "|";
-        stringOrder += QString::number( vectorContents.at( n ).pObject->getOID() );
+        QString stringColumns;
+        for ( int nCol = 0; nCol < nCols; nCol++ )
+        {
+            if ( !stringColumns.isEmpty() ) stringColumns += "|";
+            if ( vectorContents[nRow][nCol].pObject )
+                stringColumns += QString::number( vectorContents[nRow][nCol].pObject->getOID() );
+        }
+        domElemThis.setAttribute( QString("Row%1").arg( nRow ), stringColumns );
     }
 
-    // save child OID's/order
-    domElemThis.setAttribute( "Order", stringOrder );
-*/
     return domElemThis;
 }
 
 bool DLayoutGrid::doLoad( QDomElement *pdomElemObject )
 {
     DRectangleBase::doLoad( pdomElemObject );
-/*
+
     // At this point any objects we are managing have been created and are
     // a child of this layout. This was done, in part, by this layout
     // intercepting getObject and redirecting request to DDiagram::getObject.
-    // 
-    // Here we use the Order we saved in doSave to add the objects to the 
-    // layout fully - in the order specified.
 
-    QString stringOrder = pdomElemObject->attribute( "Order", "" );
+    int nRows = pdomElemObject->attribute( "Rows", 0 ).toInt();
+    int nCols = pdomElemObject->attribute( "Columns", 0 ).toInt();
 
-    QStringList sl = stringOrder.split( '|', Qt::SkipEmptyParts );
-    QString s;
-    vectorContents.clear();
-    foreach( s, sl )
+    Q_ASSERT( nRows );
+    Q_ASSERT( nCols );
+
+    // resize contents
+    vectorContents.resize( nRows );
+    for ( int nRow = 0; nRow < nRows; nRow++ )
     {
-        int nOID = s.toInt();
-        ADObject *p = ADObject::getObject( nOID );
-        Q_ASSERT(p);
-        Q_ASSERT( p->inherits( "DRectangleBase" ) );
-        // add to layout - without firing off signals - we do not want calls to doLayout etc
-        DRectangleBase *pRectangleBase = (DRectangleBase*)p;
-        vectorContents.append( DRectangleBase *( pRectangleBase ) );
-        connect( pRectangleBase, SIGNAL(signalChangedLayout()), this, SLOT(slotChangedContent()) );
+        vectorContents[nRow].resize( nCols );
     }
-*/
-    // update presentation - we should not have to do this as load restores state
-    // doInitLayout();
-    // we do this to calc layout cell rects to be used during paint()
+
+    // set contents
+    for ( int nRow = 0; nRow < nRows; nRow++ )
+    {
+        QString     stringValues    = pdomElemObject->attribute( QString("Row%1").arg( nRow ), "" );
+        QStringList listValues      = stringValues.split( '|', Qt::KeepEmptyParts );
+        QString     stringValue;
+        int         nCol            = 0;
+        foreach( stringValue, listValues )
+        {
+            Q_ASSERT( nCol < nCols );
+            if ( !stringValue.isEmpty() ) 
+            {
+                int nOID = stringValue.toInt();
+                ADObject *p = ADObject::getObject( nOID );
+                Q_ASSERT(p);
+                Q_ASSERT( p->inherits( "DRectangleBase" ) );
+                // add to layout - without firing off signals - we do not want calls to doLayout etc
+                DRectangleBase *pRectangleBase = (DRectangleBase*)p;
+                vectorContents[nRow][nCol].pObject = (DRectangleBase*)pRectangleBase;
+                connect( pRectangleBase, SIGNAL(signalChangedLayout()), this, SLOT(slotChangedContent()) );
+            }
+            nCol++;
+        }
+    }
+
+    doInitLayout();
     doLayout();
 
     return true;
@@ -619,7 +691,6 @@ void DLayoutGrid::doRemove( DRectangleBase *p )
 }
 
 /*!
-/*!
  * \brief Update contents.
  * 
  * When content changed; doInitLayout + doLayout.
@@ -694,6 +765,7 @@ void DLayoutGrid::doInitLayout()
     //
     // AGGREGATE
     //
+    sizeMinimum = QSizeF( 0, 0 );
     {
         // Set vectorRowGeometries for all rows.
         //
@@ -713,6 +785,8 @@ void DLayoutGrid::doInitLayout()
                         geometry.nMaximum   = qMin( geometry.nMaximum, pObject->getSizeMaximum().height() + margins.top() + margins.bottom() );
                         geometry.nStretch   = qMax( geometry.nStretch, pObject->getStretch().height() );
                         geometry.nHint      = qMax( geometry.nHint, pObject->getSizeHint().height() + margins.top() + margins.bottom() );
+
+                        sizeMinimum.setHeight( sizeMinimum.height() + geometry.nMinimum );
                         continue;
                     }
                 }
@@ -742,6 +816,8 @@ void DLayoutGrid::doInitLayout()
                         geometry.nMaximum   = qMin( geometry.nMaximum, pObject->getSizeMaximum().width() + margins.left() + margins.right() );
                         geometry.nStretch   = qMax( geometry.nStretch, pObject->getStretch().width() );
                         geometry.nHint      = qMax( geometry.nHint, pObject->getSizeHint().width() + margins.left() + margins.right() );
+
+                        sizeMinimum.setWidth( sizeMinimum.width() + geometry.nMinimum );
                         continue;
                     }
                 }
@@ -752,6 +828,13 @@ void DLayoutGrid::doInitLayout()
             }
         }
     }
+
+    // we may need to be larger to fit content
+    QSizeF size = getSize();
+    if ( sizeMinimum.width() > size.width() ) size.setWidth( sizeMinimum.width() );
+    if ( sizeMinimum.height() > size.height() ) size.setHeight( sizeMinimum.height() );
+    // set size without calling doLayout
+    if ( size != getSize() ) DRectangleBase::setSize( size );
 
     //
     // SET ROW HEIGHTS
@@ -774,7 +857,6 @@ void DLayoutGrid::doInitLayout()
             DLayoutGeometry geometryRow = vectorRowGeometries[nRow];
             for ( int nCol = 0; nCol < nCols; nCol++ )
             {
-                DRectangleBase *pObject = vectorContents[nRow][nCol].pObject;
                 DLayoutGeometry geometryCol = vectorColGeometries[nCol];
 
                 // set cell rect
@@ -785,7 +867,6 @@ void DLayoutGrid::doInitLayout()
             nRowY += geometryRow.WH.nHeight;
         }
     }
-
 }
 
 /*
@@ -977,7 +1058,7 @@ DLayoutSelfGeometry DLayoutGrid::getUpdateSelfCol( int nCol, DLayoutSelfGeometry
  *      - row min/max height
  *      - col min/max height
  *      - row stretch
- *      - col stretchhttps://youtu.be/0-Byic0e0fY?si=tMZkMyjaSGdt8Df2
+ *      - col stretch
  * We use cell.pObject.hint
  * 
  * 

@@ -1,9 +1,9 @@
 /*
- * Copyright 2022-2024, Peter Harvey <pharvey@codebydesign.com>
+ * Copyright 2020-2026, Peter Harvey <pharvey@codebydesign.com>
  * All rights reserved.
  *
  * This file is part of the Blue codebase.
- * This source code is not meant for public distribution.
+ * [placeholder]
  *
  */
 #include "LibInfo.h"

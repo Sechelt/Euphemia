@@ -96,7 +96,7 @@ void DLayoutGrid::setSize( const QSizeF &size )
 
 QPixmap DLayoutGrid::getIcon()
 {
-    return QPixmap( ":D/GLayout" );
+    return QPixmap( ":D/LayoutGrid" );
 }
 
 /*!

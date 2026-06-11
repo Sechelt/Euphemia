@@ -263,6 +263,7 @@ void SAMainWindow::doInitDocks()
 {
     doInitDockBrowser();
     doInitDockClasses(); 
+    doInitDockStencils(); 
     doInitDockProperties();
     doInitDockPanner();
     doInitDockScratchPad();
@@ -287,14 +288,23 @@ void SAMainWindow::doInitDockClasses()
     pDockClasses = new QDockWidget( tr( "Classes" ), this );
     pDockClasses->setObjectName( "Classes" );
 
-    pWidgetStackPalette = new WStackedWidget( pDockClasses );
-    pWidgetStackClasses = new QStackedWidget( pWidgetStackPalette );
-    pWidgetStackPalette->addWidget( tr( "Classes" ), pWidgetStackClasses );
+//    pComboStackClasses = new WStackedWidget( pDockClasses );
+//    pWidgetStackClasses = new QStackedWidget( pComboStackClasses );
+//    pComboStackClasses->addWidget( tr( "Classes" ), pWidgetStackClasses );
 
-    pDockClasses->setWidget( pWidgetStackPalette );
+//    pDockClasses->setWidget( pComboStackClasses );
     addDockWidget( Qt::LeftDockWidgetArea, pDockClasses );
 
     pMenuWindow->addAction( pDockClasses->toggleViewAction() );
+}
+
+void SAMainWindow::doInitDockStencils()
+{
+    pDockStencils = new QDockWidget( tr("Stencils"), this );
+    pDockStencils->setObjectName( "Stencils" );
+    addDockWidget( Qt::LeftDockWidgetArea, pDockStencils );
+
+    pMenuWindow->addAction( pDockStencils->toggleViewAction() );
 }
 
 void SAMainWindow::doInitDockProperties()
@@ -370,7 +380,7 @@ bool SAMainWindow::doNew()
     pFile->setEditorWidgetParent( this );
     pTreeWidgetBrowser->setRoot( pFile );
 
-    pWidgetStackPalette->addWidget( tr( "Stencils" ), pFile->getStencilsWidget( pWidgetStackPalette ) );
+//    pComboStackStencils->addWidget( tr( "Stencils" ), pFile->getStencilsWidget( pComboStackStencils ) );
 
     connect( pFile, SIGNAL(signalChangedFileName()), this, SLOT(slotAppTitle()) );
     connect( pFile, SIGNAL(signalEditorOpened(AWObject*,AWEditorWidget*)), this, SLOT(slotEditorOpened(AWObject*,AWEditorWidget*)) );
@@ -550,8 +560,8 @@ void SAMainWindow::doConnectEditorDiagram( AWEditorWidget *p )
     // DDiagramEditorWidget *pDiagramEditorWidget = (DDiagramEditorWidget*)p;
     DDiagram *pDiagram = (DDiagram *)p->getObject();
 
-    pWidgetStackClasses->setEnabled( true );
-    pWidgetStackPanners->setEnabled( true );
+//    pWidgetStackClasses->setEnabled( true );
+//    pWidgetStackPanners->setEnabled( true );
 
     // connect any selected object
     if ( pDiagram->isSelected() )
@@ -882,8 +892,8 @@ void SAMainWindow::slotEditorFocused( int n )
     if ( pEditorWidget ) doDisconnectEditor();
     if ( n < 0 ) return;
 
-    pWidgetStackClasses->setCurrentIndex( n );
-    pWidgetStackPanners->setCurrentIndex( n );
+//    pWidgetStackClasses->setCurrentIndex( n );
+//    pWidgetStackPanners->setCurrentIndex( n );
 
     doConnectEditor( (AWEditorWidget *)pCentralWidget->currentWidget() );
 }
@@ -918,7 +928,7 @@ void SAMainWindow::slotEditorOpened( AWObject *pObject, AWEditorWidget *pEditorW
 {
     int nTab = pCentralWidget->addTab( pEditorWidget, pObject->getName() );
 
-    pWidgetStackClasses->addWidget( (QWidget*)pEditorWidget->getPalWidget() );                                                                            
+//    pWidgetStackClasses->addWidget( (QWidget*)pEditorWidget->getPalWidget() );                                                                            
     pWidgetStackPanners->addWidget( (QWidget*)pEditorWidget->getPanWidget() );                                                                              
 
     pCentralWidget->setCurrentIndex( nTab );
@@ -943,7 +953,7 @@ void SAMainWindow::slotEditorClosing( AWObject *pObject, AWEditorWidget *pEditor
     }
 
     // Just remove these - they will get deleted when the editor is deleted.
-    pWidgetStackClasses->removeWidget( pWidgetStackClasses->widget( n ) );
+//    pWidgetStackClasses->removeWidget( pWidgetStackClasses->widget( n ) );
     pWidgetStackPanners->removeWidget( pWidgetStackPanners->widget( n ) );  
 }
 

@@ -28,7 +28,7 @@ DLayoutVertical::~DLayoutVertical()
 
 QPixmap DLayoutVertical::getIcon()
 {
-    return QPixmap( ":D/VLayout" );
+    return QPixmap( ":D/LayoutVertical" );
 }
 
 void DLayoutVertical::paintAt( QPainter *pPainter, const QPointF &pointPos )

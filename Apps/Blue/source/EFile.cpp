@@ -1,9 +1,9 @@
 /*
- * Copyright 2022-2024, Peter Harvey <pharvey@codebydesign.com>
+ * Copyright 2020-2026, Peter Harvey <pharvey@codebydesign.com>
  * All rights reserved.
  *
  * This file is part of the Blue codebase.
- * This source code is not meant for public distribution.
+ * [placeholder]
  *
  */
 
@@ -60,6 +60,29 @@ QMenu *EFile::getContextMenu( QWidget *pParent )
     }
 
     return pMenu; // caller invokes and then deletes
+}
+
+QDomElement EFile::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent )
+{
+    QDomElement domElemThis = LFile::doSave( pdomDoc, pdomElemParent );
+
+    // size
+    domElemThis.setAttribute( "Width", rect.width() );
+    domElemThis.setAttribute( "Height", rect.height() );
+
+    return domElemThis;
+}
+
+bool EFile::doLoad( QDomElement *pdomElemObject )
+{
+    LFile::doLoad( pdomElemObject );
+
+//    getProxy()->doPrepareGeometryChange();
+
+    // size
+    doResize( pdomElemObject->attribute( "Width", "1000" ).toDouble(), pdomElemObject->attribute( "Height", "1000" ).toDouble() );
+
+    return true;
 }
 
 bool EFile::doImport()
@@ -435,6 +458,7 @@ bool EFile::doWriteXML( const QString &stringFileName )
 
     return true;
 }
+
 
 bool EFile::doWriteImage( const QString &stringFileName )
 {

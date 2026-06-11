@@ -1,9 +1,9 @@
 /*
- * Copyright 2022-2024, Peter Harvey <pharvey@codebydesign.com>
+ * Copyright 2020-2026, Peter Harvey <pharvey@codebydesign.com>
  * All rights reserved.
  *
  * This file is part of the Blue codebase.
- * This source code is not meant for public distribution.
+ * [placeholder]
  *
  */
 
@@ -356,7 +356,7 @@ LHandle *DRObject::getHandlePrev( LHandle *pHandle, LHandle::Type nType )
  */
 void DRObject::doCreateHandles()
 {
-    if ( !bInitTransform ) doInitTransform();
+//    if ( !bInitTransform ) bInitTransform();
 
     switch ( nSelectionState )
     {
@@ -508,12 +508,14 @@ void DRObject::doSyncHandles()
         case SelectionStateShear:
             break;
         case SelectionStateRotate:
-            QRect rectView = getView()->mapFromScene( boundingRect() ).boundingRect();
-            QPointF pointBase       = rectView.center();
-            QPointF pointIndicator  = pointBase - pointRotateDelta;
+        {
+                QRect rectView = getView()->mapFromScene( boundingRect() ).boundingRect();
+                QPointF pointBase       = rectView.center();
+                QPointF pointIndicator  = pointBase - pointRotateDelta;
 
-            vectorHandles[0]->setCenter( pointBase );
-            vectorHandles[1]->setCenter( pointIndicator );
+                vectorHandles[0]->setCenter( pointBase );
+                vectorHandles[1]->setCenter( pointIndicator );
+        }
             break;
         case SelectionStateNone:
         case SelectionStateMinimal:
@@ -597,6 +599,7 @@ void DRObject::slotRefreshGeneral()
     bAutoCommit = pSettingGeneral->property( "bAutoCommit" ).toInt();
 }
 
+/*
 void DRObject::doTransform()
 {
     QTransform t;
@@ -629,4 +632,4 @@ void DRObject::doFiniTransform()
     nShearV = 0;
     bInitTransform = false;
 }
-
+*/

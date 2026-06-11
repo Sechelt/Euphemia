@@ -6,6 +6,9 @@
 	<file alias="Dynamic">images/Dynamic48x48.png</file>
 	<file alias="Ellipse">images/Ellipse48x48.png</file>
 	<file alias="Image">images/Image200x200.png</file>
+	<file alias="LayoutGrid">images/DLayoutGrid32.png</file>
+	<file alias="LayoutHorizontal">images/DLayoutHorizontal32.png</file>
+	<file alias="LayoutVertical">images/DLayoutVertical32.png</file>
 	<file alias="Line">images/Line48x48.png</file>
 	<file alias="Line90H">images/Line90H.png</file>
 	<file alias="Line90V">images/Line90V.png</file>
@@ -20,9 +23,6 @@
 	<file alias="Anchor">images/anchor.svg</file>
 	<file alias="HSpacer">images/HSpacer.png</file>
 	<file alias="VSpacer">images/VSpacer.png</file>
-	<file alias="HLayout">images/HLayout.png</file>
-	<file alias="VLayout">images/VLayout.png</file>
-	<file alias="GLayout">images/GLayout.png</file>
 	<file alias="GroupLayout">images/GroupLayout.png</file>
 </qresource>
 </RCC>

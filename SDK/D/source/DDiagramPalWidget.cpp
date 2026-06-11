@@ -21,9 +21,9 @@ DDiagramPalWidget::DDiagramPalWidget( DDiagramEditorWidget *pEditor, QWidget *pP
     {
         QWidget *pWidgetTools = new QWidget();
         WIconLayout *pLayout = new WIconLayout;
-        pLayout->addWidget( new WIconWidget( tr( "Layout Horizontal" ), QIcon( ":D/HLayout" ).pixmap( 32, 32 ), pWidgetTools ) );
-        pLayout->addWidget( new WIconWidget( tr( "Layout Vertical" ), QIcon( ":D/VLayout" ).pixmap( 32, 32 ), pWidgetTools ) );
-        pLayout->addWidget( new WIconWidget( tr( "Layout Grid" ), QIcon( ":D/GLayout" ).pixmap( 32, 32 ), pWidgetTools ) );
+        pLayout->addWidget( new WIconWidget( tr( "Layout Horizontal" ), QIcon( ":D/LayoutHorizontal" ).pixmap( 32, 32 ), pWidgetTools ) );
+        pLayout->addWidget( new WIconWidget( tr( "Layout Vertical" ), QIcon( ":D/LayoutVertical" ).pixmap( 32, 32 ), pWidgetTools ) );
+        pLayout->addWidget( new WIconWidget( tr( "Layout Grid" ), QIcon( ":D/LayoutGrid" ).pixmap( 32, 32 ), pWidgetTools ) );
         pLayout->addWidget( new WIconWidget( tr( "Spacer Horizontal" ), QIcon( ":D/HSpacer" ).pixmap( 32, 32 ), pWidgetTools ) );
         pLayout->addWidget( new WIconWidget( tr( "Spacer Vertical" ), QIcon( ":D/VSpacer" ).pixmap( 32, 32 ), pWidgetTools ) );
 

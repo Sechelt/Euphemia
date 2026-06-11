@@ -43,6 +43,36 @@ void FRObject::setSize( const QSizeF &size )
     emit signalChangedSize( rect.size() );
 }
 
+/*!
+ * \brief Do nothing.
+ * 
+ * This comes from the widget and is always read-only.
+ * 
+ * \author pharvey (2026-02-28)
+ * 
+ * \param size   
+ */
+void FRObject::setSizeHint( const QSizeF &size )
+{
+    Q_UNUSED(size);
+}
+
+/*!
+ * \brief Do nothing.
+ * 
+ * This comes from the widget and is always read-only.
+ * 
+ * \author pharvey (2026-02-28)
+ * 
+ * \param sizeMin 
+ * \param sizeMax 
+ */
+void FRObject::setSizeConstraints( const QSizeF &sizeMin, const QSizeF &sizeMax )
+{
+    Q_UNUSED(sizeMin);
+    Q_UNUSED(sizeMax);
+}
+
 AWPropWidget *FRObject::getPropWidget( QWidget *pWidgetParent )
 {
     AWPropWidget *pPropWidget = DRectangle::getPropWidget( pWidgetParent );
@@ -58,11 +88,31 @@ AWPropWidget *FRObject::getPropWidget( QWidget *pWidgetParent )
 
 const QMetaObject *FRObject::getMetaObject() 
 { 
+    return getWidget()->metaObject(); 
+}
+
+QWidget *FRObject::getWidget()
+{
     Q_ASSERT( getProxy() );
     Q_ASSERT( getProxy()->getItem() );
     Q_ASSERT( getProxy()->getItem()->inherits( "FRGraphicsObject" ) );
     Q_ASSERT( ((FRGraphicsProxyObject*)getProxy())->widget() );
-    return ((FRGraphicsProxyObject*)getProxy())->widget()->metaObject(); 
+    return ((FRGraphicsProxyObject*)getProxy())->widget();
+}
+
+QSizeF FRObject::getSizeHint()
+{
+    return getWidget()->sizeHint();
+}
+
+QSizeF FRObject::getSizeMinimum()
+{
+    return getWidget()->minimumSize();
+}
+
+QSizeF FRObject::getSizeMaximum()
+{
+    return getWidget()->maximumSize();
 }
 
 /*
@@ -90,6 +140,36 @@ void FRObject::slotSize( const QSizeF &size )
     emit signalChangedSize( rect.size() );                                              
 }                                                                                       
 */
+
+/*!
+ * \brief Do nothing. 
+ * 
+ * This comes from the widget and is always read-only.
+ * 
+ * \author pharvey (2026-02-28)
+ * 
+ * \param size   
+ */
+void FRObject::slotSizeHint( const QSizeF &size )
+{
+    Q_UNUSED(size);
+}
+
+/*!
+ * \brief Do nothing.
+ * 
+ * This comes from the widget and is always read-only.
+ * 
+ * \author pharvey (2026-02-28)
+ * 
+ * \param sizeMin 
+ * \param sizeMax 
+ */
+void FRObject::slotSizeConstraints( const QSizeF &sizeMin, const QSizeF &sizeMax )
+{
+    Q_UNUSED(sizeMin);
+    Q_UNUSED(sizeMax);
+}
 
 /*!
  * \brief Resize, and possibly reposition, based upon a sizer handle moving.

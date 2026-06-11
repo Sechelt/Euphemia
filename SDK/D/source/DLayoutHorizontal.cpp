@@ -28,7 +28,7 @@ DLayoutHorizontal::~DLayoutHorizontal()
 
 QPixmap DLayoutHorizontal::getIcon()
 {
-    return QPixmap( ":D/HLayout" );
+    return QPixmap( ":D/LayoutHorizontal" );
 }
 
 void DLayoutHorizontal::paintAt( QPainter *pPainter, const QPointF &pointPos )

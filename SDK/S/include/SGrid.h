@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024, Peter Harvey <pharvey@codebydesign.com>
+ * Copyright 2020-2026, Peter Harvey <pharvey@codebydesign.com>
  * All rights reserved.
  *
  */

@@ -59,10 +59,14 @@ private:
     // Dock Browser
     QDockWidget *   pDockBrowser;
     AWTreeWidget *  pTreeWidgetBrowser;         
-    // Dock Pallette
+    // Dock Classes
     QDockWidget *   pDockClasses;
-    WStackedWidget *pWidgetStackPalette;        // stack containing a DStencilWidget + pWidgetStackClasses and a combobox to choose which to show
+    WStackedWidget *pComboStackClasses;         // contains pWidgetStackClasses and a combobox to select active widget
     QStackedWidget *pWidgetStackClasses;        // a stack of AWPalWidget's - one per open document - widget shown is for the document with focus
+    // Dock Stencils
+    QDockWidget *   pDockStencils;
+    WStackedWidget *pComboStackStencils;        // contains pWidgetStackStencils and a combobox to select active widget
+    QStackedWidget *pWidgetStackStencils;       // stack of 0-n stencils
     // Dock Properties
     QDockWidget *   pDockProperties;            // we get a \sa AWPropWidget from selected editor object \sa ADObject::getPropWidget()
     QMap<QString,QString> mapPropertiesCurrent; // class,propname - [class=selected object class propname=AWPropWidget::propname] [used to maintain state]
@@ -122,6 +126,7 @@ private:
     // docks
     void doInitDockBrowser();
     void doInitDockClasses();
+    void doInitDockStencils();
     void doInitDockProperties();
     void doInitDockPanner();
     void doInitDockScratchPad();

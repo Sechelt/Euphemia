@@ -1,9 +1,9 @@
 /*
- * Copyright 2022-2023, Peter Harvey <pharvey@codebydesign.com>
+ * Copyright 2020-2026, Peter Harvey <pharvey@codebydesign.com>
  * All rights reserved.
  *
- * This file is part of the Merva codebase.
- * This source code is not meant for public distribution.
+ * This file is part of the Euphemia codebase.
+ * [placeholder]
  *
  */
 #include "LibInfo.h"

@@ -83,11 +83,11 @@ void SAMainWindow::slotPropertiesCurrentChanged( const QString &stringName )
     mapPropertiesCurrent[pPropWidget->getObject()->metaObject()->className()] = stringName;
 }
 
-AWFile *SAMainWindow::getDocument()
+AWObject *SAMainWindow::getDocument()
 {
     AWEditorWidget *pEditorWidget = (AWEditorWidget*)pCentralWidget->currentWidget();
     if ( !pEditorWidget ) return nullptr;
-    return (AWFile*)pEditorWidget->getObject();
+    return pEditorWidget->getObject();
 }
 
 /*!
@@ -288,11 +288,11 @@ void SAMainWindow::doInitDockClasses()
     pDockClasses = new QDockWidget( tr( "Classes" ), this );
     pDockClasses->setObjectName( "Classes" );
 
-//    pComboStackClasses = new WStackedWidget( pDockClasses );
-//    pWidgetStackClasses = new QStackedWidget( pComboStackClasses );
-//    pComboStackClasses->addWidget( tr( "Classes" ), pWidgetStackClasses );
+    pComboStackClasses = new WStackedWidget( pDockClasses );
+    pWidgetStackClasses = new QStackedWidget( pComboStackClasses );
+    pComboStackClasses->addWidget( tr( "Classes" ), pWidgetStackClasses );
 
-//    pDockClasses->setWidget( pComboStackClasses );
+    pDockClasses->setWidget( pComboStackClasses );
     addDockWidget( Qt::LeftDockWidgetArea, pDockClasses );
 
     pMenuWindow->addAction( pDockClasses->toggleViewAction() );
@@ -462,7 +462,7 @@ bool SAMainWindow::doDelete()
 bool SAMainWindow::doPreDeleteDocument( int n )
 {
     AWEditorWidget *pEditorWidget = (AWEditorWidget*)pCentralWidget->widget( n );
-    AWFile *pDocument = (AWFile*)pEditorWidget->getObject();
+    AWObject *pDocument = pEditorWidget->getObject();
     pDocument->setModified( false ); // ensure there is no prompting
     pDocument->slotCloseEditor();
 
@@ -560,8 +560,8 @@ void SAMainWindow::doConnectEditorDiagram( AWEditorWidget *p )
     // DDiagramEditorWidget *pDiagramEditorWidget = (DDiagramEditorWidget*)p;
     DDiagram *pDiagram = (DDiagram *)p->getObject();
 
-//    pWidgetStackClasses->setEnabled( true );
-//    pWidgetStackPanners->setEnabled( true );
+    pWidgetStackClasses->setEnabled( true );
+    pWidgetStackPanners->setEnabled( true );
 
     // connect any selected object
     if ( pDiagram->isSelected() )
@@ -892,8 +892,8 @@ void SAMainWindow::slotEditorFocused( int n )
     if ( pEditorWidget ) doDisconnectEditor();
     if ( n < 0 ) return;
 
-//    pWidgetStackClasses->setCurrentIndex( n );
-//    pWidgetStackPanners->setCurrentIndex( n );
+    pWidgetStackClasses->setCurrentIndex( n );
+    pWidgetStackPanners->setCurrentIndex( n );
 
     doConnectEditor( (AWEditorWidget *)pCentralWidget->currentWidget() );
 }

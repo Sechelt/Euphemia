@@ -4,6 +4,7 @@
 	<file alias="Layers">images/Layers.png</file>
 	<file alias="Draw">images/Draw.png</file>
 <!-- tools -->
+	<file alias="Arrow">images/Arrow.png</file>
  	<file alias="Manipulate">images/Manipulate.png</file>
 	<file alias="SelectRectangle">images/SelectRectangle.png</file>
 	<file alias="SelectPolygon">images/SelectPolygon.png</file>

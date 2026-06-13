@@ -501,6 +501,11 @@ void EMainWindow::doInitToolbar()
     pToolBar->addWidget( g_SSettings->getSetting( "SPen" )->getToolBar( this ) );
     pMenuToolBars->addAction( pToolBar->toggleViewAction() );
 
+    pToolBar = addToolBar( tr("Arrow") );
+    pToolBar->setObjectName( "Arrow" );
+    pToolBar->addWidget( g_SSettings->getSetting( "SArrow" )->getToolBar( this ) );
+    pMenuToolBars->addAction( pToolBar->toggleViewAction() );
+
     pToolBar = addToolBar( tr("Brush") );
     pToolBar->setObjectName( "Brush" );
     pToolBar->addWidget( g_SSettings->getSetting( "SBrush" )->getToolBar( this ) );

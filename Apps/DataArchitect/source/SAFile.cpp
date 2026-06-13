@@ -255,20 +255,25 @@ bool SAFile::slotNewDocument()
     SANewDialog dialog( getEditorWidgetParent() );
     if ( dialog.exec() != QDialog::Accepted ) return false;
     QString stringClass = dialog.getSelected();
+
+    // SANITY CHECKS
     if ( stringClass.isEmpty() ) return false;
-printf( "[%s][%s][%d] cast to AWFile is WRONG - where else is this happening?\n", __FILE__, __FUNCTION__, __LINE__ );
-    AWFile *pFile = (AWFile*)getObject( stringClass );
-    if ( pFile->inherits( "ODBCDrvModel" ) ) 
+    ADObject *pObject = getObject( stringClass );
+    Q_ASSERT( pObject );
+    Q_ASSERT( pObject->inherits( "AWObject" ) );
+
+    AWObject *pDocument = (AWObject*)pObject;
+    if ( pDocument->inherits( "ODBCDrvModel" ) ) 
     { 
-        ODBCDrvModel *p = (ODBCDrvModel*)pFile;
+        ODBCDrvModel *p = (ODBCDrvModel*)pDocument;
         if ( !p->slotQueryForFeatures() )
         {
             p->slotDelete();
             return false;
         }
     }
-    pFile->slotOpenEditor();
-    pFile->slotObjectDialog( getEditorWidgetParent() );
+    pDocument->slotOpenEditor();
+    pDocument->slotObjectDialog( getEditorWidgetParent() );
 
     return true;
 }

@@ -132,6 +132,7 @@
             Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
             GUID="{420B6470-FC23-4ABD-9D2D-C6109E5BA76B}">
             <F N="source/DRArc.cpp"/>
+            <F N="source/DRArrow.cpp"/>
             <F N="source/DRChord.cpp"/>
             <F N="source/DRDraw.cpp"/>
             <F N="source/DREllipse.cpp"/>
@@ -156,6 +157,7 @@
             GUID="{473171DF-B310-41B6-9345-C4182219A834}">
             <F N="include/DR.h"/>
             <F N="include/DRArc.h"/>
+            <F N="include/DRArrow.h"/>
             <F N="include/DRChord.h"/>
             <F N="include/DRDraw.h"/>
             <F N="include/DREllipse.h"/>
@@ -182,7 +184,24 @@
         <Folder
             Name="Bitmaps"
             Filters="*.bmp"
-            GUID="{8835C252-58E0-44A4-A6E0-0B476DF7D3B6}"/>
+            GUID="{8835C252-58E0-44A4-A6E0-0B476DF7D3B6}">
+            <F N="images/Arc.png"/>
+            <F N="images/Arrow.png"/>
+            <F N="images/Chord.png"/>
+            <F N="images/Draw.png"/>
+            <F N="images/Ellipse.png"/>
+            <F N="images/Image.png"/>
+            <F N="images/Layers.png"/>
+            <F N="images/Line.png"/>
+            <F N="images/Manipulate.png"/>
+            <F N="images/Pie.png"/>
+            <F N="images/Polygon.png"/>
+            <F N="images/Polyline.png"/>
+            <F N="images/Rectangle.png"/>
+            <F N="images/SelectPolygon.png"/>
+            <F N="images/SelectRectangle.png"/>
+            <F N="images/Text.png"/>
+        </Folder>
         <Folder
             Name="Other Files"
             Filters=""

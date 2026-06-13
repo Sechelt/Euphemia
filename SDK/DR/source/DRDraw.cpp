@@ -26,6 +26,7 @@ DRDraw::DRDraw( LFile *pParent, const QString &stringName )
     // here is what getObject() can create
     mapMeta.clear();
     mapMeta.insert( "DRArc", ADMeta( QIcon( ":DR/Arc" ), "DRArc", "Arc" ) );
+    mapMeta.insert( "DRArrow", ADMeta( QIcon( ":DR/Arrow" ), "DRArrow", "Arrow" ) );
     mapMeta.insert( "DRChord", ADMeta( QIcon( ":DR/Chord" ), "DRChord", "Chord" ) );
     mapMeta.insert( "DRImage", ADMeta( QIcon( ":DR/Image" ), "DRImage", "Image" ) );
     mapMeta.insert( "DREllipse", ADMeta( QIcon( ":DR/Ellipse" ), "DREllipse", "Ellipse" ) );
@@ -70,6 +71,7 @@ void DRDraw::setTool( int n, bool bCancelDrawing )
             nMouseEventState = MouseEventStateManipulate;
             break;
         case ToolDrawArc:
+        case ToolDrawArrow:
         case ToolDrawChord:
         case ToolDrawImage:
         case ToolDrawPie:
@@ -99,6 +101,7 @@ QVector<LTool> DRDraw::getTools()
     vectorReturn.append( LTool( ToolSelectPolygon, tr( "select using a polygon" ), QPixmap( ":DR/SelectPolygon" ), tr( "select using a polygon" ) ) );
     vectorReturn.append( LTool( ToolManipulate, tr( "select and manipulate" ), QPixmap( ":DR/Manipulate" ), tr( "select and manipulate" ) ) );
     vectorReturn.append( LTool( ToolDrawArc, tr( "arc" ), QPixmap( ":DR/Arc" ), tr( "arc" ) ) );
+    vectorReturn.append( LTool( ToolDrawArrow, tr( "arrow" ), QPixmap( ":DR/Arrow" ), tr( "arrow" ) ) );
     vectorReturn.append( LTool( ToolDrawChord, tr( "chord" ), QPixmap( ":DR/Chord" ), tr( "chord" ) ) );
     vectorReturn.append( LTool( ToolDrawImage, tr( "image" ), QPixmap( ":DR/Image" ), tr( "image" ) ) );
     vectorReturn.append( LTool( ToolDrawPie, tr( "pie" ), QPixmap( ":DR/Pie" ), tr( "pie" ) ) );
@@ -155,6 +158,7 @@ QWidget* DRDraw::getToolBar( QWidget *pParent )
         case ToolSelectPolygon:
         case ToolManipulate:
         case ToolDrawArc:
+        case ToolDrawArrow:
         case ToolDrawChord:
         case ToolDrawImage:
         case ToolDrawPie:
@@ -182,6 +186,7 @@ QWidget* DRDraw::getPanel( QWidget *pParent )
         case ToolSelectPolygon:
         case ToolManipulate:
         case ToolDrawArc:
+        case ToolDrawArrow:
         case ToolDrawChord:
         case ToolDrawImage:
         case ToolDrawPie:
@@ -207,6 +212,10 @@ ADObject* DRDraw::getObject( const QString &s, ADObject * )
     QString   stringClass     = getClass( s );
 
     if ( stringClass == "DRArc" )
+    {
+        pObject = new DRArc( this );
+    }
+    else if ( stringClass == "DRArrow" )
     {
         pObject = new DRArc( this );
     }
@@ -284,6 +293,8 @@ QString DRDraw::getToolString()
             return "ToolManipulate";
         case ToolDrawArc:
             return "ToolDrawArc";
+        case ToolDrawArrow:
+            return "ToolDrawArrow";
         case ToolDrawChord:
             return "ToolDrawChord";
         case ToolDrawImage:
@@ -1571,6 +1582,9 @@ DRObject* DRDraw::getObject( Tools nTool, const QPointF &point )
             break;
         case ToolDrawArc:
             pObject = new DRArc( this, point );
+            break;
+        case ToolDrawArrow:
+            pObject = new DRArrow( this, point );
             break;
         case ToolDrawChord:
             pObject = new DRChord( this, point );

@@ -110,7 +110,7 @@ private:
 
     QAction *pActionHelpMenu;
 
-    AWFile *getDocument();
+    AWObject *getDocument();
     QString getFileNameUserFriendly( const QString &stringFileName, int nMaxPath = 50 );
     QString getFileBaseName( const QString &stringFileName );
     QString getFilePathShort( const QString &stringFileName, int nMaxPath );

@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/W"> 
+	<file alias="Arrow">images/Arrow.png</file>
 	<file alias="AssociationLink16x16">images/AssociationLink16x16.png</file>
 	<file alias="AlignTop16x16">images/AlignTop16x16.png</file>
 	<file alias="AlignVCenter16x16">images/AlignVCenter16x16.png</file>

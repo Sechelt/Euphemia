@@ -55,6 +55,7 @@
             Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.scala;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl;*.d;*.m;*.mm;*.go;*.groovy;*.gsh"
             GUID="{4DD3A91E-37EF-4E6E-BE12-138D1D86DD12}">
             <F N="source/LibInfo.h"/>
+            <F N="source/SArrow.cpp"/>
             <F N="source/SBrush.cpp"/>
             <F N="source/SColors.cpp"/>
             <F N="source/SColorsPickerDialog.cpp"/>
@@ -73,6 +74,7 @@
             Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.h++;*.inc;*.sh;*.cpy;*.if"
             GUID="{D8E7C061-BA25-48B5-80D0-388120F2B2DC}">
             <F N="include/S.h"/>
+            <F N="include/SArrow.h"/>
             <F N="include/SBrush.h"/>
             <F N="include/SColors.h"/>
             <F N="include/SColorsPickerDialog.h"/>

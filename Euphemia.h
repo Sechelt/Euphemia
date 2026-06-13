@@ -7,7 +7,7 @@
 
     // used by about dialog
     #define CBD_LICENSE "Free - without warranty of any kind"
-    #define CBD_COPYRIGHT "2000-2025 All Rights Reserved"
+    #define CBD_COPYRIGHT "2000-2026 All Rights Reserved"
     #define CBD_VERSION "6.0.1"
     #define CBD_MAJOUR 6
     #define CBD_MINOR 0

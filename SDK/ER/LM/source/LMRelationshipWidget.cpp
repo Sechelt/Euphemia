@@ -22,20 +22,29 @@ LMRelationshipDetailsWidget::LMRelationshipDetailsWidget( LMRelationship *p, CBD
     pCheckBoxDominant = new QCheckBox( this );
     pCheckBoxDominant->setChecked( pRelationship->isDominant( nEOL ) );
     pLayout->addRow( tr("Dominant:"), pCheckBoxDominant );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pCheckBoxDominant, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotDominant(Qt::CheckState)) );
-
+#else
+    connect( pCheckBoxDominant, SIGNAL(stateChanged(int)), SLOT(slotDominant(int)) );
+#endif
     // Identified
     pCheckBoxIdentified = new QCheckBox( this );
     pCheckBoxIdentified->setChecked( pRelationship->isIdentified( nEOL ) );
     pLayout->addRow( tr("Identified:"), pCheckBoxIdentified );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pCheckBoxIdentified, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotIdentified(Qt::CheckState)) );
-
+#else
+    connect( pCheckBoxIdentified, SIGNAL(stateChanged(int)), SLOT(slotIdentified(int)) );
+#endif
     // Dependent
     pCheckBoxDependent = new QCheckBox( this );
     pCheckBoxDependent->setChecked( pRelationship->isDependent( nEOL ) );
     pLayout->addRow( tr("Dependent:"), pCheckBoxDependent );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pCheckBoxDependent, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotDependent(Qt::CheckState)) );
-
+#else
+    connect( pCheckBoxDependent, SIGNAL(stateChanged(int)), SLOT(slotDependent(int)) );
+#endif
     // Cardinality
     QStringList stringlistCardinality  = pRelationship->getCardinality( nEOL ).split( ',' );
     pComboBoxCardinalityMin = new QComboBox( this );
@@ -117,8 +126,11 @@ LMRelationshipWidget::LMRelationshipWidget( LMRelationship *p, Qt::Orientation n
 
         pGenerate = new QCheckBox( this );
         pGenerate->setChecked( pRelationship->isGenerate() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
         connect( pGenerate, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotGenerate(Qt::CheckState)) );
-
+#else
+        connect( pGenerate, SIGNAL(stateChanged(int)), SLOT(slotGenerate(int)) );
+#endif
         pLayout->addWidget( new QLabel( tr("Generate:"), this ) );
         pLayout->addWidget( pGenerate );
         pLayout->addStretch( 10 );

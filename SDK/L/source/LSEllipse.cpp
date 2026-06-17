@@ -115,8 +115,11 @@ LSEllipsePanel::LSEllipsePanel( QWidget *p )
     pBind->setToolTip( tr("geometry: change V/H lengths the same amount to create a circle") );
     pBind->setCheckState( pSetting->getBind() ? Qt::Checked : Qt::Unchecked );
     pLayout->addRow( tr("Bind"), pBind );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pBind, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotBind(Qt::CheckState)) );
-
+#else
+    connect( pBind, SIGNAL(stateChanged(int)), SLOT(slotBind(int)) );
+#endif
     connect( pSetting, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
     connect( pSetting, SIGNAL(signalSync()), SLOT(slotRefresh()) );
 }
@@ -126,7 +129,11 @@ void LSEllipsePanel::slotRefresh()
     pBind->setCheckState( pSetting->getBind() ? Qt::Checked : Qt::Unchecked );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSEllipsePanel::slotBind( Qt::CheckState n )
+#else
+void LSEllipsePanel::slotBind( int n )
+#endif
 {
     pSetting->setBind( (bool)n );
 }

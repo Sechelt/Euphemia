@@ -72,7 +72,11 @@ PMDomainChecksWidget::PMDomainChecksWidget( PMDomain *pDomain, QWidget *pParent 
     pcheckboxForceUpperCase->setChecked( pDomain->getForceUpperCase() );                                                                
     pcheckboxForceUpperCase->setToolTip( tr("force values to upper case") );                                                             
     pTableWidget->setCellWidget( nRow, 1, pcheckboxForceUpperCase );                                                                          
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pcheckboxForceUpperCase, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotForceUpper(Qt::CheckState)) );
+#else
+    connect( pcheckboxForceUpperCase, SIGNAL(stateChanged(int)), SLOT(slotForceUpper(int)) );
+#endif
                                                                                                                                         
     // LOWER CASE                                                                                                                       
     nRow++;                                                                                                                             
@@ -82,7 +86,11 @@ PMDomainChecksWidget::PMDomainChecksWidget( PMDomain *pDomain, QWidget *pParent 
     pcheckboxForceLowerCase->setChecked( pDomain->getForceLowerCase() );                                                                
     pcheckboxForceLowerCase->setToolTip( tr("force values to lower case") );                                                             
     pTableWidget->setCellWidget( nRow, 1, pcheckboxForceLowerCase );                                                                          
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pcheckboxForceLowerCase, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotForceLower(Qt::CheckState)) );
+#else
+    connect( pcheckboxForceLowerCase, SIGNAL(stateChanged(int)), SLOT(slotForceLower(int)) );
+#endif
                                                                                                                                         
     // RESTRICT MODIFY                                                                                                                  
     nRow++;                                                                                                                             
@@ -92,7 +100,11 @@ PMDomainChecksWidget::PMDomainChecksWidget( PMDomain *pDomain, QWidget *pParent 
     pcheckboxRestrictModify->setChecked( pDomain->getRestrictModify() );                                                                
     pcheckboxRestrictModify->setToolTip( tr("restrict ability to modify value") );                                                       
     pTableWidget->setCellWidget( nRow, 1, pcheckboxRestrictModify );                                                                          
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pcheckboxRestrictModify, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotRestrictModify(Qt::CheckState)) );
+#else
+    connect( pcheckboxRestrictModify, SIGNAL(stateChanged(int)), SLOT(slotRestrictModify(int)) );
+#endif
 
     // restore geometry                                                                                                                 
 /*

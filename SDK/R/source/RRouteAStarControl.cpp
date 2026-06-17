@@ -10,17 +10,29 @@ RRouteAStarControl::RRouteAStarControl( RRouteAStar *p, QWidget *pParent )
     pLayout->addWidget( new QLabel( "View", this  ) );
     pExploreLines = new QCheckBox( "Explore Lines", this  );
     pExploreLines->setChecked( pRoute->isExploreLines() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pExploreLines, SIGNAL(checkStateChanged(Qt::CheckState)), pRoute, SLOT(slotExploreLines(Qt::CheckState)) );
+#else
+    connect( pExploreLines, SIGNAL(stateChanged(int)), pRoute, SLOT(slotExploreLines(int)) );
+#endif
     pLayout->addWidget( pExploreLines );
 
     pRouteLines = new QCheckBox( "Route Lines", this  );
     pRouteLines->setChecked( pRoute->isRouteLines() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pRouteLines, SIGNAL(checkStateChanged(Qt::CheckState)), pRoute, SLOT(slotRouteLines(Qt::CheckState)) );
+#else
+    connect( pRouteLines, SIGNAL(stateChanged(int)), pRoute, SLOT(slotRouteLines(int)) );
+#endif
     pLayout->addWidget( pRouteLines );
 
     pDetails = new QCheckBox( "Details", this  );
     pDetails->setChecked( pRoute->isDetails() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pDetails, SIGNAL(checkStateChanged(Qt::CheckState)), pRoute, SLOT(slotDetails(Qt::CheckState)) );
+#else
+    connect( pDetails, SIGNAL(stateChanged(int)), pRoute, SLOT(slotDetails(int)) );
+#endif
     pLayout->addWidget( pDetails );
 
     pLayout->addWidget( new QLabel( "Heuristic", this  ) );
@@ -35,12 +47,20 @@ RRouteAStarControl::RRouteAStarControl( RRouteAStar *p, QWidget *pParent )
 
     pDiagonal = new QCheckBox( "Diagonal", this  );
     pDiagonal->setChecked( pRoute->isDiagonal() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pDiagonal, SIGNAL(checkStateChanged(Qt::CheckState)), pRoute, SLOT(slotDiagonal(Qt::CheckState)) );
+#else
+    connect( pDiagonal, SIGNAL(stateChanged(int)), pRoute, SLOT(slotDiagonal(int)) );
+#endif
     pLayout->addWidget( pDiagonal );
 
     pStraightLine = new QCheckBox( "Straight Line", this );
     pStraightLine->setChecked( pRoute->isStraightLinePreference() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pStraightLine, SIGNAL(checkStateChanged(Qt::CheckState)), pRoute, SLOT(slotStraightLine(Qt::CheckState)) );
+#else
+    connect( pStraightLine, SIGNAL(stateChanged(int)), pRoute, SLOT(slotStraightLine(int)) );
+#endif
     pLayout->addWidget( pStraightLine );
 
     pLayout->addWidget( new QLabel( "Straight Line", this  ) );

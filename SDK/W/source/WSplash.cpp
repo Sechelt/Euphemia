@@ -32,7 +32,11 @@ WSplash::WSplash( QWidget *pwidgetParent, const QPixmap &pixmap, bool bShowCheck
         pShow = new QCheckBox( tr( "Show Splash" ), this );
         pShow->setChecked( QSettings().value( "Splash", false ).toInt() );
         pgridlayout->addWidget( pShow, 0, 0 );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
         connect( pShow, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotShow(Qt::CheckState)) );
+#else
+        connect( pShow, SIGNAL(stateChanged(int)), SLOT(slotShow(int)) );
+#endif
     }
 
     if ( bShowButton ) 

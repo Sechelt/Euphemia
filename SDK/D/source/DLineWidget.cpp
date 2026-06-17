@@ -60,9 +60,13 @@ DLineConnectorWidget::DLineConnectorWidget( DLine *p, QWidget *pParent )
 
     connect( pComboBoxBegin, SIGNAL(signalChanged(W::WLineEndStyles)), pLine, SLOT(slotStyleBegin(W::WLineEndStyles)) );
     connect( pComboBoxEnd, SIGNAL(signalChanged(W::WLineEndStyles)), pLine, SLOT(slotStyleEnd(W::WLineEndStyles)) );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pCheckBoxBegin, SIGNAL(checkStateChanged(Qt::CheckState)), pLine, SLOT(slotTruncateBegin(Qt::CheckState)) );
     connect( pCheckBoxEnd, SIGNAL(checkStateChanged(Qt::CheckState)), pLine, SLOT(slotTruncateEnd(Qt::CheckState)) );
-
+#else
+    connect( pCheckBoxBegin, SIGNAL(stateChanged(int)), pLine, SLOT(slotTruncateBegin(int)) );
+    connect( pCheckBoxEnd, SIGNAL(stateChanged(int)), pLine, SLOT(slotTruncateEnd(int)) );
+#endif
     connect( pLine, SIGNAL(signalModified()), SLOT(slotModified()) );
 }
 

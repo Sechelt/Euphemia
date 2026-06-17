@@ -15,14 +15,20 @@ LMInheritanceWidget::LMInheritanceWidget( LMInheritance *p, QWidget *pParent )
     pMutuallyExclusive = new QCheckBox( this );
     pMutuallyExclusive->setChecked( pInheritance->isMutuallyExclusive() );
     pLayout->addRow( tr("Mutually Exclusive:"), pMutuallyExclusive );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pMutuallyExclusive, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotMutuallyExclusive(Qt::CheckState)) );
-
+#else
+    connect( pMutuallyExclusive, SIGNAL(stateChanged(int)), SLOT(slotMutuallyExclusive(int)) );
+#endif
     // Complete
     pComplete = new QCheckBox( this );
     pComplete->setChecked( pInheritance->isComplete() );
     pLayout->addRow( tr("Complete:"), pComplete );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pComplete, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotComplete(Qt::CheckState)) );
-
+#else
+    connect( pComplete, SIGNAL(stateChanged(int)), SLOT(slotComplete(int)) );
+#endif
     // Base Entity
     {
         // load up a combo box with all LMEntityNormal entities attached via a LMInheritanceLink 

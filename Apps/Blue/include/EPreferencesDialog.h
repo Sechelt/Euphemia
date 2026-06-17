@@ -56,8 +56,13 @@ protected:
     QCheckBox *pSplash;      
 
 protected slots:
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     void slotRestoreState( Qt::CheckState n );
     void slotSplash( Qt::CheckState n );
+#else
+    void slotRestoreState( int n );
+    void slotSplash( int n );
+#endif
 };
 
 #endif

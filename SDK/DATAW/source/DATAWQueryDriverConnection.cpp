@@ -94,8 +94,11 @@ DATAWDriverMariaWidget::DATAWDriverMariaWidget( QWidget *pParent )
     pPassword->setEchoMode( QLineEdit::Password );
     pShowPassword->setChecked( false );
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pShowPassword, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotShowPassword(Qt::CheckState)) );
-
+#else
+    connect( pShowPassword, SIGNAL(stateChanged(int)), SLOT(slotShowPassword(int)) );
+#endif
     QFormLayout *pLayout = new QFormLayout( this );
     pLayout->addRow( tr("Server"), pServer );
     pLayout->addRow( tr("User"), pUser );

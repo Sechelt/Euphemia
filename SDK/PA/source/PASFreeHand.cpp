@@ -152,8 +152,11 @@ PASFreeHandToolBar::PASFreeHandToolBar( QWidget *p )
     pLineTo->setToolTip( tr("draw a line between points or just points") );
     pLineTo->setCheckState( (Qt::CheckState)pSetting->getLineTo() );
     pLayout->addWidget( pLineTo, 10 );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pLineTo, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotLineTo(Qt::CheckState)) );
-
+#else
+    connect( pLineTo, SIGNAL(stateChanged(int)), SLOT(slotLineTo(int)) );
+#endif
     pLayout->addStretch( 16 );
 
     pWidth->setVisible( pSetting->getShape() != PASFreeHand::ShapePen );
@@ -263,7 +266,11 @@ PASFreeHandPanel::PASFreeHandPanel( QWidget *p )
     pLineTo = new QCheckBox( this );
     pLineTo->setToolTip( tr("draw a line between points or just points") );
     pLineTo->setCheckState( (Qt::CheckState)pSetting->getLineTo() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pLineTo, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotLineTo(Qt::CheckState)) );
+#else
+    connect( pLineTo, SIGNAL(stateChanged(int)), SLOT(slotLineTo(int)) );
+#endif
     // layout
     QFormLayout *pLayout = new QFormLayout( this );
     pLayout->addRow( tr("Shape"), pShape );
@@ -329,7 +336,11 @@ void PASFreeHandPanel::slotImage()
     pSetting->setImage( image );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void PASFreeHandPanel::slotLineTo( Qt::CheckState n )
+#else
+void PASFreeHandPanel::slotLineTo( int n )
+#endif
 {
     pSetting->setLineTo( (bool)n );
 }

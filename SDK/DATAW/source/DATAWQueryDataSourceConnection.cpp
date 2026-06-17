@@ -40,8 +40,11 @@ DATAWDataSourceConnectWidget::DATAWDataSourceConnectWidget( QWidget *pParent )
     pAuthentication->setEchoMode( QLineEdit::Password );
     pShowAuthentication->setChecked( false );
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pShowAuthentication, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotShowAuthentication(Qt::CheckState)) );
-
+#else
+    connect( pShowAuthentication, SIGNAL(stateChanged(int)), SLOT(slotShowAuthentication(int)) );
+#endif
     QFormLayout *pLayout = new QFormLayout( this );
     pLayout->addRow( tr("User Name"), pUserName );
     pLayout->addRow( tr("Authentication"), pAuthentication );

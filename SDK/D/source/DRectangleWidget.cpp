@@ -32,8 +32,11 @@ DRectangleTextWidget::DRectangleTextWidget( DRectangle *p, QWidget *pParent )
     pWordWrap = new QCheckBox( this );
     pWordWrap->setChecked( pRectangle->isWordWrap() );
     pLayout->addRow( tr( "WordWrap:" ), pWordWrap );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pWordWrap, SIGNAL(checkStateChanged(Qt::CheckState)), pRectangle, SLOT(slotWordWrap(Qt::CheckState)) );
-
+#else
+    connect( pWordWrap, SIGNAL(stateChanged(int)), pRectangle, SLOT(slotWordWrap(int)) );
+#endif
     pLayoutTop->addLayout( pLayout );
     pLayoutTop->addStretch( 10 );
 

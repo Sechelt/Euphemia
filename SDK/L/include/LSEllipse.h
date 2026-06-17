@@ -83,7 +83,11 @@ public slots:
     void slotRefresh();
 
 protected slots:
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     void slotBind( Qt::CheckState );
+#else
+    void slotBind( int );
+#endif
 
 protected:
     LSEllipse *    pSetting;

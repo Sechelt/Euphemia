@@ -104,25 +104,42 @@ LSRenderWidget::LSRenderWidget( QWidget *p, Qt::Orientation n )
     pAntialiasing->setTristate( false );
     pAntialiasing->setToolTip( tr("Indicates that the engine should antialias edges of primitives if possible.") );
     pAntialiasing->setChecked( pSetting->getRenderAntialiasing() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pAntialiasing, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotRenderAntialiasing(Qt::CheckState)) );
+#else
+    connect( pAntialiasing, SIGNAL(stateChanged(int)), SLOT(slotRenderAntialiasing(int)) );
+#endif
+
 
     pTextAntialiasing = new QCheckBox( this );
     pTextAntialiasing->setTristate( false );
     pTextAntialiasing->setToolTip( tr("Indicates that the engine should antialias text if possible.") );
     pTextAntialiasing->setChecked( pSetting->getRenderTextAntialiasing() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pTextAntialiasing, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotRenderTextAntialiasing(Qt::CheckState)) );
+#else
+    connect( pTextAntialiasing, SIGNAL(stateChanged(int)), SLOT(slotRenderTextAntialiasing(int)) );
+#endif
 
     pSmoothPixmapTransform = new QCheckBox( this );
     pSmoothPixmapTransform->setTristate( false );
     pSmoothPixmapTransform->setToolTip( tr("Indicates that the engine should use a smooth pixmap\ntransformation algorithm (such as bilinear) rather than nearest neighbor.") );
     pSmoothPixmapTransform->setChecked( pSetting->getRenderSmoothPixmapTransform() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pSmoothPixmapTransform, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotRenderSmoothPixmapTransform(Qt::CheckState)) );
+#else
+    connect( pSmoothPixmapTransform, SIGNAL(stateChanged(int)), SLOT(slotRenderSmoothPixmapTransform(int)) );
+#endif
 
     pLosslessImageRendering = new QCheckBox( this );
     pLosslessImageRendering->setTristate( false );
     pLosslessImageRendering->setToolTip( tr("Encode images using a lossless compression algorithm instead of lossy JPEG compression.") );
     pLosslessImageRendering->setChecked( pSetting->getRenderLosslessImageRendering() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pLosslessImageRendering, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotRenderLosslessImageRendering(Qt::CheckState)) );
+#else
+    connect( pLosslessImageRendering, SIGNAL(stateChanged(int)), SLOT(slotRenderLosslessImageRendering(int)) );
+#endif
 
     if ( n == Qt::Horizontal )
     {
@@ -166,22 +183,38 @@ void LSRenderWidget::slotRefresh()
     pLosslessImageRendering->setChecked( pSetting->getRenderLosslessImageRendering() );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSRenderWidget::slotRenderAntialiasing( Qt::CheckState t )
+#else
+void LSRenderWidget::slotRenderAntialiasing( int t )
+#endif
 {
     pSetting->setRenderAntialiasing( t );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSRenderWidget::slotRenderTextAntialiasing( Qt::CheckState t )
+#else
+void LSRenderWidget::slotRenderTextAntialiasing( int t )
+#endif
 {
     pSetting->setRenderTextAntialiasing( t );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSRenderWidget::slotRenderSmoothPixmapTransform( Qt::CheckState t )
+#else
+void LSRenderWidget::slotRenderSmoothPixmapTransform( int t )
+#endif
 {
     pSetting->setRenderSmoothPixmapTransform( t );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSRenderWidget::slotRenderLosslessImageRendering( Qt::CheckState t )
+#else
+void LSRenderWidget::slotRenderLosslessImageRendering( int t )
+#endif
 {
     pSetting->setRenderLosslessImageRendering( t );
 }

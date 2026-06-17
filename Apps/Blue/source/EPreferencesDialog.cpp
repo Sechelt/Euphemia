@@ -48,6 +48,8 @@ EPreferencesDialog::EPreferencesDialog( QWidget *pParent )
 
     QVBoxLayout *pLayoutDialog = new QVBoxLayout( this );
 
+    Q_UNUSED(pItem02);
+
     pSplitter = new QSplitter( Qt::Horizontal, this );
     pSplitter->setChildrenCollapsible( false );
     pSplitter->setStretchFactor( 1, 10 );
@@ -63,10 +65,10 @@ EPreferencesDialog::EPreferencesDialog( QWidget *pParent )
     pItem01 = doAddPanel( tr("Render"), g_SSettings->getSetting( "LSRender" )->getPanel( pPanels ) );
 
     pItem01 = doAddPanel( tr("Edit"), new QWidget( pPanels ) );
-    pItem02 = doAddPanel( pItem01, tr("General"), g_SSettings->getSetting( "LSGeneral" )->getPanel( pPanels ) );
     pItem02 = doAddPanel( pItem01, tr("Background"), g_SSettings->getSetting( "LSBackground" )->getPanel( pPanels ) );
 
     pItem01 = doAddPanel( tr("View"), new QWidget( pPanels ) );
+    pItem02 = doAddPanel( pItem01, tr("General"), g_SSettings->getSetting( "LSGeneral" )->getPanel( pPanels ) );
     pItem02 = doAddPanel( pItem01, tr("Page"), g_SSettings->getSetting( "LSPage" )->getPanel( pPanels ) );
     pItem02 = doAddPanel( pItem01, tr("Grid"), g_SSettings->getSetting( "LSGrid" )->getPanel( pPanels ) );
     pItem02 = doAddPanel( pItem01, tr("Ruler"), g_SSettings->getSetting( "SRuler" )->getPanel( pPanels ) );
@@ -212,20 +214,36 @@ EPreferencesStartUpPanel::EPreferencesStartUpPanel( QWidget *pParent )
     pRestoreState = new QCheckBox( this );
     pRestoreState->setChecked( QSettings().value( "RestoreState", false ).toInt() );
     pLayout->addRow( tr("Restore Window State"), pRestoreState );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pRestoreState, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotRestoreState(Qt::CheckState)) );
+#else
+    connect( pRestoreState, SIGNAL(stateChanged(int)), SLOT(slotRestoreState(int)) );
+#endif
 
     pSplash = new QCheckBox( this );
     pSplash->setChecked( QSettings().value( "Splash", false ).toInt() );
     pLayout->addRow( tr("Show Splash"), pSplash );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pSplash, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotSplash(Qt::CheckState)) );
+#else
+    connect( pSplash, SIGNAL(stateChanged(int)), SLOT(slotSplash(int)) );
+#endif
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void EPreferencesStartUpPanel::slotRestoreState( Qt::CheckState n )
+#else
+void EPreferencesStartUpPanel::slotRestoreState( int n )
+#endif
 {
     QSettings().setValue( "RestoreState", (int)n );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void EPreferencesStartUpPanel::slotSplash( Qt::CheckState n )
+#else
+void EPreferencesStartUpPanel::slotSplash( int n )
+#endif
 {
     QSettings().setValue( "Splash", (int)n );
 }

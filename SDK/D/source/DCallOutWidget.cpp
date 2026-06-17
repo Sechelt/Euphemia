@@ -32,8 +32,11 @@ DCallOutTextWidget::DCallOutTextWidget( DCallOut *p, QWidget *pParent )
     pWordWrap = new QCheckBox( this );
     pWordWrap->setChecked( pCallOut->isWordWrap() );
     pLayout->addRow( tr( "WordWrap:" ), pWordWrap );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pWordWrap, SIGNAL(checkStateChanged(Qt::CheckState)), pCallOut, SLOT(slotWordWrap(Qt::CheckState)) );
-
+#else
+    connect( pWordWrap, SIGNAL(stateChanged(int)), pCallOut, SLOT(slotWordWrap(int)) );
+#endif
     pLayoutTop->addLayout( pLayout );
     pLayoutTop->addStretch( 10 );
 
@@ -63,8 +66,11 @@ DCallOutConnectorWidget::DCallOutConnectorWidget( DCallOut *p, QWidget *pParent 
 
     pCheckBoxEnd = new QCheckBox( tr("Truncate"), this );
     pCheckBoxEnd->setChecked( pCallOut->isTruncate( CBD::EOLEnd ) );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pCheckBoxEnd, SIGNAL(checkStateChanged(Qt::CheckState)), pCallOut, SLOT(slotTruncateEnd(Qt::CheckState)) );
-
+#else
+    connect( pCheckBoxEnd, SIGNAL(stateChanged(int)), pCallOut, SLOT(slotTruncateEnd(int)) );
+#endif
     pLayoutTop->addRow( "End: ", pComboBoxEnd );
     pLayoutTop->addRow( "", pCheckBoxEnd );
 

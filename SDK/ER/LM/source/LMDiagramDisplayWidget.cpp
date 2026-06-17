@@ -23,10 +23,17 @@ LMDiagramDisplayWidget::LMDiagramDisplayWidget( LMModel *pDiagram, QWidget *pPar
     if ( pDiagram->getDisplayFlags() & LMModel::DisplayParams ) pcheckboxDisplayParams->setChecked( true );                             
     if ( pDiagram->getDisplayFlags() & LMModel::DisplayDefault ) pcheckboxDisplayDefault->setChecked( true );                            
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pcheckboxDisplayDataType, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotDomain(Qt::CheckState)) );
     connect( pcheckboxDisplayDomain, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotDataType(Qt::CheckState)) );
     connect( pcheckboxDisplayParams, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotParams(Qt::CheckState)) );
     connect( pcheckboxDisplayDefault, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotDefault(Qt::CheckState)) );
+#else
+    connect( pcheckboxDisplayDataType, SIGNAL(stateChanged(int)), SLOT(slotDomain(int)) );
+    connect( pcheckboxDisplayDomain, SIGNAL(stateChanged(int)), SLOT(slotDataType(int)) );
+    connect( pcheckboxDisplayParams, SIGNAL(stateChanged(int)), SLOT(slotParams(int)) );
+    connect( pcheckboxDisplayDefault, SIGNAL(stateChanged(int)), SLOT(slotDefault(int)) );
+#endif
 }
 
 LMDiagramDisplayWidget::~LMDiagramDisplayWidget()

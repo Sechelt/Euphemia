@@ -74,10 +74,17 @@ protected:
     QCheckBox *             pRuler;
 
 protected slots:
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     void slotAutoCommit( Qt::CheckState );
     void slotPage( Qt::CheckState );
     void slotGrid( Qt::CheckState );
     void slotRuler( Qt::CheckState );
+#else
+    void slotAutoCommit( int );
+    void slotPage( int );
+    void slotGrid( int );
+    void slotRuler( int );
+#endif
 };
 
 #endif

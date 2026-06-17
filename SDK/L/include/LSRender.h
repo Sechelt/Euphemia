@@ -77,10 +77,17 @@ protected:
     QCheckBox *     pLosslessImageRendering;
 
 protected slots:
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     void slotRenderAntialiasing( Qt::CheckState );
     void slotRenderTextAntialiasing( Qt::CheckState );
     void slotRenderSmoothPixmapTransform( Qt::CheckState );
     void slotRenderLosslessImageRendering( Qt::CheckState );
+#else
+    void slotRenderAntialiasing( int );
+    void slotRenderTextAntialiasing( int );
+    void slotRenderSmoothPixmapTransform( int );
+    void slotRenderLosslessImageRendering( int );
+#endif
 };
 
 #endif

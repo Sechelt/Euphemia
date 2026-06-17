@@ -776,7 +776,11 @@ AWPrefContainerWidget::AWPrefContainerWidget( QWidget *pwidgetParent, const QStr
     // CUSTOM
     pCustom = new QCheckBox( this );
     pCustom->setCheckState( (Qt::CheckState)(gPreferences->value( "Custom", "0" ).toInt()) );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pCustom, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotCustom(Qt::CheckState)) );
+#else
+    connect( pCustom, SIGNAL(stateChanged(int)), SLOT(slotCustom(int)) );
+#endif
     pLayout->addRow( tr( "Custom" ), pCustom );
 
     // NAME

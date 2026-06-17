@@ -106,7 +106,11 @@ LSRectangleToolBar::LSRectangleToolBar( QWidget *p )
     pBind->setToolTip( tr("geometry: change V/H lengths the same amount to create a square or a circle") );
     pBind->setCheckState( pSetting->getBind() ? Qt::Checked : Qt::Unchecked );
     pLayout->addWidget( pBind );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pBind, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotBind(Qt::CheckState)) );
+#else
+    connect( pBind, SIGNAL(stateChanged(int)), SLOT(slotBind(int)) );
+#endif
 
     pXRadius = new QDoubleSpinBox( this );
     pXRadius->setToolTip( tr("corner: X radius") );
@@ -166,7 +170,11 @@ void LSRectangleToolBar::slotRefresh()
     pYRadius->setValue( pSetting->getYRadius() );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSRectangleToolBar::slotBind( Qt::CheckState n )
+#else
+void LSRectangleToolBar::slotBind( int n )
+#endif
 {
     pSetting->setBind( n );
 }
@@ -203,7 +211,11 @@ LSRectanglePanel::LSRectanglePanel( QWidget *p )
     pBind->setTristate( false );
     pBind->setToolTip( tr("geometry: change V/H lengths the same amount to create a square or a circle") );
     pBind->setCheckState( pSetting->getBind() ? Qt::Checked : Qt::Unchecked );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pBind, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotBind(Qt::CheckState)) );
+#else
+    connect( pBind, SIGNAL(stateChanged(int)), SLOT(slotBind(int)) );
+#endif
 
     pXRadius = new QDoubleSpinBox( this );
     pXRadius->setToolTip( tr("corner: X radius") );
@@ -263,7 +275,11 @@ void LSRectanglePanel::slotRefresh()
     }
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSRectanglePanel::slotBind( Qt::CheckState n )
+#else
+void LSRectanglePanel::slotBind( int n )
+#endif
 {
     pSetting->setBind( n );
 }

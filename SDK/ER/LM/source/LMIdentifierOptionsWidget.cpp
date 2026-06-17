@@ -24,7 +24,11 @@ LMIdentifierOptionsWidget::LMIdentifierOptionsWidget( LMIdentifier *pIdentifier,
     pCheckBoxPrimary->setChecked( pIdentifier->isPrimary() );                                                                      
     pCheckBoxPrimary->setToolTip( tr("indicate if this is the primary identifier (can only be one)") );                                                             
     pTableWidget->setCellWidget( nRow, 1, pCheckBoxPrimary );                                                                              
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pCheckBoxPrimary, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotPrimary(Qt::CheckState)) );
+#else
+    connect( pCheckBoxPrimary, SIGNAL(stateChanged(int)), SLOT(slotPrimary(int)) );
+#endif
 }
 
 LMIdentifierOptionsWidget::~LMIdentifierOptionsWidget()

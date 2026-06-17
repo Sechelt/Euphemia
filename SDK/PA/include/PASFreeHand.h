@@ -120,7 +120,11 @@ protected slots:
     void slotWidth( int );
     void slotHeight( int );
     void slotImage();
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     void slotLineTo( Qt::CheckState n );
+#else
+    void slotLineTo( int n );
+#endif
 
 protected:
     PASFreeHand *        pSetting;

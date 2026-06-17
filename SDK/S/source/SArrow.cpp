@@ -19,7 +19,6 @@ SArrow::SArrow()
 
 void SArrow::setValue( qreal n )
 {
-printf( "[PAH][%s][%s][%d] %f\n", __FILE__, __FUNCTION__, __LINE__, n );
     if ( n == nSize ) return;
     nSize = n;
     emit signalChanged();

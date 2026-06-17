@@ -11,17 +11,29 @@ RRouteDynamicControl::RRouteDynamicControl( RRouteDynamic *p, QWidget *pParent )
                                      
     pExploreLines = new QCheckBox( "Explore Lines", this );                     
     pExploreLines->setChecked( pRoute->isExploreLines() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pExploreLines, SIGNAL(checkStateChanged(Qt::CheckState)), pRoute, SLOT(slotExploreLines(Qt::CheckState)) );     
+#else
+    connect( pExploreLines, SIGNAL(stateChanged(int)), pRoute, SLOT(slotExploreLines(int)) );     
+#endif
     pLayout->addWidget( pExploreLines );                                                      
                                                                                               
     pRouteLines = new QCheckBox( "Route Lines", this );
     pRouteLines->setChecked( pRoute->isRouteLines() );                         
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pRouteLines, SIGNAL(checkStateChanged(Qt::CheckState)), pRoute, SLOT(slotRouteLines(Qt::CheckState)) );         
+#else
+    connect( pRouteLines, SIGNAL(stateChanged(int)), pRoute, SLOT(slotRouteLines(int)) );         
+#endif
     pLayout->addWidget( pRouteLines );                                                        
                                                                                               
     pDetails = new QCheckBox( "Details", this );      
     pDetails->setChecked( pRoute->isDetails() );                          
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pDetails, SIGNAL(checkStateChanged(Qt::CheckState)), pRoute, SLOT(slotDetails(Qt::CheckState)) );               
+#else
+    connect( pDetails, SIGNAL(stateChanged(int)), pRoute, SLOT(slotDetails(int)) );               
+#endif
     pLayout->addWidget( pDetails );                                                           
                                                                                               
     pLayout->addWidget( new QLabel( "Depart", this ) );                                    

@@ -67,7 +67,11 @@ protected:
 
 protected slots:
     void slotComposition( int );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     void slotStamp( Qt::CheckState );
+#else
+    void slotStamp( int );
+#endif
 };
 
 /*!
@@ -94,7 +98,11 @@ protected:
 
 protected slots:
     void slotComposition( int );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     void slotStamp( Qt::CheckState );
+#else
+    void slotStamp( int );
+#endif
 };
 
 #endif

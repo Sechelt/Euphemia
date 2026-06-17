@@ -315,8 +315,13 @@ SFontPanel::SFontPanel( QWidget *pParent )
     connect( pListWidgetFont, SIGNAL(itemClicked(QListWidgetItem *)), SLOT(slotFonts(QListWidgetItem *)) );
     connect( pListWidgetFontStyle, SIGNAL(itemClicked(QListWidgetItem *)), SLOT(slotFontStyles(QListWidgetItem *)) );
     connect( pListWidgetSize, SIGNAL(itemClicked(QListWidgetItem *)), SLOT(slotSizes(QListWidgetItem *)) );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pCheckBoxStrikeOut, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotStrikeout(Qt::CheckState)) );
     connect( pCheckBoxUnderline, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotUnderline(Qt::CheckState)) );
+#else
+    connect( pCheckBoxStrikeOut, SIGNAL(stateChanged(int)), SLOT(slotStrikeout(int)) );
+    connect( pCheckBoxUnderline, SIGNAL(stateChanged(int)), SLOT(slotUnderline(int)) );
+#endif
     connect( pComboBoxWritingSystem, SIGNAL(currentIndexChanged(int)), SLOT(slotWritingSystems(int)) );
 
     connect( pSetting, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
@@ -539,7 +544,11 @@ void SFontPanel::slotSizes( QListWidgetItem *p )
     pSetting->setValue( font );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void SFontPanel::slotStrikeout( Qt::CheckState nState )
+#else
+void SFontPanel::slotStrikeout( int nState )
+#endif
 {
     if ( nState == Qt::Checked ) 
         font.setStrikeOut(true);
@@ -549,7 +558,11 @@ void SFontPanel::slotStrikeout( Qt::CheckState nState )
     pSetting->setValue( font );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void SFontPanel::slotUnderline( Qt::CheckState nState )
+#else
+void SFontPanel::slotUnderline( int nState )
+#endif
 {
     if ( nState == Qt::Checked ) 
         font.setUnderline( true );

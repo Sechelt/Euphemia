@@ -102,25 +102,41 @@ LSGeneralWidget::LSGeneralWidget( QWidget *pParent, Qt::Orientation n )
     pAutoCommit = new QCheckBox( this );
     pAutoCommit->setToolTip( tr("Auto Commit Shapes") );
     pAutoCommit->setChecked( pSetting->getAutoCommit() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pAutoCommit, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotAutoCommit(Qt::CheckState)) );
+#else
+    connect( pAutoCommit, SIGNAL(stateChanged(int)), SLOT(slotAutoCommit(int)) );
+#endif
 
     pPage = new QCheckBox( this );
     pPage->setTristate( false );
     pPage->setCheckState( pSetting->getPage() ? Qt::Checked : Qt::Unchecked );
     pPage->setToolTip( tr("draw page: draw a border around the page/canvas") );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pPage, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotPage(Qt::CheckState)) );
+#else
+    connect( pPage, SIGNAL(stateChanged(int)), SLOT(slotPage(int)) );
+#endif
 
     pGrid = new QCheckBox( this );
     pGrid->setTristate( false );
     pGrid->setToolTip( tr("Show Grid") );
     pGrid->setCheckState( pSetting->getGrid() ? Qt::Checked : Qt::Unchecked );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pGrid, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotGrid(Qt::CheckState)) );
+#else
+    connect( pGrid, SIGNAL(stateChanged(int)), SLOT(slotGrid(int)) );
+#endif
 
     pRuler = new QCheckBox( this );
     pRuler->setTristate( false );
     pRuler->setToolTip( tr("Show Ruler") );
     pRuler->setCheckState( pSetting->getRuler() ? Qt::Checked : Qt::Unchecked );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pRuler, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotRuler(Qt::CheckState)) );
+#else
+    connect( pRuler, SIGNAL(stateChanged(int)), SLOT(slotRuler(int)) );
+#endif
 
     if ( n == Qt::Horizontal )
     {
@@ -157,22 +173,38 @@ void LSGeneralWidget::slotRefresh()
     pRuler->setCheckState( pSetting->getRuler() ? Qt::Checked : Qt::Unchecked );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSGeneralWidget::slotAutoCommit( Qt::CheckState n )
+#else
+void LSGeneralWidget::slotAutoCommit( int n )
+#endif
 {
     pSetting->setAutoCommit( n );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSGeneralWidget::slotPage( Qt::CheckState n )
+#else
+void LSGeneralWidget::slotPage( int n )
+#endif
 {
     pSetting->setPage( n );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSGeneralWidget::slotGrid( Qt::CheckState n )
+#else
+void LSGeneralWidget::slotGrid( int n )
+#endif
 {
     pSetting->setGrid( n );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void LSGeneralWidget::slotRuler( Qt::CheckState n )
+#else
+void LSGeneralWidget::slotRuler( int n )
+#endif
 {
     pSetting->setRuler( n );
 }

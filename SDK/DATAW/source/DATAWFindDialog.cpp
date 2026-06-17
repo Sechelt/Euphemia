@@ -49,11 +49,19 @@ DATAWFindDialog::DATAWFindDialog( QWidget *parent, DATASqlWidget *pSQLWidget, bo
 
         mainLayout->addLayout( leftLayout, 0, 0 );
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
         connect( pCaseSensitive, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotStateChanged(Qt::CheckState)) );
         connect( pFromStart, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotStateChanged(Qt::CheckState)) );
         connect( pWholeWords, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotStateChanged(Qt::CheckState)) );
         connect( pExpression, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotStateChanged(Qt::CheckState)) );
         connect( pSelection, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotStateChanged(Qt::CheckState)) );
+#else
+        connect( pCaseSensitive, SIGNAL(stateChanged(int)), SLOT(slotStateChanged(int)) );
+        connect( pFromStart, SIGNAL(stateChanged(int)), SLOT(slotStateChanged(int)) );
+        connect( pWholeWords, SIGNAL(stateChanged(int)), SLOT(slotStateChanged(int)) );
+        connect( pExpression, SIGNAL(stateChanged(int)), SLOT(slotStateChanged(int)) );
+        connect( pSelection, SIGNAL(stateChanged(int)), SLOT(slotStateChanged(int)) );
+#endif
     }
 
     // vertical dialog buttons

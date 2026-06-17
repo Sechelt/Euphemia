@@ -102,12 +102,19 @@ SAPreferencesStartUpPanel::SAPreferencesStartUpPanel( QWidget *pParent )
     pRestoreState = new QCheckBox( this );
     pRestoreState->setChecked( QSettings().value( "RestoreState", false ).toInt() );
     pLayout->addRow( tr("Restore Window State"), pRestoreState );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pRestoreState, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotRestoreState(Qt::CheckState)) );
-
+#else
+    connect( pRestoreState, SIGNAL(stateChanged(int)), SLOT(slotRestoreState(int)) );
+#endif
     pSplash = new QCheckBox( this );
     pSplash->setChecked( QSettings().value( "Splash", false ).toInt() );
     pLayout->addRow( tr("Show Splash"), pSplash );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pSplash, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotSplash(Qt::CheckState)) );
+#else
+    connect( pSplash, SIGNAL(stateChanged(int)), SLOT(slotSplash(int)) );
+#endif
 }
 
 void SAPreferencesStartUpPanel::slotRestoreState( Qt::CheckState n )

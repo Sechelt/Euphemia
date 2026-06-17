@@ -24,7 +24,11 @@ PMKeyOptionsWidget::PMKeyOptionsWidget( PMKey *pKey, QWidget *pParent )
     pCheckBoxPrimary->setChecked( pKey->isPrimary() );                                                                      
     pCheckBoxPrimary->setToolTip( tr("indicate if this is the primary key (can only be one)") );                                                             
     pTableWidget->setCellWidget( nRow, 1, pCheckBoxPrimary );                                                                              
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pCheckBoxPrimary, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotPrimary(Qt::CheckState)) );
+#else
+    connect( pCheckBoxPrimary, SIGNAL(stateChanged(int)), SLOT(slotPrimary(int)) );
+#endif
 }
 
 PMKeyOptionsWidget::~PMKeyOptionsWidget()

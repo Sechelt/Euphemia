@@ -157,8 +157,13 @@ protected slots:
     void slotFonts( QListWidgetItem * );
     void slotFontStyles( QListWidgetItem * );
     void slotSizes( QListWidgetItem * );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     void slotStrikeout( Qt::CheckState );
     void slotUnderline( Qt::CheckState );
+#else
+    void slotStrikeout( int );
+    void slotUnderline( int );
+#endif
 };
 
 /*!

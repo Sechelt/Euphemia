@@ -24,8 +24,11 @@ LMEntityOptionsWidget::LMEntityOptionsWidget( LMEntityBase *pEntity, QWidget *pw
     pGenerate->setChecked( pEntity->getGenerate() );                                                                            
     pGenerate->setToolTip( tr("generate a table in the Physical Model") );                                                       
     pTableWidget->setCellWidget( nRow, 1, pGenerate );                                                                                
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pGenerate, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotGenerate(Qt::CheckState)) );
-                                                                                                                                        
+#else
+    connect( pGenerate, SIGNAL(stateChanged(int)), SLOT(slotGenerate(int)) );
+#endif                                                                                                                                        
     // RECORDS                                                                                                                          
     nRow++;                                                                                                                             
     pTableWidget->setRowCount( nRow + 1 );

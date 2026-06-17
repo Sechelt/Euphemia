@@ -34,7 +34,11 @@ PMColumnChecksWidget::PMColumnChecksWidget( PMColumn *pColumn, QWidget *pwidgetP
     pcheckboxMandatory->setChecked( pColumn->isMandatory() );                                                                       
     pcheckboxMandatory->setToolTip( tr("column must have a value") );                                                                    
     pTableWidget->setCellWidget( nRow, 1, pcheckboxMandatory );                                                                               
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pcheckboxMandatory, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotMandatory(Qt::CheckState)) );
+#else
+    connect( pcheckboxMandatory, SIGNAL(stateChanged(int)), SLOT(slotMandatory(int)) );
+#endif
                                                                                                                                         
     // HIDDEN                                                                                                                           
     nRow++;                                                                                                                             
@@ -44,7 +48,11 @@ PMColumnChecksWidget::PMColumnChecksWidget( PMColumn *pColumn, QWidget *pwidgetP
     pcheckboxHidden->setChecked( pColumn->isHidden() );                                                                             
     pcheckboxHidden->setToolTip( tr("column is seen by User") );                                                                         
     pTableWidget->setCellWidget( nRow, 1, pcheckboxHidden );                                                                                  
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pcheckboxHidden, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotHidden(Qt::CheckState)) );
+#else
+    connect( pcheckboxHidden, SIGNAL(stateChanged(int)), SLOT(slotHidden(int)) );
+#endif
                                                                                                                                         
     // MINIMUM                                                                                                                          
     nRow++;                                                                                                                             
@@ -90,7 +98,11 @@ PMColumnChecksWidget::PMColumnChecksWidget( PMColumn *pColumn, QWidget *pwidgetP
     pcheckboxForceUpperCase->setChecked( pColumn->isForceUpperCase() );                                                                
     pcheckboxForceUpperCase->setToolTip( tr("force values to upper case") );                                                             
     pTableWidget->setCellWidget( nRow, 1, pcheckboxForceUpperCase );                                                                          
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pcheckboxForceUpperCase, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotForceUpper(Qt::CheckState)) );
+#else
+    connect( pcheckboxForceUpperCase, SIGNAL(stateChanged(int)), SLOT(slotForceUpper(int)) );
+#endif
 
     // LOWER CASE                                                                                                                       
     nRow++;                                                                                                                             
@@ -100,7 +112,11 @@ PMColumnChecksWidget::PMColumnChecksWidget( PMColumn *pColumn, QWidget *pwidgetP
     pcheckboxForceLowerCase->setChecked( pColumn->isForceLowerCase() );                                                                
     pcheckboxForceLowerCase->setToolTip( tr("force values to lower case") );                                                             
     pTableWidget->setCellWidget( nRow, 1, pcheckboxForceLowerCase );                                                                          
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pcheckboxForceLowerCase, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotForceLower(Qt::CheckState)) );
+#else
+    connect( pcheckboxForceLowerCase, SIGNAL(stateChanged(int)), SLOT(slotForceLower(int)) );
+#endif
 
     // RESTRICT MODIFY                                                                                                                  
     nRow++;                                                                                                                             
@@ -110,7 +126,11 @@ PMColumnChecksWidget::PMColumnChecksWidget( PMColumn *pColumn, QWidget *pwidgetP
     pcheckboxRestrictModify->setChecked( pColumn->isRestrictModify() );                                                                
     pcheckboxRestrictModify->setToolTip( tr("restrict ability to modify value") );                                                       
     pTableWidget->setCellWidget( nRow, 1, pcheckboxRestrictModify );                                                                          
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pcheckboxRestrictModify, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotRestrictModify(Qt::CheckState)) );
+#else
+    connect( pcheckboxRestrictModify, SIGNAL(stateChanged(int)), SLOT(slotRestrictModify(int)) );
+#endif
                                                                                                                                         
     // restore geometry                                                                                                                 
 /*

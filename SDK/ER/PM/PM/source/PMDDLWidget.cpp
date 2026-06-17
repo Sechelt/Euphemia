@@ -19,12 +19,20 @@ PMDDLWidget::PMDDLWidget( PMDDLManager *pDDLManager, const QString &stringCreate
         pManualCreate = new QCheckBox( tr("Manual"), this );
         pManualCreate->setChecked( pDDLManager->isCreateManual() );
         pLayout01->addWidget( pManualCreate );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
         connect( pManualCreate, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotManualCreate(Qt::CheckState)) );
+#else
+        connect( pManualCreate, SIGNAL(stateChanged(int)), SLOT(slotManualCreate(int)) );
+#endif
 
         pIncludeCreate = new QCheckBox( tr("Include"), this );
         pIncludeCreate->setChecked( pDDLManager->isIncludeCreate() );
         pLayout01->addWidget( pIncludeCreate );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
         connect( pIncludeCreate, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotIncludeCreate(Qt::CheckState)) );
+#else
+        connect( pIncludeCreate, SIGNAL(stateChanged(int)), SLOT(slotIncludeCreate(int)) );
+#endif
         pLayout01->addStretch( 10 );
 
         pLayout->addLayout( pLayout01 );
@@ -48,12 +56,20 @@ PMDDLWidget::PMDDLWidget( PMDDLManager *pDDLManager, const QString &stringCreate
         pManualDrop = new QCheckBox( tr("Manual"), this );
         pManualDrop->setChecked( pDDLManager->isDropManual() );
         pLayout01->addWidget( pManualDrop );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
         connect( pManualDrop, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotManualDrop(Qt::CheckState)) );
+#else
+        connect( pManualDrop, SIGNAL(stateChanged(int)), SLOT(slotManualDrop(int)) );
+#endif
 
         pIncludeDrop = new QCheckBox( tr("Include"), this );
         pIncludeDrop->setChecked( pDDLManager->isIncludeDrop() );
         pLayout01->addWidget( pIncludeDrop );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
         connect( pIncludeDrop, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotIncludeDrop(Qt::CheckState)) );
+#else
+        connect( pIncludeDrop, SIGNAL(stateChanged(int)), SLOT(slotIncludeDrop(int)) );
+#endif
         pLayout01->addStretch( 10 );
 
         pLayout->addLayout( pLayout01 );

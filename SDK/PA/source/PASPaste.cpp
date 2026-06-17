@@ -129,7 +129,11 @@ PASPasteToolBar::PASPasteToolBar( QWidget *p )
     pStamp = new QCheckBox( tr("Stamp"), this );
     pStamp->setTristate( false );
     pStamp->setChecked( pSetting->getStamp() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pStamp, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotStamp(Qt::CheckState)) );
+#else
+    connect( pStamp, SIGNAL(stateChanged(int)), SLOT(slotStamp(int)) );
+#endif
     pLayout->addWidget( pStamp );
 
     pLayout->addStretch( 10 );
@@ -149,7 +153,11 @@ void PASPasteToolBar::slotComposition( int )
     pSetting->setCompositionMode( QPainter::CompositionMode(pComposition->currentData().toInt()) );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 void PASPasteToolBar::slotStamp( Qt::CheckState n )
+#else
+void PASPasteToolBar::slotStamp( int n )
+#endif
 {
     pSetting->setStamp( n );
 }
@@ -216,7 +224,11 @@ PASPastePanel::PASPastePanel( QWidget *p )
     pStamp = new QCheckBox( this );
     pStamp->setTristate( false );
     pStamp->setChecked( pSetting->getStamp() );
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pStamp, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotStamp(Qt::CheckState)) );
+#else
+    connect( pStamp, SIGNAL(stateChanged(int)), SLOT(slotStamp(int)) );
+#endif
 
     pLayout->addRow( tr("Composition"), pComposition );
     pLayout->addRow( tr("Stamp"), pStamp );
@@ -236,7 +248,7 @@ void PASPastePanel::slotComposition( int )
     pSetting->setCompositionMode( QPainter::CompositionMode(pComposition->currentData().toInt()) );
 }
 
-void PASPastePanel::slotStamp( Qt::CheckState n )
+void PASPastePanel::slotStamp( int n )
 {
     pSetting->setStamp( (bool)n );
 }

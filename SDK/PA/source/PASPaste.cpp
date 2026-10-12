@@ -248,7 +248,11 @@ void PASPastePanel::slotComposition( int )
     pSetting->setCompositionMode( QPainter::CompositionMode(pComposition->currentData().toInt()) );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+void PASPastePanel::slotStamp( Qt::CheckState n )
+#else
 void PASPastePanel::slotStamp( int n )
+#endif
 {
     pSetting->setStamp( (bool)n );
 }

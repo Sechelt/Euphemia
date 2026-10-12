@@ -77,6 +77,24 @@ EMainWindow::~EMainWindow()
     doSaveState();
 }
 
+bool EMainWindow::doOpen( const QString &s )
+{
+    // create the 'model' and create its graphics (a scene)
+    EFile *pFile = (EFile*)pWorkspace->getObject( "EFile" );
+    Q_ASSERT( pFile );
+
+    if ( !pFile->doOpen( s ) )
+    {
+        pWorkspace->slotDelete( pFile );
+        return false;
+    }
+    pFile->slotOpenEditor();
+
+    doAddRecentFile( pFile->getFileName() );
+
+    return true;
+}
+
 void EMainWindow::closeEvent( QCloseEvent *pEvent )
 {
     // reset state of current layer

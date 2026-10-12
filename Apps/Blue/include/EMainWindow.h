@@ -36,6 +36,8 @@ public:
     EMainWindow( QWidget *pWidget = nullptr );
     ~EMainWindow();
 
+    bool doOpen( const QString & ); // support opening a file from the command-line
+
 protected:
     void closeEvent( QCloseEvent *pEvent );
 

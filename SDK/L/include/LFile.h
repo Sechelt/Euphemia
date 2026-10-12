@@ -42,6 +42,8 @@ public:
     LFile( ADObject *pParent, const QString &stringName = QString() );
     virtual ~LFile();
 
+    bool doOpen( const QString & ); // supports opening a file from the command-line
+
     // Graphics...
     virtual LGraphicsScene *getGraphics() { return pGraphics; }
     virtual void doGraphicsCreate( QObject *pParent );

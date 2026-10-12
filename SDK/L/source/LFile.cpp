@@ -44,6 +44,14 @@ LFile::~LFile()
     if ( pGraphics ) doGraphicsDelete();
 }
 
+bool LFile::doOpen( const QString &stringFileName )                                                                                                                                                                                                                   
+{
+    if ( !doRead( stringFileName ) ) return false;                                                                                                                                                                                        
+    setFileName( stringFileName );                                                                                                                                                                                                    
+    setModified( false );                                                                                                                                                                                                                 
+    return true;
+}
+
 // actually this MUST be done before adding a layer
 void LFile::doGraphicsCreate( QObject *pParent )
 {

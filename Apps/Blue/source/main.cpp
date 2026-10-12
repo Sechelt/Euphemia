@@ -127,6 +127,23 @@ int main( int argc, char *argv[] )
     QCoreApplication::setApplicationName( APP_NAME );
     QCoreApplication::setApplicationVersion( APP_VER );
 
+    // PARSE COMMAND-LINE
+    QStringList listPosArgs;
+    {
+        QCommandLineParser parser;
+        parser.setApplicationDescription( APP_NAME );
+        parser.addHelpOption();
+
+        // Add positional arguments (e.g., your filename)
+        parser.addPositionalArgument( "file", "The file to process." );
+        
+        // Process the actual command line arguments
+        parser.process( a );
+
+        // Retrieve the positional arguments list
+        listPosArgs = parser.positionalArguments();
+    }
+    
     /*
      * Init globals. 
      * - some globals auto initialize but others, like those below, need to be initialized 
@@ -177,6 +194,10 @@ int main( int argc, char *argv[] )
      */
     EMainWindow *pMainWindow = new EMainWindow();
     pMainWindow->show();
+    if ( !listPosArgs.isEmpty() )
+    {
+        pMainWindow->doOpen( listPosArgs.first() );
+    }
     int n = a.exec();
 
     /* Delete main window

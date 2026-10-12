@@ -31,16 +31,24 @@ LColorControl::LColorControl( QWidget *pParent )
 
     connect( pSettingPen, SIGNAL(signalChanged()), SLOT(slotRefreshPen()) );
     connect( pSettingBrush, SIGNAL(signalChanged()), SLOT(slotRefreshBrush()) );
+
+#ifndef CBD_OLDCOLORPICKER
+    connect( &colorPickerObject, SIGNAL(signalColorPicked(const QColor &)), this, SLOT(slotColorPicked(const QColor &)) ); 
+#endif
 }
 
 void LColorControl::slotColorPicker()
 {
+#ifdef CBD_OLDCOLORPICKER
     bColorPicker = true;
     grabMouse( QCursor( QPixmap( ":W/ColorPicker" ), 0, 0 ) );
 
     // note: grabMouse() is probably doing the following for us...
     // QGuiApplication::setOverrideCursor()
     // QGuiApplication::restoreOverrideCursor()
+#else
+    colorPickerObject.startPicking();
+#endif
 }
 
 // something changed the color (and is not aware of foreground/background control state or settings
@@ -87,6 +95,14 @@ void LColorControl::slotRefreshBrush()
     update();
 }
 
+#ifndef CBD_OLDCOLORPICKER
+void LColorControl::slotColorPicked( const QColor &c )
+{
+    if ( !c.isValid() ) return;
+    slotChange( c );
+}
+#endif
+
 void LColorControl::paintEvent( QPaintEvent * )
 {
     QPainter painter( this );
@@ -117,8 +133,9 @@ void LColorControl::resizeEvent( QResizeEvent *pEvent )
 
 void LColorControl::mouseDoubleClickEvent( QMouseEvent *pEvent )
 {
+#ifdef CBD_OLDCOLORPICKER
     if ( bColorPicker ) return;
-
+#endif
     if ( rectPen.contains( pEvent->pos() ) )
     {
         nSwatch = SwatchPen;
@@ -154,6 +171,7 @@ void LColorControl::mouseDoubleClickEvent( QMouseEvent *pEvent )
 
 void LColorControl::mousePressEvent( QMouseEvent *pEvent )
 {
+#ifdef CBD_OLDCOLORPICKER
     if ( bColorPicker  )
     {
         QScreen *screen = QGuiApplication::primaryScreen();
@@ -183,6 +201,7 @@ void LColorControl::mousePressEvent( QMouseEvent *pEvent )
         releaseMouse();
         return;
     }
+#endif
 
     if ( rectPen.contains( pEvent->pos() ) )
     {

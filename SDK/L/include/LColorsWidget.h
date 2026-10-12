@@ -10,6 +10,10 @@
 #ifndef H_LColorsWidget
 #define H_LColorsWidget
 
+#ifndef CBD_OLDCOLORPICKER
+#include <WColorPickerObject.h>
+#endif
+
 #include <SSettings.h>
 #include <SPen.h>
 #include <SBrush.h>
@@ -49,12 +53,21 @@ public slots:
     void slotRefreshPen();                      /*!< update foreground swatch - from global context             */
     void slotRefreshBrush();                    /*!< update background swatch - from global context             */
 
+#ifndef CBD_OLDCOLORPICKER
+protected slots:
+    void slotColorPicked( const QColor & );
+#endif
+
 protected:
     SPen *      pSettingPen;
     SBrush *    pSettingBrush;
 
     QSize       size            = QSize( 24, 24 );     
+#ifdef CBD_OLDCOLORPICKER
     bool        bColorPicker    = false;           /*!< true if we are in 'color picker' mode                      */
+#else
+    WColorPickerObject colorPickerObject;
+#endif
     Swatchs     nSwatch         = SwatchPen;
     QColor      colorPen;
     QColor      colorBrush;

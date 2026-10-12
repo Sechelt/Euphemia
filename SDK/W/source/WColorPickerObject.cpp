@@ -60,7 +60,7 @@ void WColorPickerObject::slotPortalResponse( uint responseCode, const QVariantMa
     if (responseCode != 0) 
     {
         qWarning() << "Color picking was cancelled or dismissed by the user.";
-        emit signalColor( QColor() );
+        emit signalColorPicked( QColor() );
         return;
     }
 
@@ -68,7 +68,7 @@ void WColorPickerObject::slotPortalResponse( uint responseCode, const QVariantMa
     if ( !results.contains( "color" ) ) 
     {
         qWarning() << "Results returned [" << results << "] and did not contain 'color'";
-        emit signalColor( QColor() );
+        emit signalColorPicked( QColor() );
         return;
     }
 
@@ -84,7 +84,7 @@ void WColorPickerObject::slotPortalResponse( uint responseCode, const QVariantMa
         arg >> r >> g >> b;
         arg.endStructure();
 
-        emit signalColor( QColor::fromRgbF( r, g, b ) );
+        emit signalColorPicked( QColor::fromRgbF( r, g, b ) );
         return;
     }
     // Legacy Packed u (32-bit uint (0x00RRGGBB))
@@ -95,12 +95,11 @@ void WColorPickerObject::slotPortalResponse( uint responseCode, const QVariantMa
         int g = (packedColor >> 8) & 0xFF;
         int b = packedColor & 0xFF;
         
-        emit signalColor( QColor::fromRgbF( r, g, b ) );
+        emit signalColorPicked( QColor::fromRgbF( r, g, b ) );
         return;
     }
 
-
     qWarning() << "Failed to convert value to RGB values.";
-    emit signalColor( QColor() );
+    emit signalColorPicked( QColor() );
 }
 

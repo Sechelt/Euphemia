@@ -57,6 +57,7 @@ QT += xml
 QT += svg
 QT += openglwidgets
 QT += concurrent
+QT += dbus
 
 #
 # SQL

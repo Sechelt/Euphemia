@@ -42,6 +42,10 @@ SColorsPickerDialog::SColorsPickerDialog( const QColor &color, QWidget *pParent,
     connect( pButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
     connect( pButtonBox, &QDialogButtonBox::rejected, this, &QDialog::reject );
     doLoadState();
+
+#ifndef CBD_OLDCOLORPICKER
+    connect( &colorPickerObject, SIGNAL(signalColorPicked(const QColor &)), this, SLOT(slotColorPicked(const QColor &)) ); 
+#endif
 }
 
 SColorsPickerDialog::~SColorsPickerDialog()
@@ -92,13 +96,25 @@ void SColorsPickerDialog::doSaveState()
 
 void SColorsPickerDialog::slotColorPicker()
 {
+#ifdef CBD_OLDCOLORPICKER
     bColorPicker = true;
     grabMouse( QCursor( QPixmap( ":W/ColorPicker" ), 0, 0 ) );
 
     // note: grabMouse() is probably doing the following for us...
     // QGuiApplication::setOverrideCursor()
     // QGuiApplication::restoreOverrideCursor()
+#else
+    colorPickerObject.startPicking();
+#endif
 }
+
+#ifndef CBD_OLDCOLORPICKER
+void SColorsPickerDialog::slotColorPicked( const QColor &c )
+{
+    if ( !c.isValid() ) return;
+    pColorPickerWidget->setColor( c );
+}
+#endif
 
 /*!
  * \brief Set colour to the pixel colour at cursor.
@@ -115,6 +131,7 @@ void SColorsPickerDialog::slotColorPicker()
  */
 void SColorsPickerDialog::mousePressEvent( QMouseEvent *pEvent )
 {
+#ifdef CBD_OLDCOLORPICKER
     if ( bColorPicker  )
     {
         // Use the global pos to determine which screen to use.
@@ -129,7 +146,7 @@ void SColorsPickerDialog::mousePressEvent( QMouseEvent *pEvent )
         releaseMouse();
         return;
     }
-
+#endif
     QDialog::mousePressEvent( pEvent );
 }
 

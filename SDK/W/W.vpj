@@ -61,6 +61,7 @@
             <F N="source/WBrushStyleComboBox.cpp"/>
             <F N="source/WCanvasSizeWidget.cpp"/>
             <F N="source/WColorButton.cpp"/>
+            <F N="source/WColorPickerObject.cpp"/>
             <F N="source/WColorsPickerDialog.cpp"/>
             <F N="source/WColorsPickerWidget.cpp"/>
             <F N="source/WColorsWidget.cpp"/>
@@ -119,6 +120,7 @@
             <F N="include/WBrushStyleComboBox.h"/>
             <F N="include/WCanvasSizeWidget.h"/>
             <F N="include/WColorButton.h"/>
+            <F N="include/WColorPickerObject.h"/>
             <F N="include/WColorsPickerDialog.h"/>
             <F N="include/WColorsPickerWidget.h"/>
             <F N="include/WColorsWidget.h"/>

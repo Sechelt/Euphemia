@@ -42,6 +42,10 @@ WColorsPickerDialog::WColorsPickerDialog( const QColor &color, QWidget *pParent,
     connect( pButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
     connect( pButtonBox, &QDialogButtonBox::rejected, this, &QDialog::reject );
     doLoadState();
+
+#ifndef CBD_OLDCOLORPICKER
+    connect( &colorPickerObject, SIGNAL(signalColorPicked(const QColor &)), this, SLOT(slotColorPicked(const QColor &)) ); 
+#endif
 }
 
 WColorsPickerDialog::~WColorsPickerDialog()
@@ -92,16 +96,29 @@ void WColorsPickerDialog::doSaveState()
 
 void WColorsPickerDialog::slotColorPicker()
 {
+#ifdef CBD_OLDCOLORPICKER
     bColorPicker = true;
     grabMouse( QCursor( QPixmap( ":W/ColorPicker" ), 0, 0 ) );
 
     // note: grabMouse() is probably doing the following for us...
     // QGuiApplication::setOverrideCursor()
     // QGuiApplication::restoreOverrideCursor()
+#else
+    colorPickerObject.startPicking();
+#endif
 }
+
+#ifndef CBD_OLDCOLORPICKER
+void WColorsPickerDialog::slotColorPicked( const QColor &c )
+{
+    if ( !c.isValid() ) return;
+    pColorPickerWidget->setColor( c );
+}
+#endif
 
 void WColorsPickerDialog::mousePressEvent( QMouseEvent *pEvent )
 {
+#ifdef CBD_OLDCOLORPICKER
     if ( bColorPicker  )
     {
         QWidget *p = window();
@@ -115,7 +132,7 @@ void WColorsPickerDialog::mousePressEvent( QMouseEvent *pEvent )
         releaseMouse();
         return;
     }
-
+#endif
     QDialog::mousePressEvent( pEvent );
 }
 

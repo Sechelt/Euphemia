@@ -12,6 +12,10 @@
 
 #include "W.h"
 
+#ifndef CBD_OLDCOLORPICKER
+#include <WColorPickerObject.h>
+#endif
+
 class SColorsPickerWidget;
 
 class SColorsPickerDialog : public QDialog
@@ -27,8 +31,17 @@ public:
 public slots:
     void slotColorPicker();                     /*!< enter 'color picker' mode                                  */
 
+#ifndef CBD_OLDCOLORPICKER
+protected slots:
+    void slotColorPicked( const QColor & );
+#endif
+
 protected:
-    bool                    bColorPicker = false;           /*!< true if we are in 'color picker' mode                      */
+#ifdef CBD_OLDCOLORPICKER
+    bool                    bColorPicker    = false;           /*!< true if we are in 'color picker' mode                      */
+#else
+    WColorPickerObject      colorPickerObject;
+#endif
     bool                    bShowPaletteColor;
     SColorsPickerWidget *  pColorPickerWidget;
 

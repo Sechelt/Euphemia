@@ -30,6 +30,7 @@ HEADERS	+= \
         include/WBrushStyleComboBox.h \
         include/WCanvasSizeWidget.h \
         include/WColorButton.h \
+        include/WColorPickerObject.h \
         include/WColorsPickerDialog.h \
         include/WColorsPickerWidget.h \
         include/WColorsWidget.h \
@@ -84,6 +85,7 @@ SOURCES	+= \
         source/WBrushStyleComboBox.cpp \
         source/WCanvasSizeWidget.cpp \
         source/WColorButton.cpp \
+        source/WColorPickerObject.cpp \
         source/WColorsPickerDialog.cpp \
         source/WColorsPickerWidget.cpp \
         source/WColorsWidget.cpp \

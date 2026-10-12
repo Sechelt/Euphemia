@@ -3,6 +3,8 @@
 
 #include "W.h"
 
+#include <QtDBus/QtDBus>
+
 class WColorPickerObject : public QObject 
 {
     Q_OBJECT
@@ -11,7 +13,7 @@ public:
     void startPicking();
 
 signals:
-    void signalColor( const QColor & );
+    void signalColorPicked( const QColor & );
 
 private slots:
     void slotPortalResponse( uint responseCode, const QVariantMap &results );

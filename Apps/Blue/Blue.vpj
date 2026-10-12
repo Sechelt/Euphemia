@@ -59,6 +59,7 @@
             <F N="source/EFile.cpp"/>
             <F N="source/EMainWindow.cpp"/>
             <F N="source/EPreferencesDialog.cpp"/>
+            <F N="source/EStartLayerDialog.cpp"/>
             <F N="source/EWorkspace.cpp"/>
             <F N="source/main.cpp"/>
         </Folder>
@@ -70,6 +71,7 @@
             <F N="include/EFile.h"/>
             <F N="include/EMainWindow.h"/>
             <F N="include/EPreferencesDialog.h"/>
+            <F N="include/EStartLayerDialog.h"/>
             <F N="include/EWorkspace.h"/>
         </Folder>
         <Folder

@@ -221,6 +221,9 @@ private:
     void doSaveState();
     void doLoadState();
 
+    // 
+    bool doNew(); // create a new and empty document
+
     //
     void doConnectEditor( AWEditorWidget * );
     void doDisconnectEditor();

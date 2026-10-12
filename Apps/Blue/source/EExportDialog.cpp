@@ -50,12 +50,14 @@ bool EExportDialog::isXML()
     return pExportWidget->pXML->isChecked();      
 }
 
+
 //
 // EExportWidget
 //
 EExportWidget::EExportWidget( QWidget *pParent )
     : QWidget( pParent )
 {
+
     setObjectName( "EExportWidget" );
 
     QVBoxLayout *pLayoutTop     = new QVBoxLayout( this );

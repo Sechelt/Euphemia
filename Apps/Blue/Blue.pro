@@ -33,6 +33,7 @@ HEADERS += \
         include/EFile.h \
         include/EMainWindow.h \
         include/EPreferencesDialog.h \
+        include/EStartLayerDialog.h \
         include/EWorkspace.h
 
 SOURCES += \
@@ -40,6 +41,7 @@ SOURCES += \
         source/EFile.cpp \
         source/EMainWindow.cpp \
         source/EPreferencesDialog.cpp \
+        source/EStartLayerDialog.cpp \
         source/EWorkspace.cpp \
         source/main.cpp
 

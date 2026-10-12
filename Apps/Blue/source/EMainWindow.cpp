@@ -14,6 +14,7 @@
 
 #include "EFile.h"
 #include "LEditorWidget.h"
+#include "EStartLayerDialog.h"
 
 // max number of recent files in file menu
 // - must be > 0
@@ -807,6 +808,18 @@ void EMainWindow::doLoadState()
     restoreState( settings.value( "windowState" ).toByteArray() );
 }
 
+bool EMainWindow::doNew()
+{
+    // create the 'model' and create its graphics (a scene)
+    EFile *pFile = (EFile*)pWorkspace->getObject( "EFile" );
+    Q_ASSERT( pFile );
+    pFile->setModified( false );
+    // open a 'view'
+    pFile->slotOpenEditor();
+
+    return true;
+}
+
 void EMainWindow::doConnectEditor( AWEditorWidget *p )
 {
     Q_ASSERT( !pEditorWidget );
@@ -1111,14 +1124,26 @@ QString EMainWindow::getFilePath( const QString &stringFileName )
 
 bool EMainWindow::slotNew()
 {
-    // create the 'model' and create its graphics (a scene)
-    EFile *pFile = (EFile*)pWorkspace->getObject( "EFile" );
-    Q_ASSERT( pFile );
-    pFile->setModified( false );
-    // open a 'view'
-    pFile->slotOpenEditor();
+    // new document
+    bool b = doNew();
+    if ( !b ) return b;
 
-    return true;
+    // prompt for start layer class
+    EStartLayerDialog dialog( this );
+    if ( dialog.exec() != QDialog::Accepted ) return b;
+
+    if ( dialog.isPaint() )
+    {
+        EFile *pFile = (EFile*)pEditorWidget->getObject();
+        if ( !pFile->doLayerNew( "PAPaint" ) ) return b;
+    }
+    else if ( dialog.isDraw() )
+    {
+        EFile *pFile = (EFile*)pEditorWidget->getObject();
+        if ( !pFile->doLayerNew( "DRDraw" ) ) return b;
+    }
+
+    return b;
 }
 
 bool EMainWindow::slotNewWithSize()
@@ -1130,7 +1155,7 @@ bool EMainWindow::slotNewWithSize()
         if ( !bOk ) return false;                                                                  
     }                                                                                              
                                                                                                    
-    slotNew();
+    doNew();
     Q_ASSERT( pEditorWidget );
     EFile *pFile = (EFile*)pEditorWidget->getObject();
     pFile->doResize( size.width(), size.height() );
@@ -1155,10 +1180,11 @@ bool EMainWindow::slotNewFromPaste()
                                                                                                                    
     image = image.convertToFormat( QImage::Format_ARGB32 );                                                        
                                                                                                                    
-    slotNew();
+    doNew();
     Q_ASSERT( pEditorWidget );
     EFile *pFile = (EFile*)pEditorWidget->getObject();
     LLayer *pLayer = pFile->getLayerCurrent();
+    Q_ASSERT( pLayer );
     pFile->doResize( image.size().width(), image.size().height() );
     pLayer->doPaste();
     pLayer->doCommit();
@@ -1518,7 +1544,7 @@ void EMainWindow::slotCreateHeuristicMask()
     else                                                  
         image = pCanvas->getImage().createHeuristicMask();
                                                           
-    slotNew();                                            
+    doNew();                                            
     Q_ASSERT( pView );                                    
     pView->getLayers()->setImage( image );                
 */
@@ -1536,7 +1562,7 @@ void EMainWindow::slotCreateAlphaMask()
     else                                              
         image = pCanvas->getImage().createAlphaMask();
                                                       
-    slotNew();                                        
+    doNew();                                        
     Q_ASSERT( pView );                                
     pView->getLayers()->setImage( image );            
 */

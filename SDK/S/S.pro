@@ -20,7 +20,6 @@ INCLUDEPATH	+= ../W/include
 HEADERS	+= \
         source/LibInfo.h \
         include/S.h \
-        include/SArrow.h \
         include/SBrush.h \
         include/SColors.h \
         include/SColorsPickerDialog.h \
@@ -28,6 +27,7 @@ HEADERS	+= \
         include/SColorsWidget.h \
         include/SFont.h \
         include/SGrid.h \
+        include/SLine.h \
         include/SPen.h \
         include/SRuler.h \
         include/SSetting.h \
@@ -35,7 +35,6 @@ HEADERS	+= \
         include/SText.h
 
 SOURCES	+= \
-        source/SArrow.cpp \
         source/SBrush.cpp \
         source/SColors.cpp \
         source/SColorsPickerDialog.cpp \
@@ -43,6 +42,7 @@ SOURCES	+= \
         source/SColorsWidget.cpp \
         source/SFont.cpp \
         source/SGrid.cpp \
+        source/SLine.cpp \
         source/SPen.cpp \
         source/SRuler.cpp \
         source/SSetting.cpp \

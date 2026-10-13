@@ -16,7 +16,6 @@
 #include "DRSelectPolygon.h"
 #include "DRSelectRectangle.h"
 #include "DRArc.h"
-#include "DRArrow.h"
 #include "DRChord.h"
 #include "DRImage.h"
 #include "DRPie.h"
@@ -52,7 +51,6 @@ public:
         ToolSelectPolygon, 
         ToolManipulate,                 /*!< select shape(s) and then cycle through states (manipulate, transform:size, transform:rotate, transform:shear) */
         ToolDrawArc,                    /*!< shape: draw an arc                                      */ 
-        ToolDrawArrow,                  /*!< shape: draw an arrow                                    */ 
         ToolDrawChord,                  /*!< shape: draw a chord (an arc that is enclosed and filled)*/
         ToolDrawImage,                  /*!< shape: draw an image                                    */
         ToolDrawPie,                    /*!< shape: draw a pie                                       */

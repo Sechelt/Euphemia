@@ -517,26 +517,31 @@ void EMainWindow::doInitToolbar()
     // pen and brush (fill)
     pToolBar = addToolBar( tr("Pen") );
     pToolBar->setObjectName( "Pen" );
+    pToolBar->setToolTip( tr("pen config") );
     pToolBar->addWidget( g_SSettings->getSetting( "SPen" )->getToolBar( this ) );
-    pMenuToolBars->addAction( pToolBar->toggleViewAction() );
-
-    pToolBar = addToolBar( tr("Arrow") );
-    pToolBar->setObjectName( "Arrow" );
-    pToolBar->addWidget( g_SSettings->getSetting( "SArrow" )->getToolBar( this ) );
     pMenuToolBars->addAction( pToolBar->toggleViewAction() );
 
     pToolBar = addToolBar( tr("Brush") );
     pToolBar->setObjectName( "Brush" );
+    pToolBar->setToolTip( tr("brush config") );
     pToolBar->addWidget( g_SSettings->getSetting( "SBrush" )->getToolBar( this ) );
+    pMenuToolBars->addAction( pToolBar->toggleViewAction() );
+
+    pToolBar = addToolBar( tr("Line") );
+    pToolBar->setObjectName( "Line" );
+    pToolBar->setToolTip( tr("line config") );
+    pToolBar->addWidget( g_SSettings->getSetting( "SLine" )->getToolBar( this ) );
     pMenuToolBars->addAction( pToolBar->toggleViewAction() );
 
     pToolBarHolder = addToolBar( tr("Tool Config") );
     pToolBarHolder->setObjectName( "ToolConfig" );
+    pToolBarHolder->setToolTip( tr("tool config (when possible)") );
     pMenuToolBars->addAction( pToolBarHolder->toggleViewAction() );
 
     // grid
     pToolBar = addToolBar( tr("Grid") );
     pToolBar->setObjectName( "Grid" );
+    pToolBar->setToolTip( tr("grid config") );
     pToolBar->addWidget( g_SSettings->getSetting( "LSGrid" )->getToolBar( this ) );
     pToolBar->hide();
     pMenuToolBars->addAction( pToolBar->toggleViewAction() );
@@ -544,6 +549,7 @@ void EMainWindow::doInitToolbar()
     // render
     pToolBar = addToolBar( tr("Render") );
     pToolBar->setObjectName( "Render" );
+    pToolBar->setToolTip( tr("render config") );
     pToolBar->addWidget( g_SSettings->getSetting( "LSRender" )->getToolBar( this ) );
     pToolBar->hide();
     pMenuToolBars->addAction( pToolBar->toggleViewAction() );
@@ -551,6 +557,7 @@ void EMainWindow::doInitToolbar()
     // image
     pToolBar = addToolBar( tr("Image") );
     pToolBar->setObjectName( "Image" );
+    pToolBar->setToolTip( tr("image config") );
     pToolBar->addWidget( g_SSettings->getSetting( "LSImage" )->getToolBar( this ) );
     pToolBar->hide();
     pMenuToolBars->addAction( pToolBar->toggleViewAction() );

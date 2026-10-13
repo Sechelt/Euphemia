@@ -41,7 +41,6 @@ RESOURCES   = DR.qrc
 HEADERS = \
         include/DR.h \
         include/DRArc.h \
-        include/DRArrow.h \
         include/DRChord.h \
         include/DRImage.h \
         include/DRDraw.h \
@@ -62,7 +61,6 @@ HEADERS = \
 SOURCES = \
         source/LibInfo.h \
         source/DRArc.cpp \
-        source/DRArrow.cpp \
         source/DRChord.cpp \
         source/DRImage.cpp \
         source/DRDraw.cpp \

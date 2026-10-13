@@ -8,102 +8,102 @@
  */
 
 #include "LibInfo.h"
-#include "SArrow.h"
+#include "SLine.h"
 
 /****************************************************************
- * SArrow
+ * SLine
  ****************************************************************/
-SArrow::SArrow()
+SLine::SLine()
 {
 }
 
-void SArrow::setValue( qreal n )
+void SLine::setValue( qreal n )
 {
     if ( n == nSize ) return;
     nSize = n;
     emit signalChanged();
 }
 
-void SArrow::setSelected( qreal n )
+void SLine::setSelected( qreal n )
 {
     if ( n == nSize ) return;
     nSize = n;
     emit signalSync();
 }
 
-QWidget *SArrow::getButton( QWidget *pParent )
+QWidget *SLine::getButton( QWidget *pParent )
 {
-    return new SArrowButton( pParent );
+    return new SLineButton( pParent );
 }
 
-QWidget *SArrow::getToolBar( QWidget *pParent )
+QWidget *SLine::getToolBar( QWidget *pParent )
 {
-    return new SArrowToolBar( pParent );
+    return new SLineToolBar( pParent );
 }
 
-QWidget *SArrow::getPanel( QWidget *pParent )
+QWidget *SLine::getPanel( QWidget *pParent )
 {
-    return new SArrowPanel( pParent );
+    return new SLinePanel( pParent );
 }
 
-QWidget *SArrow::getSwatch( QWidget *pParent )
+QWidget *SLine::getSwatch( QWidget *pParent )
 {
-    return new SArrowSwatch( pParent );
+    return new SLineSwatch( pParent );
 }
 
-void SArrow::doSave( QDomDocument *pdomDoc, QDomElement * )
+void SLine::doSave( QDomDocument *pdomDoc, QDomElement * )
 {
-    QDomElement domElemThis = pdomDoc->createElement( "SArrow" );
+    QDomElement domElemThis = pdomDoc->createElement( "SLine" );
 
     domElemThis.setAttribute( "Size", nSize );
 }
 
-void SArrow::doLoad( QDomElement *pdomElemThis )
+void SLine::doLoad( QDomElement *pdomElemThis )
 {
     nSize = pdomElemThis->attribute( "Size", "0" ).toDouble(); 
 }
 
 /****************************************************************
- * SArrowButton
+ * SLineButton
  ****************************************************************/
-SArrowButton::SArrowButton( QWidget *pParent )
+SLineButton::SLineButton( QWidget *pParent )
     : QToolButton( pParent )
 {
-    setObjectName( "SArrowButton" );
+    setObjectName( "SLineButton" );
 
-    pArrow = (SArrow*)g_SSettings->getSetting( "SArrow" );
-    if ( !pArrow )
+    pLine = (SLine*)g_SSettings->getSetting( "SLine" );
+    if ( !pLine )
     {
-        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Could not find key [SArrow].";
+        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Could not find key [SLine].";
         return;
     }
 
     setIcon( getIcon() );
 
-    connect( pArrow, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
-    connect( pArrow, SIGNAL(signalSync()), SLOT(slotRefresh()) );
+    connect( pLine, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
+    connect( pLine, SIGNAL(signalSync()), SLOT(slotRefresh()) );
     connect( this, SIGNAL(clicked()), SLOT(slotClicked()) );
 }
 
-void SArrowButton::slotRefresh()
+void SLineButton::slotRefresh()
 {
     setIcon( getIcon() );
 }
 
-void SArrowButton::slotClicked()
+void SLineButton::slotClicked()
 {
-    SDialog dialog( this, "SArrow", "Pen" );
+    SDialog dialog( this, "SLine", "Pen" );
     dialog.exec();
 }
 
-QPixmap SArrowButton::getIcon()
+QPixmap SLineButton::getIcon()
 {
     // dynamic
 
     /*
     QPixmap pixmap( ":W/Pen16" );
     QPainter p( &pixmap );
-    p.fillRect( QRect( 0, 13, 16, 5 ), pArrow->getValue().color() );
+    p.fillRect( QRect( 0, 13, 16, 5 ), pLine->getValue().color() );
     return pixmap;
     */
 
@@ -112,22 +112,22 @@ QPixmap SArrowButton::getIcon()
 }
 
 /****************************************************************
- * SArrowToolBar
+ * SLineToolBar
  ****************************************************************/
-SArrowToolBar::SArrowToolBar( QWidget *pParent )
+SLineToolBar::SLineToolBar( QWidget *pParent )
     : QWidget( pParent )
 {
-    setObjectName( "SArrowToolBar" );
+    setObjectName( "SLineToolBar" );
 
-    pArrow = (SArrow*)g_SSettings->getSetting( "SArrow" );
-    if ( !pArrow )
+    pLine = (SLine*)g_SSettings->getSetting( "SLine" );
+    if ( !pLine )
     {
-        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Could not find key [SArrow].";
+        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Could not find key [SLine].";
         return;
     }
 
 
-    nSize = pArrow->getValue();
+    nSize = pLine->getValue();
 
     QHBoxLayout *pLayout = new QHBoxLayout( this );
 
@@ -147,44 +147,44 @@ SArrowToolBar::SArrowToolBar( QWidget *pParent )
 
     pLayout->addStretch( 11 );
 
-    connect( pArrow, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
-    connect( pArrow, SIGNAL(signalSync()), SLOT(slotRefresh()) );
+    connect( pLine, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
+    connect( pLine, SIGNAL(signalSync()), SLOT(slotRefresh()) );
 }
 
-void SArrowToolBar::slotRefresh()
+void SLineToolBar::slotRefresh()
 {
-    nSize = pArrow->getValue();
+    nSize = pLine->getValue();
     pSize->setValue( nSize );
 }
 
-void SArrowToolBar::slotSize( qreal n )
+void SLineToolBar::slotSize( qreal n )
 {
     nSize = n;
-    pArrow->setValue( nSize );
+    pLine->setValue( nSize );
 }
 
-void SArrowToolBar::slotMore()
+void SLineToolBar::slotMore()
 {
-    SDialog dialog( this, "SArrow", "Pen" );
+    SDialog dialog( this, "SLine", "Pen" );
     dialog.exec();
 }
 
 /****************************************************************
- * SArrowPanel
+ * SLinePanel
  ****************************************************************/
-SArrowPanel::SArrowPanel( QWidget *pParent )
+SLinePanel::SLinePanel( QWidget *pParent )
     : QWidget( pParent )
 {
     setWindowTitle( tr("Pen") );
 
-    pArrow = (SArrow*)g_SSettings->getSetting( "SArrow" );
-    if ( pArrow )
+    pLine = (SLine*)g_SSettings->getSetting( "SLine" );
+    if ( pLine )
     {
-        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Could not find key [SArrow].";
+        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Could not find key [SLine].";
         return;
     }
 
-    nSize = pArrow->getValue();
+    nSize = pLine->getValue();
 
     pSize = new QDoubleSpinBox( this );
     pSize->setMinimum( 0 );
@@ -196,47 +196,47 @@ SArrowPanel::SArrowPanel( QWidget *pParent )
     QFormLayout *pLayoutForm = new QFormLayout( this );
     pLayoutForm->addRow( tr("Size:"), pSize );
 
-    connect( pArrow, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
-    connect( pArrow, SIGNAL(signalSync()), SLOT(slotRefresh()) );
+    connect( pLine, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
+    connect( pLine, SIGNAL(signalSync()), SLOT(slotRefresh()) );
 }
 
-void SArrowPanel::slotRefresh()
+void SLinePanel::slotRefresh()
 {
-    nSize = pArrow->getValue();
+    nSize = pLine->getValue();
     pSize->setValue( nSize );
 }
 
-void SArrowPanel::slotSize( qreal n )
+void SLinePanel::slotSize( qreal n )
 {
     nSize = n;
-    pArrow->setValue( nSize );
+    pLine->setValue( nSize );
 }
 
 /****************************************************************
- * SArrowSwatch
+ * SLineSwatch
  ****************************************************************/
-SArrowSwatch::SArrowSwatch( QWidget *pParent )
+SLineSwatch::SLineSwatch( QWidget *pParent )
     : QWidget( pParent )
 {
-    pArrow = (SArrow*)g_SSettings->getSetting( "SArrow" );
-    if ( pArrow )
+    pLine = (SLine*)g_SSettings->getSetting( "SLine" );
+    if ( pLine )
     {
-        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Could not find key [SArrow].";
+        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Could not find key [SLine].";
         return;
     }
 
-    nSize = pArrow->getValue();
-    connect( pArrow, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
-    connect( pArrow, SIGNAL(signalSync()), SLOT(slotRefresh()) );
+    nSize = pLine->getValue();
+    connect( pLine, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
+    connect( pLine, SIGNAL(signalSync()), SLOT(slotRefresh()) );
 }
 
-void SArrowSwatch::slotRefresh()
+void SLineSwatch::slotRefresh()
 {
-    nSize = pArrow->getValue();
+    nSize = pLine->getValue();
     update();
 }
 
-void SArrowSwatch::paintEvent( QPaintEvent *pEvent )
+void SLineSwatch::paintEvent( QPaintEvent *pEvent )
 {
     Q_UNUSED(pEvent);
 
@@ -251,7 +251,7 @@ void SArrowSwatch::paintEvent( QPaintEvent *pEvent )
     */
 }
 
-QSize SArrowSwatch::sizeHint() const
+QSize SLineSwatch::sizeHint() const
 {
     return QSize( 48, 48 );
 }

@@ -6,22 +6,22 @@
  * [placeholder]
  *
  */
-#ifndef H_SArrow
-#define H_SArrow
+#ifndef H_SLine
+#define H_SLine
 
 #include <SSettings.h>
 
 /*!
- * \brief Setting for a SArrow.
+ * \class SLine
  * 
- * \author pharvey (3/14/23)
+ * \author pharvey (2026-10-12)
  */
-class SArrow : public SSetting 
+class SLine : public SSetting 
 {
     Q_OBJECT
     Q_PROPERTY(qreal nSize READ getValue WRITE setValue NOTIFY signalChanged)
 public:
-    SArrow();
+    SLine();
 
     void setValue( qreal );
     void setSelected( qreal );
@@ -42,19 +42,19 @@ protected:
 /*!
  * \brief A button to invoke a dialog/panel to edit.
  * 
- * \author pharvey (12/27/24)
+ * \author pharvey (2026-10-12)
  */
-class SArrowButton : public QToolButton
+class SLineButton : public QToolButton
 {
     Q_OBJECT
 public:
-    SArrowButton( QWidget *pParent );
+    SLineButton( QWidget *pParent );
 
 public slots:
     void slotRefresh();
 
 protected:
-    SArrow *pArrow;
+    SLine *pLine;
 
     QPixmap getIcon();
 
@@ -63,24 +63,24 @@ protected slots:
 };
 
 /*!
- * \brief Edit SArrow using a widget which can be used in a tool bar. 
+ * \brief Edit SLine using a widget which can be used in a tool bar. 
  *  
  * Horizontal layout with subset of options. 
  * Includes 'More' button to invoke dialog to edit more details. 
  * 
- * \author pharvey (3/14/23)
+ * \author pharvey (2026-10-12)
  */
-class SArrowToolBar : public QWidget
+class SLineToolBar : public QWidget
 {
     Q_OBJECT
 public:
-    SArrowToolBar( QWidget *pParent );
+    SLineToolBar( QWidget *pParent );
 
 public slots:
     void slotRefresh();
 
 protected:
-    SArrow *            pArrow;
+    SLine *            pLine;
     qreal               nSize;
     QDoubleSpinBox *    pSize   = nullptr;
     QToolButton *       pMore   = nullptr;
@@ -91,24 +91,24 @@ protected slots:
 };
 
 /*!
- * \brief Panel for editing a SArrow.
+ * \brief Panel for editing a SLine.
  *  
  * Vertical layout. 
  * Includes all details. 
  *  
- * \author pharvey (3/14/23)
+ * \author pharvey (2026-10-12)
  */
-class SArrowPanel : public QWidget
+class SLinePanel : public QWidget
 {
     Q_OBJECT
 public:
-    SArrowPanel( QWidget *pParent = nullptr );
+    SLinePanel( QWidget *pParent = nullptr );
 
 public slots:
     void slotRefresh();
 
 protected:
-    SArrow *pArrow;
+    SLine *pLine;
     qreal   nSize;
     QDoubleSpinBox *          pSize;
 
@@ -117,21 +117,21 @@ protected slots:
 };
 
 /*!
- * \brief Swatch (example) for a SArrow.
+ * \brief Swatch (example) for a SLine.
  * 
- * \author pharvey (3/14/23)
+ * \author pharvey (2026-10-12)
  */
-class SArrowSwatch : public QWidget
+class SLineSwatch : public QWidget
 {
     Q_OBJECT
 public:
-    SArrowSwatch( QWidget *pParent );
+    SLineSwatch( QWidget *pParent );
 
 public slots:
     void slotRefresh();
 
 protected:
-    SArrow *pArrow;
+    SLine *pLine;
     qreal   nSize;
 
     void paintEvent( QPaintEvent *pEvent );

@@ -54,7 +54,7 @@ EStartLayerWidget::EStartLayerWidget( QWidget *pParent )
     setObjectName( "EStartLayerWidget" );
 
     // create buttons in a group box
-    QGroupBox *pGroupBox = new QGroupBox( tr("Initial Layer"), this );
+    QGroupBox *pGroupBox = new QGroupBox( tr("Start Layer"), this );
     pNone   = new QRadioButton( tr("None"), pGroupBox );
     pPaint  = new QRadioButton( tr("Paint"), pGroupBox );
     pDraw   = new QRadioButton( tr("Draw"), pGroupBox );

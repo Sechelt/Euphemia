@@ -12,6 +12,8 @@
 
 #include "DRObject.h"
 
+#include <SLine.h>
+
 class DRLine : public DRObject
 {
     Q_OBJECT

@@ -27,7 +27,7 @@ HEADERS	+= \
         include/SColorsWidget.h \
         include/SFont.h \
         include/SGrid.h \
-        include/SLine.h \
+#        include/SLine.h \
         include/SPen.h \
         include/SRuler.h \
         include/SSetting.h \
@@ -42,7 +42,7 @@ SOURCES	+= \
         source/SColorsWidget.cpp \
         source/SFont.cpp \
         source/SGrid.cpp \
-        source/SLine.cpp \
+#        source/SLine.cpp \
         source/SPen.cpp \
         source/SRuler.cpp \
         source/SSetting.cpp \

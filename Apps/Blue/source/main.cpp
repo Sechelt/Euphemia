@@ -18,7 +18,6 @@
 #include <SSettings.h>
 
 // SSetting classes we know about...
-#include <SLine.h>       
 #include <SPen.h>       
 #include <SRuler.h>       
 #include <SBrush.h>     
@@ -158,7 +157,6 @@ int main( int argc, char *argv[] )
      * Settings such as whether or not to show a splash screen can be in QSetting. 
      */
     g_SSettings = new SSettings();
-    g_SSettings->doInsert( "SLine", new SLine() );       
     g_SSettings->doInsert( "SPen", new SPen() );       
     g_SSettings->doInsert( "SRuler", new SRuler() );       
     g_SSettings->doInsert( "SBrush", new SBrush() );     

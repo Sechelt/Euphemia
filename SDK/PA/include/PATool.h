@@ -83,15 +83,15 @@ protected:
     SSetting *          pSettingGeneral;
     bool                bAutoCommit;
     // Rendering
-    SSetting *pSettingRender;
-    int nAntialiasing           = 1;
-    int nTextAntialiasing       = 1;
-    int nSmoothPixmapTransform  = 1;
-    int nLosslessImageRendering = 1;
+    SSetting *          pSettingRender;
+    int                 nAntialiasing           = 1;
+    int                 nTextAntialiasing       = 1;
+    int                 nSmoothPixmapTransform  = 1;
+    int                 nLosslessImageRendering = 1;
 
     //
     States              nState = StateIdle;
-    PAPaint *            pLayer;                     /*!< layer we are drawing on                                                                */
+    PAPaint *           pLayer;                     /*!< layer we are drawing on                                                                */
     LGraphicsLayer *    pLayerGraphics;             /*!< QGraphicsObject for layer                                                              */
     LGraphicsScene *    pLayerScene;                /*!< QGraphicsScene for layer                                                               */
     QGraphicsView *     pLayerView;                 /*!< view with focus - handles belong here - in pLayer but we use it a lot so its here      */

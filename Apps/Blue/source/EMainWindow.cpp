@@ -527,12 +527,6 @@ void EMainWindow::doInitToolbar()
     pToolBar->addWidget( g_SSettings->getSetting( "SBrush" )->getToolBar( this ) );
     pMenuToolBars->addAction( pToolBar->toggleViewAction() );
 
-    pToolBar = addToolBar( tr("Line") );
-    pToolBar->setObjectName( "Line" );
-    pToolBar->setToolTip( tr("line config") );
-    pToolBar->addWidget( g_SSettings->getSetting( "SLine" )->getToolBar( this ) );
-    pMenuToolBars->addAction( pToolBar->toggleViewAction() );
-
     pToolBarHolder = addToolBar( tr("Tool Config") );
     pToolBarHolder->setObjectName( "ToolConfig" );
     pToolBarHolder->setToolTip( tr("tool config (when possible)") );

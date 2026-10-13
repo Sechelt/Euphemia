@@ -179,17 +179,22 @@ void PALine::doDrawLineEnd( QPainter *pPainter, LSLine::LineEndStyles nStyle, co
 void PALine::doDrawLineEndArrow( QPainter *pPainter, const QLineF &line )
 {
     // draw at p1
-    qreal arrowSize = 6;
     const qreal Pi = 3.14;
     double angle = ::acos( line.dx() / line.length() );
+
+    qreal nSize = 6;
+    if ( line.p1() == pointBegin )
+        nSize = nBeginSize;
+    else
+        nSize = nEndSize;
 
     if ( line.dy() >= 0 )
         angle = (Pi * 2) - angle;
 
-    QPointF arrowP1 = line.p1() + QPointF( sin( angle + Pi / 3 ) * arrowSize,
-                                           cos( angle + Pi / 3 ) * arrowSize );
-    QPointF arrowP2 = line.p1() + QPointF( sin( angle + Pi - Pi / 3 ) * arrowSize,
-                                           cos( angle + Pi - Pi / 3 ) * arrowSize );
+    QPointF arrowP1 = line.p1() + QPointF( sin( angle + Pi / 3 ) * nSize,
+                                           cos( angle + Pi / 3 ) * nSize );
+    QPointF arrowP2 = line.p1() + QPointF( sin( angle + Pi - Pi / 3 ) * nSize,
+                                           cos( angle + Pi - Pi / 3 ) * nSize );
 
     QPolygonF polygonArrow;
     polygonArrow << line.p1() << arrowP1 << arrowP2;
@@ -199,7 +204,13 @@ void PALine::doDrawLineEndArrow( QPainter *pPainter, const QLineF &line )
 void PALine::doDrawLineEndBall( QPainter *pPainter, const QLineF &line )
 {
     // draw at p1
-    pPainter->drawEllipse( line.p1(), 4, 4 );
+    qreal nSize = 6;
+    if ( line.p1() == pointBegin )
+        nSize = nBeginSize;
+    else
+        nSize = nEndSize;
+
+    pPainter->drawEllipse( line.p1(), nSize, nSize );
 }
 
 void PALine::doDrawState( const QPoint &point )
@@ -340,7 +351,11 @@ void PALine::doMoveHandle( const QPoint &pointPos )
 void PALine::slotRefreshLine()
 {
     nStyleBegin = LSLine::LineEndStyles(pSettingLine->property( "nBegin" ).toInt());
+    nBeginSize  = pSettingLine->property( "nBeginSize" ).toReal();
+
     nStyleEnd = LSLine::LineEndStyles(pSettingLine->property( "nEnd" ).toInt());
+    nEndSize  = pSettingLine->property( "nEndSize" ).toReal();
+
     update();
 }
 

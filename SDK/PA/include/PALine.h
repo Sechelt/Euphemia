@@ -36,6 +36,8 @@ protected:
     SSetting *              pSettingLine;
     QPoint                  pointBegin;
     QPoint                  pointEnd;
+    qreal                   nBeginSize  = 5;
+    qreal                   nEndSize    = 5;
     LSLine::LineEndStyles   nStyleBegin = LSLine::LineEndNone;
     LSLine::LineEndStyles   nStyleEnd   = LSLine::LineEndNone;
 

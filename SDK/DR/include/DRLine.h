@@ -12,7 +12,7 @@
 
 #include "DRObject.h"
 
-#include <SLine.h>
+#include <LSLine.h>
 
 class DRLine : public DRObject
 {

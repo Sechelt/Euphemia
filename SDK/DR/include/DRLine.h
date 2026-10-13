@@ -38,13 +38,25 @@ public:
     virtual bool        doLoad( QDomElement *pdomElem ) override;
 
 protected:
-    QPointF pointBegin;
-    QPointF pointEnd;
+    SSetting *              pSettingLine;
+    QPointF                 pointBegin;
+    QPointF                 pointEnd;
+    qreal                   nBeginSize  = 5;
+    qreal                   nEndSize    = 5;
+    LSLine::LineEndStyles   nBeginStyle = LSLine::LineEndNone;
+    LSLine::LineEndStyles   nEndStyle   = LSLine::LineEndNone;
 
     virtual void doDraw( QPainter * ) override;
+    virtual void doDrawLineEnds( QPainter *pPainter );
+    virtual void doDrawLineEnd( QPainter *pPainter, LSLine::LineEndStyles nStyle, const QLineF &line );
+    virtual void doDrawLineEndArrow( QPainter *pPainter, const QLineF &line );
+    virtual void doDrawLineEndBall( QPainter *pPainter, const QLineF &line );
 
     virtual void doCreateHandles() override;
     virtual void doSyncHandles() override;
+
+protected slots:
+    virtual void slotRefreshLine();
 };
 
 #endif

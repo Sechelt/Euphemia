@@ -158,8 +158,9 @@ QWidget* DRDraw::getToolBar( QWidget *pParent )
         case ToolDrawChord:
         case ToolDrawImage:
         case ToolDrawPie:
-        case ToolDrawLine:
             break;
+        case ToolDrawLine:
+            return g_SSettings->getSetting( "LSLine" )->getToolBar( pParent );
         case ToolDrawRectangle:
             return g_SSettings->getSetting( "LSRectangle" )->getToolBar( pParent );
         case ToolDrawEllipse:
@@ -185,8 +186,9 @@ QWidget* DRDraw::getPanel( QWidget *pParent )
         case ToolDrawChord:
         case ToolDrawImage:
         case ToolDrawPie:
-        case ToolDrawLine:
             break;
+        case ToolDrawLine:
+            return g_SSettings->getSetting( "LSLine" )->getPanel( pParent );
         case ToolDrawRectangle:
             return g_SSettings->getSetting( "LSRectangle" )->getPanel( pParent );
         case ToolDrawEllipse:

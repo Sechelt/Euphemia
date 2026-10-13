@@ -26,6 +26,10 @@ DRLine::DRLine( DRDraw *pCanvas, const QPointF &pointPos )
         pointBegin = pointEnd = QPointF( 0, 0 );
     else
         pointBegin = pointEnd = pointPos;
+
+    pSettingLine = g_SSettings->getSetting( "LSLine" ); Q_ASSERT( pSettingLine );
+    slotRefreshLine();
+    connect( pSettingLine, SIGNAL(signalChanged()), SLOT(slotRefreshLine()) );
 }
 
 DRLine::~DRLine()
@@ -176,6 +180,11 @@ QDomElement DRLine::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent )
     // end
     domElemThis.setAttribute( "x2", pointEnd.x() );
     domElemThis.setAttribute( "y2", pointEnd.y() );
+    // line ends
+    domElemThis.setAttribute( "BeginStyle", nBeginStyle );
+    domElemThis.setAttribute( "EndStyle", nEndStyle );
+    domElemThis.setAttribute( "BeginSize", nBeginSize );
+    domElemThis.setAttribute( "EndSize", nEndSize );
 
     return domElemThis;
 }
@@ -190,6 +199,11 @@ bool DRLine::doLoad( QDomElement *pdomElemThis )
     // end
     pointEnd.setX( pdomElemThis->attribute( "x2", "0" ).toDouble() ); 
     pointEnd.setY( pdomElemThis->attribute( "y2", "0" ).toDouble() ); 
+    // line-ends
+    nBeginStyle = LSLine::LineEndStyles(pdomElemThis->attribute( "BeginStyle", QString::number( int(nBeginStyle) ) ).toInt());
+    nEndStyle   = LSLine::LineEndStyles(pdomElemThis->attribute( "EndStyle", QString::number( int(nEndStyle) ) ).toInt());
+    nBeginSize  = pdomElemThis->attribute( "BeginSize", "5" ).toDouble(); 
+    nEndSize    = pdomElemThis->attribute( "EndSize", "5" ).toDouble(); 
 
     return true;
 }
@@ -213,6 +227,68 @@ void DRLine::doDraw( QPainter *pPainter )
         pPainter->setPen( QPen( Qt::DashLine ) );
         pPainter->drawLine( pointBegin, pointEnd );                         
     }
+
+    // draw line ends (if any)
+    doDrawLineEnds( pPainter );
+}
+
+void DRLine::doDrawLineEnds( QPainter *pPainter )
+{
+    doDrawLineEnd( pPainter, nBeginStyle, QLineF( pointBegin, pointEnd ) );
+    // provide reversed line because doDrawLineEnd always draws at p1
+    doDrawLineEnd( pPainter, nEndStyle, QLineF( pointEnd, pointBegin ) );
+}
+
+void DRLine::doDrawLineEnd( QPainter *pPainter, LSLine::LineEndStyles nStyle, const QLineF &line )
+{
+    switch ( nStyle )
+    {
+        case LSLine::LineEndArrow:
+            doDrawLineEndArrow( pPainter, line );
+            break;
+        case LSLine::LineEndBall:
+            doDrawLineEndBall( pPainter, line );
+            break;
+        case LSLine::LineEndNone:
+            break;
+    };
+}
+
+void DRLine::doDrawLineEndArrow( QPainter *pPainter, const QLineF &line )
+{
+    // draw at p1
+    const qreal Pi = 3.14;
+    double angle = ::acos( line.dx() / line.length() );
+
+    qreal nSize = 6;
+    if ( line.p1() == pointBegin )
+        nSize = nBeginSize;
+    else
+        nSize = nEndSize;
+
+    if ( line.dy() >= 0 )
+        angle = (Pi * 2) - angle;
+
+    QPointF arrowP1 = line.p1() + QPointF( sin( angle + Pi / 3 ) * nSize,
+                                           cos( angle + Pi / 3 ) * nSize );
+    QPointF arrowP2 = line.p1() + QPointF( sin( angle + Pi - Pi / 3 ) * nSize,
+                                           cos( angle + Pi - Pi / 3 ) * nSize );
+
+    QPolygonF polygonArrow;
+    polygonArrow << line.p1() << arrowP1 << arrowP2;
+    pPainter->drawPolygon( polygonArrow );
+}
+
+void DRLine::doDrawLineEndBall( QPainter *pPainter, const QLineF &line )
+{
+    // draw at p1
+    qreal nSize = 6;
+    if ( line.p1() == pointBegin )
+        nSize = nBeginSize;
+    else
+        nSize = nEndSize;
+
+    pPainter->drawEllipse( line.p1(), nSize, nSize );
 }
 
 void DRLine::doCreateHandles()
@@ -256,4 +332,14 @@ void DRLine::doSyncHandles()
     vectorHandles[DRLineEnd]->setCenter( rectView.bottomRight() );
 }
 
+void DRLine::slotRefreshLine()
+{
+    nBeginStyle = LSLine::LineEndStyles(pSettingLine->property( "nBegin" ).toInt());
+    nBeginSize  = pSettingLine->property( "nBeginSize" ).toReal();
+
+    nEndStyle = LSLine::LineEndStyles(pSettingLine->property( "nEnd" ).toInt());
+    nEndSize  = pSettingLine->property( "nEndSize" ).toReal();
+
+    if ( pGraphics ) pGraphics->update();
+}
 

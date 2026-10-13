@@ -62,7 +62,6 @@
             <F N="source/SColorsWidget.cpp"/>
             <F N="source/SFont.cpp"/>
             <F N="source/SGrid.cpp"/>
-            <F N="source/SLine.cpp"/>
             <F N="source/SPen.cpp"/>
             <F N="source/SRuler.cpp"/>
             <F N="source/SSetting.cpp"/>
@@ -81,7 +80,6 @@
             <F N="include/SColorsWidget.h"/>
             <F N="include/SFont.h"/>
             <F N="include/SGrid.h"/>
-            <F N="include/SLine.h"/>
             <F N="include/SPen.h"/>
             <F N="include/SRuler.h"/>
             <F N="include/SSetting.h"/>

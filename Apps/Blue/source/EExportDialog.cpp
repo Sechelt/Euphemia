@@ -57,31 +57,34 @@ bool EExportDialog::isXML()
 EExportWidget::EExportWidget( QWidget *pParent )
     : QWidget( pParent )
 {
-
     setObjectName( "EExportWidget" );
 
     QVBoxLayout *pLayoutTop     = new QVBoxLayout( this );
     QVBoxLayout *pLayoutGroup;
 
-    QGroupBox *pGroupLayer = new QGroupBox( tr("Layer"), this );
-    pCurrent    = new QRadioButton( tr("Current") );
-    pAll        = new QRadioButton( tr("All") );
-    pCurrent->setChecked( true );
-    pLayoutGroup= new QVBoxLayout();
-    pLayoutGroup->addWidget( pCurrent );
-    pLayoutGroup->addWidget( pAll );
-    pGroupLayer->setLayout( pLayoutGroup );
-    pLayoutTop->addWidget( pGroupLayer );
+    {
+        QGroupBox *pGroupBox = new QGroupBox( tr("Layer"), this );
+        pCurrent    = new QRadioButton( tr("Current") );
+        pAll        = new QRadioButton( tr("All") );
+        pCurrent->setChecked( true );
+        pLayoutGroup= new QVBoxLayout();
+        pLayoutGroup->addWidget( pCurrent );
+        pLayoutGroup->addWidget( pAll );
+        pGroupBox->setLayout( pLayoutGroup );
+        pLayoutTop->addWidget( pGroupBox );
+    }
 
-    QGroupBox *pGroupFormat = new QGroupBox( tr("Format"), this );
-    pImage      = new QRadioButton( tr("Image") );
-    pXML        = new QRadioButton( tr("XML") );
-    pImage->setChecked( true );
-    pLayoutGroup= new QVBoxLayout();
-    pLayoutGroup->addWidget( pImage );
-    pLayoutGroup->addWidget( pXML );
-    pGroupFormat->setLayout( pLayoutGroup );
-    pLayoutTop->addWidget( pGroupFormat );
+    {
+        QGroupBox *pGroupBox = new QGroupBox( tr("Format"), this );
+        pImage      = new QRadioButton( tr("Image") );
+        pXML        = new QRadioButton( tr("XML") );
+        pImage->setChecked( true );
+        pLayoutGroup= new QVBoxLayout();
+        pLayoutGroup->addWidget( pImage );
+        pLayoutGroup->addWidget( pXML );
+        pGroupBox->setLayout( pLayoutGroup );
+        pLayoutTop->addWidget( pGroupBox );
+    }
 }
 
 

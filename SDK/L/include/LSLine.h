@@ -86,7 +86,7 @@ protected slots:
 };
 
 /*!
- * \brief Edit SLine using a widget which can be used in a tool bar. 
+ * \brief Edit LSLine using a widget which can be used in a tool bar. 
  *  
  * Horizontal layout with subset of options. 
  * Includes 'More' button to invoke dialog to edit more details. 

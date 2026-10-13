@@ -10,7 +10,7 @@
 #ifndef H_PALine
 #define H_PALine
 
-#include <SSetting.h>
+// #include <SSetting.h>
 #include <LSLine.h>
 
 #include "PATool.h"

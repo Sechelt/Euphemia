@@ -133,47 +133,46 @@ SBrushToolBar::SBrushToolBar( QWidget *pParent, bool bCompress )
     setObjectName( "SBrushToolBar" );
 
     pSettingsBrush = (SBrush*)g_SSettings->getSetting( "SBrush" );
-    if ( pSettingsBrush )
-    {
-        brush    = pSettingsBrush->getValue();
-
-        QHBoxLayout *pLayout = new QHBoxLayout( this );
-
-        if ( !bCompress )
-        {
-            pColor = new WColorButton( brush.color(), this, WColorButton::Fill );
-            pLayout->addWidget( pColor );
-            connect( pColor, SIGNAL(signalChanged(const QColor &)), SLOT(slotColor(const QColor &)) );
-        }
-
-        pStyle = new WBrushStyleComboBox( this, brush.style() );
-        pStyle->setToolTip( tr("brush style") );
-        pLayout->addWidget( pStyle );
-        connect( pStyle, SIGNAL(signalChanged(Qt::BrushStyle)), SLOT(slotStyle(Qt::BrushStyle)) );
-
-        if ( !bCompress )
-        {
-            pImage = new WImageButton( this, brush.textureImage() );
-            pImage->setToolTip( tr("double-click to set texture") );
-            pLayout->addWidget( pImage, 10 );
-            connect( pImage, SIGNAL(signalClick()), SLOT(slotImage()) );
-        }
-
-        pMore = new QToolButton( this );
-        pMore->setToolTip( tr("more") );
-        pMore->setText( ":" );
-        pLayout->addWidget( pMore );
-        connect( pMore, SIGNAL(clicked()), SLOT(slotMore()) );
-
-        pLayout->addStretch( 10 );
-
-        connect( pSettingsBrush, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
-        connect( pSettingsBrush, SIGNAL(signalSync()), SLOT(slotRefresh()) );
-    }
-    else
+    if ( !pSettingsBrush )
     {
         qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Could not find key [SBrush].";
+        return;
     }
+
+    brush    = pSettingsBrush->getValue();
+
+    QHBoxLayout *pLayout = new QHBoxLayout( this );
+
+    if ( !bCompress )
+    {
+        pColor = new WColorButton( brush.color(), this, WColorButton::Fill );
+        pLayout->addWidget( pColor );
+        connect( pColor, SIGNAL(signalChanged(const QColor &)), SLOT(slotColor(const QColor &)) );
+    }
+
+    pStyle = new WBrushStyleComboBox( this, brush.style() );
+    pStyle->setToolTip( tr("brush style") );
+    pLayout->addWidget( pStyle );
+    connect( pStyle, SIGNAL(signalChanged(Qt::BrushStyle)), SLOT(slotStyle(Qt::BrushStyle)) );
+
+    if ( !bCompress )
+    {
+        pImage = new WImageButton( this, brush.textureImage() );
+        pImage->setToolTip( tr("double-click to set texture") );
+        pLayout->addWidget( pImage, 1 );
+        connect( pImage, SIGNAL(signalClick()), SLOT(slotImage()) );
+    }
+
+    pMore = new QToolButton( this );
+    pMore->setToolTip( tr("more") );
+    pMore->setText( ":" );
+    pLayout->addWidget( pMore );
+    connect( pMore, SIGNAL(clicked()), SLOT(slotMore()) );
+
+    pLayout->addStretch( 50 );
+
+    connect( pSettingsBrush, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
+    connect( pSettingsBrush, SIGNAL(signalSync()), SLOT(slotRefresh()) );
 }
 
 void SBrushToolBar::slotRefresh()

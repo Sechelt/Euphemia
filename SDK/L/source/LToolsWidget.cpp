@@ -134,7 +134,19 @@ void LToolsWidget::doInitActions( QVector<LTool> vectorTools )
     pActionGroup = new QActionGroup( this );
     foreach( LTool tool, vectorTools )
     {
-        QAction *pAction = new QAction( tool.pixmap, tool.stringText, pActionGroup );
+        // create a modified version to (better) show when selected
+        QIcon icon( tool.pixmap );
+        {
+            QPixmap pixmapSelected = tool.pixmap;
+            QPainter painter( &pixmapSelected );
+            QPen pen( QColor( Qt::darkMagenta ) );
+            pen.setWidth( 10 );
+            painter.setPen( pen );
+            painter.drawRect( 0, pixmapSelected.height() - 8, pixmapSelected.width(), pixmapSelected.height() - 8 );
+            icon.addPixmap( pixmapSelected, QIcon::Normal, QIcon::On );
+        }
+        // add the tool action
+        QAction *pAction = new QAction( icon, tool.stringText, pActionGroup );
         pAction->setToolTip( tool.stringToolTip );
         pAction->setCheckable( true );
         pAction->setProperty( "Tool", tool.nID );

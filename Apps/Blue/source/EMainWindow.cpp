@@ -531,6 +531,7 @@ void EMainWindow::doInitToolbar()
     pToolBarHolder->setObjectName( "ToolConfig" );
     pToolBarHolder->setToolTip( tr("tool config (when possible)") );
     pMenuToolBars->addAction( pToolBarHolder->toggleViewAction() );
+    pToolBarHolder->setMinimumHeight( 32 );
 
     // grid
     pToolBar = addToolBar( tr("Grid") );

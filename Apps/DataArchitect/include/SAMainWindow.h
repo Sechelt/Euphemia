@@ -61,7 +61,6 @@ private:
     AWTreeWidget *  pTreeWidgetBrowser;         
     // Dock Classes
     QDockWidget *   pDockClasses;
-    WStackedWidget *pComboStackClasses;         // contains pWidgetStackClasses and a combobox to select active widget
     QStackedWidget *pWidgetStackClasses;        // a stack of AWPalWidget's - one per open document - widget shown is for the document with focus
     // Dock Stencils
     QDockWidget *   pDockStencils;

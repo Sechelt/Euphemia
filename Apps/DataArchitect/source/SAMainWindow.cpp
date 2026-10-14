@@ -287,14 +287,9 @@ void SAMainWindow::doInitDockClasses()
 {
     pDockClasses = new QDockWidget( tr( "Classes" ), this );
     pDockClasses->setObjectName( "Classes" );
-
-    pComboStackClasses = new WStackedWidget( pDockClasses );
-    pWidgetStackClasses = new QStackedWidget( pComboStackClasses );
-    pComboStackClasses->addWidget( tr( "Classes" ), pWidgetStackClasses );
-
-    pDockClasses->setWidget( pComboStackClasses );
+    pWidgetStackClasses = new QStackedWidget( pDockClasses );
+    pDockClasses->setWidget( pWidgetStackClasses );
     addDockWidget( Qt::LeftDockWidgetArea, pDockClasses );
-
     pMenuWindow->addAction( pDockClasses->toggleViewAction() );
 }
 
@@ -928,7 +923,7 @@ void SAMainWindow::slotEditorOpened( AWObject *pObject, AWEditorWidget *pEditorW
 {
     int nTab = pCentralWidget->addTab( pEditorWidget, pObject->getName() );
 
-//    pWidgetStackClasses->addWidget( (QWidget*)pEditorWidget->getPalWidget() );                                                                            
+    pWidgetStackClasses->addWidget( (QWidget*)pEditorWidget->getPalWidget() );                                                                            
     pWidgetStackPanners->addWidget( (QWidget*)pEditorWidget->getPanWidget() );                                                                              
 
     pCentralWidget->setCurrentIndex( nTab );
@@ -953,7 +948,7 @@ void SAMainWindow::slotEditorClosing( AWObject *pObject, AWEditorWidget *pEditor
     }
 
     // Just remove these - they will get deleted when the editor is deleted.
-//    pWidgetStackClasses->removeWidget( pWidgetStackClasses->widget( n ) );
+    pWidgetStackClasses->removeWidget( pWidgetStackClasses->widget( n ) );
     pWidgetStackPanners->removeWidget( pWidgetStackPanners->widget( n ) );  
 }
 

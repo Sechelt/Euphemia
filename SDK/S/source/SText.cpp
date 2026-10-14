@@ -182,6 +182,7 @@ STextToolBar::STextToolBar( QWidget *pParent )
 
     pFontComboBox = new QFontComboBox( this );
     pFontComboBox->setCurrentFont( text.font );
+    pFontComboBox->setToolTip( tr("font") );
     connect( pFontComboBox, SIGNAL(currentFontChanged(const QFont &)), SLOT(slotFont(const QFont &)) );
     pLayout->addWidget( pFontComboBox );
 
@@ -189,13 +190,15 @@ STextToolBar::STextToolBar( QWidget *pParent )
     pSize->setMinimum( 2 );
     pSize->setMaximum( 100 );
     pSize->setValue( text.font.pointSize() );
+    pSize->setToolTip( tr("size") );
     connect( pSize, SIGNAL(valueChanged(int)), SLOT(slotSize(int)) );
     pLayout->addWidget( pSize );
 
     pMore = new QToolButton( this );
     pMore->setText( ":" );
-    pLayout->addWidget( pMore );
+    pMore->setToolTip( tr("more") );
     connect( pMore, SIGNAL(clicked()), SLOT(slotMore()) );
+    pLayout->addWidget( pMore );
 
     pLayout->addStretch( 11 );
 

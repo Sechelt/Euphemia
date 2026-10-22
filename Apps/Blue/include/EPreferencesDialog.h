@@ -11,14 +11,15 @@
 #define H_EPreferencesDialog
 
 #include <CBD.h>
+#include <SSettings.h>
 
 class EPreferencesDialog : public QDialog
 {
     Q_OBJECT
 public:
-    EPreferencesDialog( QWidget *pParent = nullptr );
+    EPreferencesDialog( QWidget *pParent = nullptr, SSettings::Mode = SSettings::ModePreference );
 
-    static void doPreferences( QWidget *pParent );
+    static void doPreferences( QWidget *pParent, SSettings::Mode = SSettings::ModePreference );
 
 protected:
     QSplitter *     pSplitter; 

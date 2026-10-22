@@ -183,7 +183,8 @@ void EMainWindow::doInitActions()
         pActionAutoCommit   = new QAction( tr("Auto Commit"), this );
         pActionCommit       = new QAction( QIcon( ":E/Commit" ), tr("Commit"), this );
         pActionCancel       = new QAction( QIcon( ":E/Cancel" ), tr("Cancel"), this );
-        pActionPreferences  = new QAction( QIcon( ":W/Properties16x16" ), tr("Preferences"), this );
+        pActionContext      = new QAction( QIcon( ":W/Properties16x16" ), tr("Current Context..."), this );
+        pActionPreferences  = new QAction( QIcon( ":W/Properties16x16" ), tr("Startup Context..."), this );
 
         pActionCut->setShortcut( QKeySequence::Cut );
         pActionCopy->setShortcut( QKeySequence::Copy );
@@ -211,6 +212,7 @@ void EMainWindow::doInitActions()
         pActionAutoCommit->setEnabled( true );
         pActionCommit->setEnabled( false );
         pActionCancel->setEnabled( false );
+        pActionContext->setEnabled( true );
         pActionPreferences->setEnabled( true );
 
         connect( pActionCut, &QAction::triggered, this, &EMainWindow::slotCut );
@@ -226,6 +228,7 @@ void EMainWindow::doInitActions()
         connect( pActionAutoCommit, &QAction::toggled, this, &EMainWindow::slotAutoCommit );
         connect( pActionCommit, &QAction::triggered, this, &EMainWindow::slotCommit );
         connect( pActionCancel, &QAction::triggered, this, &EMainWindow::slotCancel );
+        connect( pActionContext, &QAction::triggered, this, &EMainWindow::slotContext );
         connect( pActionPreferences, &QAction::triggered, this, &EMainWindow::slotPreferences );
     }
 
@@ -409,6 +412,7 @@ void EMainWindow::doInitMenus()
     pMenuEdit->addAction( pActionCommit );
     pMenuEdit->addAction( pActionCancel );
     pMenuEdit->addSeparator();
+    pMenuEdit->addAction( pActionContext );
     pMenuEdit->addAction( pActionPreferences );
 
     // VIEW
@@ -1443,6 +1447,11 @@ void EMainWindow::slotCancel()
     EFile *pFile = (EFile*)pEditorWidget->getObject();
     LLayer *pLayer = pFile->getLayerCurrent();
     if ( pLayer ) pLayer->doCancel();
+}
+
+void EMainWindow::slotContext()
+{
+    EPreferencesDialog::doPreferences( this, SSettings::ModeContext );
 }
 
 void EMainWindow::slotPreferences()

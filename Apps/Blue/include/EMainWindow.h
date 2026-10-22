@@ -124,7 +124,9 @@ private:
     QAction *pActionRuler;
     QAction *pActionCommit;
     QAction *pActionCancel;
+    QAction *pActionContext;
     QAction *pActionPreferences;
+
     // view
     QMenu *pMenuView;
     QAction *pActionZoomIn;
@@ -281,6 +283,7 @@ private slots:
     void slotPointerContext();
     void slotCommit();
     void slotCancel();
+    void slotContext();
     void slotPreferences();
     void slotZoomIn();
     void slotZoomOut();

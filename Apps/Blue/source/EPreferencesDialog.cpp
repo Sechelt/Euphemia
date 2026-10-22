@@ -10,8 +10,6 @@
 #include "AppInfo.h"
 #include "EPreferencesDialog.h"
 
-#include <SSettings.h>
-
 // SSetting classes we know about...
 #include <SPen.h>       
 #include <SRuler.h>       
@@ -38,11 +36,14 @@
 #include <PASPolygonFilled.h>
 #include <PASSpray.h>     
 
-EPreferencesDialog::EPreferencesDialog( QWidget *pParent )
+EPreferencesDialog::EPreferencesDialog( QWidget *pParent, SSettings::Mode nMode )
     : QDialog( pParent )
 {
     setObjectName( "EPreferencesDialog" );
-    setWindowTitle( tr("Preferences") );
+    if ( nMode == SSettings::ModePreference )
+        setWindowTitle( tr("Startup Context...") );
+    else
+        setWindowTitle( tr("Current Context...") );
 
     QTreeWidgetItem *pItem01;
     QTreeWidgetItem *pItem02;
@@ -62,7 +63,11 @@ EPreferencesDialog::EPreferencesDialog( QWidget *pParent )
 
     pPanels = new QStackedWidget( pSplitter );   
 
-    pItem01 = doAddPanel( tr("StartUp"), new EPreferencesStartUpPanel( pPanels ) );
+    if ( nMode == SSettings::ModePreference )
+    {
+        pItem01 = doAddPanel( tr("StartUp"), new EPreferencesStartUpPanel( pPanels ) );
+    }
+
     pItem01 = doAddPanel( tr("Render"), g_SSettings->getSetting( "LSRender" )->getPanel( pPanels ) );
 
     pItem01 = doAddPanel( tr("Edit"), new QWidget( pPanels ) );
@@ -104,42 +109,51 @@ EPreferencesDialog::EPreferencesDialog( QWidget *pParent )
 
 }
 
-void EPreferencesDialog::doPreferences( QWidget *pParent )
+void EPreferencesDialog::doPreferences( QWidget *pParent, SSettings::Mode nMode )
 {
-    // load settings (current defaults)
-    SSettings settings( SSettings::ModePreference );
-    settings.doInsert( "SPen", new SPen() );       
-    settings.doInsert( "SBrush", new SBrush() );     
-    settings.doInsert( "SFont", new SFont() );      
-    settings.doInsert( "LSRender", new LSRender() );      
-    settings.doInsert( "LSImage", new LSImage() );      
-    settings.doInsert( "LSPage", new LSPage() );      
-    settings.doInsert( "LSGrid", new LSGrid() );      
-    settings.doInsert( "LSPointer", new LSPointer() );      
-    settings.doInsert( "LSEllipse", new LSEllipse() );     
-    settings.doInsert( "PASErase", new PASErase() );     
-    settings.doInsert( "PASFreeHand", new PASFreeHand() );  
-    settings.doInsert( "PASGradient", new PASGradient() );  
-    settings.doInsert( "PASPaste", new PASPaste() );     
-    settings.doInsert( "PASPolygonFilled", new PASPolygonFilled() );
-    settings.doInsert( "LSLine", new LSLine() ); 
-    settings.doInsert( "LSRectangle", new LSRectangle() ); 
-    settings.doInsert( "PASSpray", new PASSpray() );     
-    settings.doInsert( "LSText", new LSText() );      
-    settings.doInsert( "LSBackground", new LSBackground() );     
-    settings.doInsert( "LSGeneral", new LSGeneral() );     
-    settings.doInsert( "SRuler", new SRuler() );     
-    settings.doLoad();
-    // temp make ourself the global settings as that is what the various widgets will work with
-    SSettings *pSettings = g_SSettings;
-    g_SSettings = &settings;
-    // invoke preferences dialog with the various widgets for editing the settings
-    EPreferencesDialog dialog( pParent );
+    // startup context
+    if ( nMode == SSettings::ModePreference )
+    {
+        // load settings (current defaults)
+        SSettings settings( SSettings::ModePreference );
+        settings.doInsert( "SPen", new SPen() );       
+        settings.doInsert( "SBrush", new SBrush() );     
+        settings.doInsert( "SFont", new SFont() );      
+        settings.doInsert( "LSRender", new LSRender() );      
+        settings.doInsert( "LSImage", new LSImage() );      
+        settings.doInsert( "LSPage", new LSPage() );      
+        settings.doInsert( "LSGrid", new LSGrid() );      
+        settings.doInsert( "LSPointer", new LSPointer() );      
+        settings.doInsert( "LSEllipse", new LSEllipse() );     
+        settings.doInsert( "PASErase", new PASErase() );     
+        settings.doInsert( "PASFreeHand", new PASFreeHand() );  
+        settings.doInsert( "PASGradient", new PASGradient() );  
+        settings.doInsert( "PASPaste", new PASPaste() );     
+        settings.doInsert( "PASPolygonFilled", new PASPolygonFilled() );
+        settings.doInsert( "LSLine", new LSLine() ); 
+        settings.doInsert( "LSRectangle", new LSRectangle() ); 
+        settings.doInsert( "PASSpray", new PASSpray() );     
+        settings.doInsert( "LSText", new LSText() );      
+        settings.doInsert( "LSBackground", new LSBackground() );     
+        settings.doInsert( "LSGeneral", new LSGeneral() );     
+        settings.doInsert( "SRuler", new SRuler() );     
+        settings.doLoad();
+        // temp make ourself the global settings as that is what the various widgets will work with
+        SSettings *pSettings = g_SSettings;
+        g_SSettings = &settings;
+        // invoke preferences dialog with the various widgets for editing the settings
+        EPreferencesDialog dialog( pParent, nMode );
+        dialog.exec();
+        // restore global settings (context)
+        g_SSettings = pSettings;
+        // save settings (new defaults)
+        settings.doSave();
+        return;
+    }
+
+    // current context
+    EPreferencesDialog dialog( pParent, nMode );
     dialog.exec();
-    // restore global settings (context)
-    g_SSettings = pSettings;
-    // save settings (new defaults)
-    settings.doSave();
 }
 
 QTreeWidgetItem *EPreferencesDialog::doAddPanel( const QString &stringText, QWidget *pPanel )

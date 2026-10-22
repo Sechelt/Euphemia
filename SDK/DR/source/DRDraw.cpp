@@ -48,14 +48,28 @@ void DRDraw::setImage( const QImage &i )
 
 void DRDraw::setTool( int n, bool bCancelDrawing )
 {
+printf( "[PAH][%s][%s][%d] nMouseEventState=%d nTool=%d n=%d bCancelDrawing=%d\n", __FILE__, __FUNCTION__, __LINE__, nMouseEventState, nTool, n, bCancelDrawing );
     if ( n == nTool ) return;
     if ( bCancelDrawing )
     {
-        if ( canCancel() ) doCancel();
-        else if ( canCommit() ) doCommit();
-        if ( hasSelection() ) doSelectNone2();
+        if ( canCancel() )
+        {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
+            doCancel();
+        }
+        else if ( canCommit() ) 
+        {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
+            doCommit();
+        }
+        if ( hasSelection() )
+        {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
+            doSelectNone2();
+        }
     }
 
+printf( "[PAH][%s][%s][%d] nMouseEventState=%d nTool=%d\n", __FILE__, __FUNCTION__, __LINE__, nMouseEventState, nTool );
     nTool = (Tools)n;
 
     switch ( nTool )
@@ -1142,6 +1156,7 @@ void DRDraw::doSelectNone2()
 {
     while ( vectorSelected.count() )
     {
+printf( "[PAH][%s][%s][%d] vectorSelected.count()=%d\n", __FILE__, __FUNCTION__, __LINE__, vectorSelected.count() );
         setSelected( vectorSelected.at( 0 ), false );
     }
 }
@@ -1510,6 +1525,7 @@ void DRDraw::setSelected( DRObject *p, DRObject::SelectionStates nState )
 {
     Q_ASSERT( p );
 
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     // remove it
     if ( nState == DRObject::SelectionStateNone )
     {
@@ -1518,21 +1534,26 @@ void DRDraw::setSelected( DRObject *p, DRObject::SelectionStates nState )
             qInfo() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Object was not in selection.";
             return;
         }
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         vectorSelected.removeAll( p );
         if ( !p->isSelected() )
         {
             qInfo() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Object is not selected.";
             return;
         }
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         p->setSelected( nState );
     }
     // add/change it
     else
     {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         if ( !vectorSelected.contains( p ) ) vectorSelected.append( p );
         p->setSelected( nState );
     }
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     emit signalChanged();
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 }
 
 DRObject* DRDraw::getObject( const QPointF &point )

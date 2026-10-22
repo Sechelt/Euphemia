@@ -23,6 +23,7 @@
 SAPreferencesDialog::SAPreferencesDialog( QWidget *pParent )
     : QDialog( pParent )
 {
+    setObjectName( "SAPreferencesDialog" );
     setWindowTitle( tr("Preferences") );
 
     QVBoxLayout *pLayoutDialog = new QVBoxLayout( this );
@@ -84,9 +85,42 @@ void SAPreferencesDialog::doPreferences( QWidget *pParent )
     settings.doSave();
 }
 
+void SAPreferencesDialog::doLoadState()
+{
+    QString s = objectName() + "/";
+    QSettings settings;
+
+    if ( settings.value( s + "geometry" ).isNull() ) return;
+    
+    restoreGeometry(settings.value(s + "geometry").toByteArray());
+
+    pSplitter->restoreState( settings.value( s + "splitterSizes" ).toByteArray() );
+}
+
+void SAPreferencesDialog::doSaveState()
+{
+    QString s = objectName() + "/";
+    QSettings settings;
+    settings.setValue( s + "geometry", saveGeometry() );
+
+    settings.setValue( s + "splitterSizes", pSplitter->saveState() );
+}
+
 void SAPreferencesDialog::slotItemActivated( QTreeWidgetItem *pItem, int )
 {
     pPanel->setCurrentIndex( pTree->indexOfTopLevelItem( pItem ) );
+}
+
+void SAPreferencesDialog::slotOk()
+{
+    doSaveState();
+    done( QDialog::Accepted );
+}
+
+void SAPreferencesDialog::slotRejected()
+{
+    doSaveState();
+    done( QDialog::Rejected );
 }
 
 /****************************************************************

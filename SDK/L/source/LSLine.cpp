@@ -288,11 +288,14 @@ LSLinePanel::LSLinePanel( QWidget *pParent )
     connect( pEndSize, SIGNAL(valueChanged(qreal)), SLOT(slotEndSize(qreal)) );
 
     // FORM
-    QFormLayout *pLayoutForm = new QFormLayout( this );
+    QHBoxLayout *pLayoutStretch = new QHBoxLayout( this );
+    QFormLayout *pLayoutForm = new QFormLayout();
     pLayoutForm->addRow( tr("Begin:"), pBegin );
     pLayoutForm->addRow( tr("Size:"), pBeginSize );
     pLayoutForm->addRow( tr("End:"), pEnd );
     pLayoutForm->addRow( tr("Size:"), pEndSize );
+    pLayoutStretch->addLayout( pLayoutForm );
+    pLayoutStretch->addStretch( 10 );
 
     connect( pSetting, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
     connect( pSetting, SIGNAL(signalSync()), SLOT(slotRefresh()) );

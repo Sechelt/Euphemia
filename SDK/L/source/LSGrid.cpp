@@ -154,12 +154,15 @@ LSGridWidget::LSGridWidget( QWidget *pParent, Qt::Orientation n )
     }
     else
     {
-        QFormLayout *pLayout = new QFormLayout( this );
+        QHBoxLayout *pLayoutStretch = new QHBoxLayout( this );
+        QFormLayout *pLayout = new QFormLayout();
         pLayout->addRow( tr("Type"), pType );
         pLayout->addRow( tr("Snap"), pSnap );
         pLayout->addRow( tr("Width"), pCellX );
         pLayout->addRow( tr("Height"), pCellY );
         pLayout->addRow( tr("Minimum"), pMin );
+        pLayoutStretch->addLayout( pLayout );
+        pLayoutStretch->addStretch( 10 );
     }
 
     connect( pSetting, SIGNAL(signalChanged()), SLOT(slotRefresh()) );

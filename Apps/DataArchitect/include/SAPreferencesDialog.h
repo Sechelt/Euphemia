@@ -25,8 +25,13 @@ protected:
     QTreeWidget *   pTree;
     QStackedWidget *pPanel;
 
+    void doLoadState();
+    void doSaveState();
+
 protected slots:
     void slotItemActivated( QTreeWidgetItem *, int );
+    void slotOk();
+    void slotRejected();
 };
 
 /*!

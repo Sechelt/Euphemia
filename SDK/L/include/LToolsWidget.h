@@ -14,6 +14,12 @@
 
 class WIconLayout;
 
+/*!
+ * \class LToolsWidget
+ * \brief Displays the current tool actions. 
+ * 
+ * \author pharvey (2026-10-20)
+ */
 class LToolsWidget : public QWidget
 {
     Q_OBJECT

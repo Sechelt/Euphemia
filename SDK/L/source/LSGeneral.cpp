@@ -154,11 +154,14 @@ LSGeneralWidget::LSGeneralWidget( QWidget *pParent, Qt::Orientation n )
     }
     else
     {
-        QFormLayout *pLayout = new QFormLayout( this );
+        QHBoxLayout *pLayoutStretch = new QHBoxLayout( this );
+        QFormLayout *pLayout = new QFormLayout();
         pLayout->addRow( tr("Auto Commit Shapes"), pAutoCommit );
         pLayout->addRow( tr("Draw Page"), pPage );
         pLayout->addRow( tr("Show Grid"), pGrid );
         pLayout->addRow( tr("Show Ruler"), pRuler );
+        pLayoutStretch->addLayout( pLayout );
+        pLayoutStretch->addStretch( 10 );
     }
 
     connect( pSetting, SIGNAL(signalChanged()), SLOT(slotRefresh()) );

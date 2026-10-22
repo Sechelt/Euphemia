@@ -41,6 +41,7 @@
 EPreferencesDialog::EPreferencesDialog( QWidget *pParent )
     : QDialog( pParent )
 {
+    setObjectName( "EPreferencesDialog" );
     setWindowTitle( tr("Preferences") );
 
     QTreeWidgetItem *pItem01;

@@ -133,11 +133,14 @@ LSTextPanel::LSTextPanel( QWidget *p, Qt::Orientation nOrientation )
     // layout
     if ( nOrientation == Qt::Vertical )
     {
-        QFormLayout *pLayout = new QFormLayout( this );
+        QHBoxLayout *pLayoutStretch = new QHBoxLayout( this );
+        QFormLayout *pLayout = new QFormLayout();
         pLayout->addRow( tr("Font"), pFontPanel );
         pLayout->addRow( tr("Text"), pLineEdit );
         pLayout->addRow( tr("H-Align"), pHAlign );
         pLayout->addRow( tr("V-Align"), pVAlign );
+        pLayoutStretch->addLayout( pLayout );
+        pLayoutStretch->addStretch( 10 );
     }
     else
     {

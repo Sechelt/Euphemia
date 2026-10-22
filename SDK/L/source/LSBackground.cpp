@@ -111,10 +111,13 @@ LSBackgroundWidget::LSBackgroundWidget( QWidget *pParent, Qt::Orientation n )
     }
     else
     {
-        QFormLayout *pLayout = new QFormLayout( this );
+        QHBoxLayout *pLayoutStretch = new QHBoxLayout( this );
+        QFormLayout *pLayout = new QFormLayout();
         pLayout->addRow( tr("Transparency Color"), pColor );
         pLayout->addRow( tr("Transparency Style"), pStyle );
         pLayout->addRow( tr("Transparency Texture"), pImage );
+        pLayoutStretch->addLayout( pLayout );
+        pLayoutStretch->addStretch( 10 );
     }
 
     connect( pSetting, SIGNAL(signalChanged()), SLOT(slotRefresh()) );

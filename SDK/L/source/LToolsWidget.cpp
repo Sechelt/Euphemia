@@ -207,11 +207,16 @@ void LToolsWidget::slotChangedCurrent()
 
 void LToolsWidget::slotChangedTool()
 {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     Q_ASSERT( pLayer );
 
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     if ( nTool >= 0 || vectorActions.count() ) doDisconnectTool();
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     int n = pLayer->getTool();
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     if ( n >= 0 ) doConnectTool( n );
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 }
 
 

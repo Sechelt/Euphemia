@@ -207,7 +207,8 @@ LSPageWidget::LSPageWidget( QWidget *pParent, Qt::Orientation n )
     }
     else
     {
-        QFormLayout *pLayout = new QFormLayout( this );
+        QHBoxLayout *pLayoutStretch = new QHBoxLayout( this );
+        QFormLayout *pLayout = new QFormLayout();
         pLayout->addRow( tr("Page Width"), pSizeX );
         pLayout->addRow( tr("Page Height"), pSizeY );
         pLayout->addRow( tr("Margin Sides"), pMarginsX );
@@ -217,6 +218,8 @@ LSPageWidget::LSPageWidget( QWidget *pParent, Qt::Orientation n )
         pLayout->addRow( tr("Printer Page Size"), pPrinter );
         pLayout->addRow( tr("Draw Margins"), pDrawMargins );
         pLayout->addRow( tr("Auto Pages"), pAutoPages );
+        pLayoutStretch->addLayout( pLayout );
+        pLayoutStretch->addStretch( 10 );
     }
 
     connect( pSetting, SIGNAL(signalChanged()), SLOT(slotRefresh()) );

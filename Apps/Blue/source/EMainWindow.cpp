@@ -1822,9 +1822,12 @@ void EMainWindow::slotDeletedLayer( ADObject *p )
  */
 void EMainWindow::slotChangedTool()
 {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     Q_ASSERT( pLayer );
     if ( pToolConfigWidget ) doDisconnectTool();
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     if ( pLayer->getTool() >= 0 ) doConnectTool();
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 }
 
 void EMainWindow::slotChangedLayerToolState()

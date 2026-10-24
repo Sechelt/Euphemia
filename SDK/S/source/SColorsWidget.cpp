@@ -181,7 +181,7 @@ SColorsWidget::SColorsWidget( QWidget *pParent )
 
         pLoad->setIcon( QIcon( ":W/FileOpen16x16" ) );
         pSave->setIcon( QIcon( ":W/Save16x16" ) );
-        pSaveAs->setIcon( QIcon( ":W/Save16x16" ) );
+        pSaveAs->setIcon( QIcon( ":W/SaveAs16x16" ) );
         pReset->setIcon( QIcon( ":W/ResetToDefault" ) );
 
         pLoad->setToolTip( tr("load color palette") );

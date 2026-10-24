@@ -247,6 +247,7 @@ void PATool::doDeleteHandles()
 
 void PATool::doShowHandles( bool b )
 {
+printf( "[PAH][%s][%s][%d] b=%d\n", __FILE__, __FUNCTION__, __LINE__, b );
     for ( LHandle *p : vectorHandles )
     {
         p->setVisible( b );

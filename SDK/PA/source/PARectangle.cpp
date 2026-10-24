@@ -77,7 +77,13 @@ void PARectangle::doPress( PMouseEvent *pEvent )
         break;
     case StateManipulate:
         pHandle = getHandle( pEvent->pos() );
-        if ( !pHandle ) doCommit();
+        if ( pHandle )
+        {
+            // NOTE: This did not work and not sure why?
+            // doShowHandles( false ); 
+        }
+        else 
+            doCommit();
         break;
     }
 }
@@ -85,6 +91,9 @@ void PARectangle::doPress( PMouseEvent *pEvent )
 void PARectangle::doMove( PMouseEvent *pEvent ) 
 {
     Q_ASSERT( !acceptHoverEvents() );
+
+    // setMouseTracking is always on so the following is not going to work...
+    // if ( pEvent->button() != Qt::LeftButton ) return;
 
     switch ( nState )
     {
@@ -105,7 +114,7 @@ void PARectangle::doMove( PMouseEvent *pEvent )
         update();
         break;
     case StateManipulate:
-        if ( pHandle ) doMoveHandle( pEvent->pos() );
+            if ( pHandle ) doMoveHandle( pEvent->pos() );
         break;
     }
 }
@@ -130,6 +139,10 @@ void PARectangle::doRelease( PMouseEvent *pEvent )
         pHandle = nullptr;
         break;
     }
+
+    // NOTE: This did not work and not sure why?
+    // ensure handles (if any) are visible
+    // doShowHandles( true );
 }
 
 void PARectangle::doCommit()
@@ -304,6 +317,7 @@ void PARectangle::doMoveHandle( const QPoint &pointPos )
         doSyncHandleTypes();
         doSyncHandles();
     }
+
     update();
 }
 

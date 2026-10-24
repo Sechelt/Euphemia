@@ -21,7 +21,7 @@ class LFile;
 /*!
  * \brief Describes a tool. This can be used, by the app, to create QActionGroup for tools. 
  *  
- * A list of LTool's can be used to create a QActionGroup for seleting a tool. 
+ * A list of LTool's can be used to create a QActionGroup for selecting a tool. 
  * A tool is mutually exclusive group of tools (only one can be active at any one time). 
  * A common feature of a tool is that a mouse click on the canvas initiates the use of the tool. 
  *  

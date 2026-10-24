@@ -83,6 +83,7 @@
 	<file alias="RowUp16x16">images/RowUp16x16.png</file>
 	<file alias="RowDown16x16">images/RowDown16x16.png</file>
 	<file alias="Save16x16">images/Save16x16.png</file>
+	<file alias="SaveAs16x16">images/SaveAs16x16.png</file>
 	<file alias="Save48x48">images/Save48x48.png</file>
 	<file alias="SaveAll16x16">images/SaveAll16x16.png</file>
 	<file alias="SaveAll48x48">images/SaveAll48x48.png</file>

@@ -20,7 +20,7 @@ class WIconLayout;
  * 
  * \author pharvey (2026-10-20)
  */
-class LToolsWidget : public QWidget
+class LToolsWidget : public QSplitter
 {
     Q_OBJECT
 public:
@@ -32,11 +32,16 @@ protected:
     LFile * pLayers = nullptr;
     LLayer *pLayer  = nullptr;
 
-    QScrollArea *       pScrollArea         = nullptr;
-    QWidget *           pScrollableWidget   = nullptr;
-    QActionGroup *      pActionGroup        = nullptr;
+    QSplitter *         pSplitter               = nullptr;
+
+    QScrollArea *       pScrollAreaTools        = nullptr;
+    QWidget *           pScrollableWidgetTools  = nullptr;
+    QActionGroup *      pActionGroup            = nullptr;
     QVector<QAction*>   vectorActions;
     int                 nTool = -1;
+
+    QScrollArea *       pScrollAreaPanel        = nullptr;
+    QWidget *           pScrollableWidgetPanel  = nullptr;
 
     void doConnectLayers( LFile *p );
     void doDisconnectLayers();
@@ -49,6 +54,9 @@ protected:
     void doFiniActions();
     void doInitButtons();
     void doFiniButtons();
+
+    void doInitPanel();
+    void doFiniPanel();
 
 protected slots:
     void slotTriggered( QAction * );

@@ -153,7 +153,9 @@ void LEditorWidget::doInitCentralArea()
 
     pView = new LGraphicsView( pFile, this );
     pView->setRenderHint( QPainter::Antialiasing, true );
-    pView->setMouseTracking( true );
+
+    // LGraphicsView has alreadyy set this
+    // pView->setMouseTracking( true );
 }
 
 void LEditorWidget::slotRefreshGeneral()

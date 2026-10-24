@@ -16,15 +16,25 @@
 // LToolsWidget
 //
 LToolsWidget::LToolsWidget( QWidget *pParent )
-    : QWidget( pParent )
+    : QSplitter( pParent )
 {
-    // put the new widget into a scroll area so we get scroll bars as needed
-    pScrollArea = new QScrollArea( this );
-    pScrollArea->setWidgetResizable( true );
+    setOrientation( Qt::Vertical );
 
-    // put it all into a layout on this widget
-    QVBoxLayout *pLayout = new QVBoxLayout( this );
-    pLayout->addWidget( pScrollArea );
+    // top area is a scroll area containing all tool actions
+    {
+        pScrollAreaTools = new QScrollArea( this );
+        pScrollAreaTools->setToolTip( tr("tools") );
+        pScrollAreaTools->setWidgetResizable( true );
+        addWidget( pScrollAreaTools );
+    }
+
+    // bottom area is the settings panel (if any) for the currently selected tool
+    {
+        pScrollAreaPanel = new QScrollArea( this );
+        pScrollAreaPanel->setToolTip( tr("settings panel for active tool (if available)") );
+        pScrollAreaPanel->setWidgetResizable( true );
+        addWidget( pScrollAreaPanel );
+    }
 }
 
 void LToolsWidget::setLayers( LFile *p )
@@ -61,6 +71,7 @@ void LToolsWidget::doConnectLayer( LLayer *p )
 
     doInitActions( pLayer->getTools() );
     doInitButtons();
+    doInitPanel();
 
     connect( pLayer, SIGNAL(signalChangedTool()), this, SLOT(slotChangedTool()) );
 }
@@ -76,6 +87,7 @@ void LToolsWidget::doDisconnectLayer()
         disconnect( pLayer, SIGNAL( signalChangedTool() ), this, SLOT( slotChangedTool() ) );
     }
 
+    doFiniPanel();
     doFiniButtons();
     doFiniActions();
 
@@ -84,46 +96,58 @@ void LToolsWidget::doDisconnectLayer()
 
 void LToolsWidget::doConnectTool( int n )
 {
-    Q_ASSERT( nTool < 0 );
-    Q_ASSERT( n >= 0 );
+    Q_ASSERT( nTool < 0 );  // must NOT be connected to a tool
+    Q_ASSERT( n >= 0 );     // requested tool must be a valid tool
 
-    // find the action
-    QAction *p = nullptr;
-    foreach( QAction *pAction, vectorActions )
+    // set tool button active
     {
-        if ( pAction->property( "Tool" ).toInt() == n )
+        // find the action
+        QAction *p = nullptr;
+        foreach( QAction *pAction, vectorActions )
         {
-            p = pAction;
-            break;
+            if ( pAction->property( "Tool" ).toInt() == n )
+            {
+                p = pAction;
+                break;
+            }
         }
+
+        Q_ASSERT( p );
+
+        // make it current
+        p->setChecked( true );
+        nTool = n;
     }
 
-    Q_ASSERT( p );
-
-    // make it current
-    p->setChecked( true );
-    nTool = n;
+    // set panel (if available)
+    doInitPanel();
 }
 
 void LToolsWidget::doDisconnectTool()
 {
-    Q_ASSERT( nTool >= 0 );
-    // find the action
-    QAction *p = nullptr;
-    foreach( QAction *pAction, vectorActions )
+    // set tool button inactive
     {
-        if ( pAction->property( "Tool" ).toInt() == nTool )
+        Q_ASSERT( nTool >= 0 );
+        // find the action
+        QAction *p = nullptr;
+        foreach( QAction *pAction, vectorActions )
         {
-            p = pAction;
-            break;
+            if ( pAction->property( "Tool" ).toInt() == nTool )
+            {
+                p = pAction;
+                break;
+            }
         }
+
+        Q_ASSERT( p );
+
+        // make it current
+        p->setChecked( false );
+        nTool = -1;
     }
 
-    Q_ASSERT( p );
-
-    // make it current
-    p->setChecked( false );
-    nTool = -1;
+    // get rid of panel (if there is one)
+    doFiniPanel();
 }
 
 void LToolsWidget::doInitActions( QVector<LTool> vectorTools )
@@ -168,28 +192,43 @@ void LToolsWidget::doFiniActions()
 
 void LToolsWidget::doInitButtons()
 {
-    Q_ASSERT( !pScrollableWidget );
+    // init tool buttons
+    Q_ASSERT( !pScrollableWidgetTools );
 
     // create widget to scroll
-    pScrollableWidget = new QWidget( this );
-    WIconLayout *pIconLayout = new WIconLayout( pScrollableWidget );
+    pScrollableWidgetTools = new QWidget( this );
+    WIconLayout *pIconLayout = new WIconLayout( pScrollableWidgetTools );
     foreach( QAction *pAction, vectorActions )
     {
         QToolButton *pButton = new QToolButton( this );
         pButton->setDefaultAction( pAction );
         pIconLayout->addWidget( pButton );
     }
-    pScrollArea->setWidget( pScrollableWidget );
+    pScrollAreaTools->setWidget( pScrollableWidgetTools );
 }
 
 void LToolsWidget::doFiniButtons()
 {
-    Q_ASSERT( pScrollableWidget );
+    Q_ASSERT( pScrollableWidgetTools );
 
-    pScrollArea->setWidget( nullptr );
+    pScrollAreaTools->setWidget( nullptr );
 
-    delete pScrollableWidget;
-    pScrollableWidget = nullptr;
+    delete pScrollableWidgetTools;
+    pScrollableWidgetTools = nullptr;
+}
+
+void LToolsWidget::doInitPanel()
+{
+    Q_ASSERT( pLayer );
+    Q_ASSERT( !pScrollableWidgetPanel );
+    pScrollableWidgetPanel = pLayer->getPanel( this );
+    if ( pScrollableWidgetPanel ) pScrollAreaPanel->setWidget( pScrollableWidgetPanel );
+}
+
+void LToolsWidget::doFiniPanel()
+{
+    if ( pScrollableWidgetPanel ) delete pScrollableWidgetPanel;
+    pScrollableWidgetPanel = nullptr;
 }
 
 void LToolsWidget::slotTriggered( QAction *p )
@@ -207,16 +246,11 @@ void LToolsWidget::slotChangedCurrent()
 
 void LToolsWidget::slotChangedTool()
 {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     Q_ASSERT( pLayer );
 
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     if ( nTool >= 0 || vectorActions.count() ) doDisconnectTool();
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     int n = pLayer->getTool();
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     if ( n >= 0 ) doConnectTool( n );
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 }
 
 

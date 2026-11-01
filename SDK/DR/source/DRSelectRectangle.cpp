@@ -19,7 +19,8 @@
 DRSelectRectangle::DRSelectRectangle( DRDraw *pLayer, const QPointF &pointPos )
     : DRRectangleBase( pLayer, pointPos )
 {
-    bBind = false; 
+    bSelectable = false;
+    bBind       = false; 
 }
 
 QPixmap DRSelectRectangle::getIcon()
@@ -55,27 +56,20 @@ QDomElement DRSelectRectangle::getXML( QDomDocument *pdomDoc, QDomElement *pdomE
 void DRSelectRectangle::doMove( LHandle *pHandle, const QPointF &point )
 {
     QPointF pointDiff = point - r.center();
+    // move self
     DRRectangleBase::doMove( pHandle, point );
     if ( bDrawing ) return;
-    QVector<DRObject *> vectorSelected = pLayer->getSelected();
 
-    // move
+    QVector<DRObject *> vectorSelected = pLayer->getSelected();
+printf( "[PAH][%s][%s][%d] Selected: %lld\n", __FILE__, __FUNCTION__, __LINE__, vectorSelected.count() );
+
+    // move selected objects
     if ( pHandle->getType() == LHandle::TypeDrag ) 
     {
         foreach( DRObject *pObject, vectorSelected )
         {
             if ( pObject != this ) pObject->doMoveBy( pointDiff );
         }
-        return;
-    }
-    // resize - stretch and move all selected objects
-    if ( pHandle->getType() == LHandle::TypeSizeTopLeft ) 
-    {
-        // pObject->doResize();
-        return;
-    }
-    if ( pHandle->getType() == LHandle::TypeSizeBottomRight ) 
-    {
         return;
     }
 }

@@ -135,20 +135,20 @@ LSTextPanel::LSTextPanel( QWidget *p, Qt::Orientation nOrientation )
     {
         QHBoxLayout *pLayoutStretch = new QHBoxLayout( this );
         QFormLayout *pLayout = new QFormLayout();
-        pLayout->addRow( tr("Font"), pFontPanel );
         pLayout->addRow( tr("Text"), pLineEdit );
         pLayout->addRow( tr("H-Align"), pHAlign );
         pLayout->addRow( tr("V-Align"), pVAlign );
+        pLayout->addRow( tr("Font"), pFontPanel );
         pLayoutStretch->addLayout( pLayout );
         pLayoutStretch->addStretch( 10 );
     }
     else
     {
         QHBoxLayout *pLayout = new QHBoxLayout( this );
-        pLayout->addWidget( pFontToolBar );
         pLayout->addWidget( pLineEdit );
         pLayout->addWidget( pHAlign );
         pLayout->addWidget( pVAlign );
+        pLayout->addWidget( pFontToolBar );
         pLayout->addWidget( pMore );
         pLayout->addStretch( 10 );
     }

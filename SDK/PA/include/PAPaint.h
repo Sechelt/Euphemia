@@ -183,12 +183,12 @@ protected:
     SSetting *pSettingImage     = nullptr;
     Qt::ImageConversionFlags flagsImageConversion = Qt::AutoColor;
 
-    Tools           nTool       = ToolDrawLine;
+    Tools           nTool       = ToolDrawLine;                 /*!< We decide whether this gets changed or not. Others make requests. */
     QImage          image;   
     int             nMaxUndo    = 10;
     QStack<QImage>  stackUndo;  
     QStack<QImage>  stackRedo;  
-    PATool *        pTool       = nullptr;                          /*!< active shape (or not)          */
+    PATool *        pTool       = nullptr;                      /*!< active shape (or not)                                              */
 };
 
 #endif

@@ -10,6 +10,8 @@
 #ifndef H_DRDraw
 #define H_DRDraw
 
+#include <ADObjectSelectionManager.h>
+
 #include <LFile.h>
 #include <LLayer.h>
 
@@ -71,6 +73,7 @@ public:
     };
 
     DRDraw( LFile *pParent, const QString &stringName = QString() );
+    virtual ~DRDraw();
 
     void setImage( const QImage & ) override;
     void setTool( int n, bool bCancelDrawing = true );
@@ -90,7 +93,7 @@ public:
     ADObject *          getObject( const QString &s, ADObject * ) override;
     QString             getToolString();
     QString             getMouseEventStateString();
-    QVector<DRObject*>  getSelected() { return vectorSelected; }
+    QVector<DRObject*>  getSelected();
     QRectF              getSelectedBoundingRect();
 
     void doMousePressEvent( QGraphicsSceneMouseEvent *pEvent ) override;
@@ -146,6 +149,7 @@ public:
     bool isDrawing() override;
 
     bool hasSelection() override;
+    bool hasSelector();
     bool hasXML() override      { return true;  }
     bool hasImage() override    { return true;  }
 
@@ -185,30 +189,30 @@ protected:
 
     void doSelectAll( const QRectF & );
     void doSelectAll( const QPolygonF & );
-    void doSelectNone2();
 
     // begin - possibly get rid of these
     bool isBackgroundTransparent() { return colorBackground.alpha() == 0; }
     // end
 
     // state
-    Tools               nTool               = ToolManipulate;               /*!< manipulate tool                */
+    Tools               nTool               = ToolManipulate;               /*!< We decide whether this gets changed or not. Others make requests ie via setTool. */
     MouseEventStates    nMouseEventState    = MouseEventStateManipulate;    /*!< ready to manipulate            */
     // state modifiers
     bool            bMoving     = false;    /*!< true if Press was followed by a Move                           */
     bool            bTracking   = false;    /*!< true if we are initializing a polyline based object            */
     bool            bDrawing    = false;    /*!< true if we are initializing a new object                       */
 
-    QImage              image;      
-    int                 nMaxUndo    = 10;
-    QStack<QImage>      stackUndo;  
-    QStack<QImage>      stackRedo;  
-    QVector<DRObject*>  vectorSelected;
+    QImage                      image;      
+    int                         nMaxUndo    = 10;
+    QStack<QImage>              stackUndo;  
+    QStack<QImage>              stackRedo;  
+    ADObjectSelectionManager *  pSelectionManager;  /*!< use a selection manager to select/unselect objects DO NOT SELECT OBJECTS DIRECTLY  */
+
     //
-    QPointF         pointPress;             /*!< point when Press                                               */
-    QPointF         pointCurrent;           /*!< store mouse pos in case mouse goes off scene (or even view)    */
-    DRObject *      pObject     = nullptr;  /*!< shape being created/manipulated (can be a DRSelect*)           */
-    LHandle *       pHandle     = nullptr;  /*!< handle being moved                                             */
+    QPointF         pointPress;                     /*!< point when Press                                                                   */
+    QPointF         pointCurrent;                   /*!< store mouse pos in case mouse goes off scene (or even view)                        */
+    DRObject *      pObject     = nullptr;          /*!< shape being created/manipulated (can be a DRSelect*)                               */
+    LHandle *       pHandle     = nullptr;          /*!< handle being moved                                                                 */
 };
 
 #endif

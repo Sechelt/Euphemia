@@ -35,6 +35,19 @@ DRDraw::DRDraw( LFile *pParent, const QString &stringName )
     mapMeta.insert( "DRPolyline", ADMeta( QIcon( ":DR/Polyline" ), "DRPolyline", "Polyline" ) );
     mapMeta.insert( "DRRectangle", ADMeta( QIcon( ":DR/Rectangle" ), "DRRectangle", "Rectangle" ) );
     mapMeta.insert( "DRText", ADMeta( QIcon( ":PA/Text" ), "DRText", "Text" ) );
+
+    pSelectionManager = new ADObjectSelectionManager( this );
+    // see DDiagram for how this works
+    // connect( pSelectionManager, SIGNAL(signalChangedSelection()), SLOT(slotChangedSelection()) );
+}
+
+DRDraw::~DRDraw()
+{
+    if ( pSelectionManager )
+    {
+        pSelectionManager->doSelectNone();
+        delete pSelectionManager; 
+    }
 }
 
 void DRDraw::setImage( const QImage &i )
@@ -48,28 +61,23 @@ void DRDraw::setImage( const QImage &i )
 
 void DRDraw::setTool( int n, bool bCancelDrawing )
 {
-printf( "[PAH][%s][%s][%d] nMouseEventState=%d nTool=%d n=%d bCancelDrawing=%d\n", __FILE__, __FUNCTION__, __LINE__, nMouseEventState, nTool, n, bCancelDrawing );
     if ( n == nTool ) return;
     if ( bCancelDrawing )
     {
         if ( canCancel() )
         {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
             doCancel();
         }
         else if ( canCommit() ) 
         {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
             doCommit();
         }
         if ( hasSelection() )
         {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-            doSelectNone2();
+            pSelectionManager->doSelectNone();
         }
     }
 
-printf( "[PAH][%s][%s][%d] nMouseEventState=%d nTool=%d\n", __FILE__, __FUNCTION__, __LINE__, nMouseEventState, nTool );
     nTool = (Tools)n;
 
     switch ( nTool )
@@ -196,6 +204,21 @@ QWidget* DRDraw::getPanel( QWidget *pParent )
         case ToolSelectRectangle:
         case ToolSelectPolygon:
         case ToolManipulate:
+            if ( hasSelection() ) 
+            {
+                DRObject *p = (DRObject *)(pSelectionManager->getSelected().at( 0 ));
+                Q_ASSERT( p );
+                QString s = p->metaObject()->className();
+                if ( s == "DRLine" )
+                    return g_SSettings->getSetting( "LSLine" )->getPanel( pParent );
+                else if ( s == "DRRectangle" )
+                    return g_SSettings->getSetting( "LSRectangle" )->getPanel( pParent );
+                else if ( s == "DREllipse" )
+                    return g_SSettings->getSetting( "LSEllipse" )->getPanel( pParent );
+                else if ( s == "DRText" )
+                    return g_SSettings->getSetting( "LSText" )->getPanel( pParent );
+            }
+            break;
         case ToolDrawArc:
         case ToolDrawChord:
         case ToolDrawImage:
@@ -338,12 +361,26 @@ QString DRDraw::getMouseEventStateString()
     return "unknown";
 }
 
+QVector<DRObject*> DRDraw::getSelected() 
+{
+    QVector<DRObject*> vectorResult;
+    QList<ADObject *> l = pSelectionManager->getSelected();
+    for ( ADObject *p : l )
+    {
+        vectorResult << (DRObject*)p;
+    }
+
+    return vectorResult; 
+}
+
 QRectF DRDraw::getSelectedBoundingRect()
 {
     QRectF r;
     bool bFirst = true;
-    foreach( DRObject *pObject, vectorSelected )
+    QList<ADObject*> l = pSelectionManager->getSelected();
+    foreach( ADObject *p, l )
     {
+        DRObject *pObject = (DRObject*)p;
         if ( pObject->isSelector() ) continue;
         if ( bFirst ) 
         {
@@ -520,11 +557,13 @@ void DRDraw::doMousePressEventSelectRectangle( QGraphicsSceneMouseEvent *pEvent 
     Q_ASSERT( !pObject );
     Q_ASSERT( !pHandle );
 
-    doSelectNone2();
+    pSelectionManager->doSelectNone();
     pointCurrent = pointPress = pEvent->scenePos();
     pObject = getObject( ToolSelectRectangle, pointPress );
     Q_ASSERT( pObject );
-    pObject->setSelected(); // select WITHOUT adding to vectorSelected
+
+    pObject->setSelected( DRObject::SelectionStateStandard );
+
     pHandle = pObject->getGrab( pointPress, true );
     Q_ASSERT( pHandle );
     bDrawing = true;
@@ -545,6 +584,22 @@ void DRDraw::doMouseMoveEventSelectRectangle( QGraphicsSceneMouseEvent *pEvent )
     pObject->doMove( pHandle, pointCurrent );
 }
 
+/*!
+ * \brief Complete selection.
+ *
+ * If bDrawing
+ *  If rect contains >0 objects THEN
+ *      - select all objects and switch to Minimal state (no handles)
+ *      - switch to manipulate tool 
+ *  Else 
+ *      - delete the selector and stay with selector tool
+ * Else
+ *  
+ * 
+ * \author pharvey (2026-10-31)
+ * 
+ * \param pEvent 
+ */
 void DRDraw::doMouseReleaseEventSelectRectangle( QGraphicsSceneMouseEvent *pEvent )
 {
     Q_UNUSED( pEvent );
@@ -558,30 +613,30 @@ void DRDraw::doMouseReleaseEventSelectRectangle( QGraphicsSceneMouseEvent *pEven
     pObject->doDrop( pHandle, pointCurrent );
     QRectF r = pObject->getRect();
     pHandle = nullptr;
-    bDrawing = false;
     bMoving = false;
 
-    // select all in rect to SelectionStateMinimal (this will include pObject)
-    doSelectAll( r );       
-    // was anything other than self selected?
-    if ( vectorSelected.count() <= 1 ) 
+    if ( bDrawing )
     {
-        doCancel();
-        // get rid of the selection object
-        // doSelectNone();
-        // slotDelete( pObject );
-        // pObject = nullptr;
+        // drawing (not manipulating)
+        bDrawing = false;
+        doSelectAll( r );    
+        if ( hasSelection() )
+        {
+            // something selected so
+            // shrink selection rectangle to just what we need
+            DRSelectRectangle *pSelectRectangle = (DRSelectRectangle *)pObject;
+            pSelectRectangle->setRect( getSelectedBoundingRect() );   
+            pSelectRectangle->setSelected( DRObject::SelectionStateMove );    
+            // set tool but do not unselect
+            setTool( ToolManipulate, false );
+            emit signalChanged();
+            return;
+        }
+        // nothing selected so delete selector but leave tool alone
+        slotDelete( pObject );
+        pObject = nullptr;
+        return;
     }
-    else
-    {
-        // select pObject back to SelectionStateStandard
-        setSelected( pObject, DRObject::SelectionStateStandard ); // selected self in doSelectAll but switch to standard handles
-        // shrink selection rectangle to just what we need
-        DRSelectRectangle *pSelectRectangle = (DRSelectRectangle *)pObject;
-        pSelectRectangle->setRect( getSelectedBoundingRect() );       
-    }
-
-    setTool( ToolManipulate, false );
 }
 
 void DRDraw::doMousePressEventSelectPolygon( QGraphicsSceneMouseEvent *pEvent )
@@ -643,6 +698,7 @@ void DRDraw::doMousePressEventManipulate( QGraphicsSceneMouseEvent *pEvent )
 
     // Handles can sometimes be outside of the shapes bounding rect. So lets start by going after a handle...
     pHandleClicked = getHandle( pointPress );
+// printf( "[PAH][%s][%s][%d] %p\n", __FILE__, __FUNCTION__, __LINE__, pHandleClicked );
     if ( pHandleClicked )
     {
         // Get the object the handle is working with...
@@ -661,6 +717,7 @@ void DRDraw::doMousePressEventManipulate( QGraphicsSceneMouseEvent *pEvent )
     //
     if ( pObject && pObject == pObjectClicked ) 
     {
+// printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         pHandle = pHandleClicked; // may be nullptr
         // any selection state cycle will happen in mouse release
         return;
@@ -668,7 +725,7 @@ void DRDraw::doMousePressEventManipulate( QGraphicsSceneMouseEvent *pEvent )
     else if ( pObject ) 
     {
         if ( canCommit() ) doCommit();
-        if ( hasSelection() ) doSelectNone2();
+        if ( hasSelection() ) pSelectionManager->doSelectNone();
     }
 
     //
@@ -690,6 +747,7 @@ void DRDraw::doMouseMoveEventManipulate( QGraphicsSceneMouseEvent *pEvent )
     if ( !pHandle ) return;
     Q_ASSERT( pObject );
     
+// printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     // manipulate self and selected if isSelector   
     pObject->doMove( pHandle, pointCurrent );
 }
@@ -701,6 +759,7 @@ void DRDraw::doMouseReleaseEventManipulate( QGraphicsSceneMouseEvent *pEvent )
     // Handle - so we were probably moving it...
     if ( pHandle )
     {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         Q_ASSERT( pObject );
         // manipulate self and selected if isSelector   
         pObject->doDrop( pHandle, pointCurrent );
@@ -779,7 +838,7 @@ void DRDraw::doMouseMoveEventCreate( QGraphicsSceneMouseEvent *pEvent )
         if ( !pHandle )
         {
             // have object? stop using it
-            if ( hasSelection() ) doSelectNone2();
+            if ( hasSelection() ) pSelectionManager->doSelectNone();
             //
             // create new object
             //
@@ -843,7 +902,7 @@ void DRDraw::doMouseReleaseEventCreate( QGraphicsSceneMouseEvent *pEvent )
 void DRDraw::doDragEnterEvent( QGraphicsSceneDragDropEvent * )
 {
     Q_ASSERT( pGraphics );
-    Q_ASSERT( vectorSelected.count() > 1 );
+    Q_ASSERT( hasSelection() );
 }
 
 void DRDraw::doDragMoveEvent( QGraphicsSceneDragDropEvent * )
@@ -929,9 +988,12 @@ void DRDraw::doCopy()
     domDoc.appendChild( domElementRoot );
 
     // save selected
-    foreach( DRObject *pObject, vectorSelected )
     {
-        pObject->doSave( &domDoc, &domElementRoot );
+        QList<ADObject*> l = pSelectionManager->getSelected();
+        foreach( ADObject *pObject, l )
+        {
+            pObject->doSave( &domDoc, &domElementRoot );
+        }
     }
 
     // write
@@ -956,7 +1018,7 @@ void DRDraw::doPaste()
 
     if ( hasSelection() ) 
     {
-        doSelectNone2();
+        pSelectionManager->doSelectNone();
     }
 
     QClipboard *pClipboard = QGuiApplication::clipboard();
@@ -1054,7 +1116,7 @@ void DRDraw::doPaste( const QImage &i )
 
     if ( hasSelection() ) 
     {
-        doSelectNone2();
+        pSelectionManager->doSelectNone();
     }
 
     pObject = getObject( i );
@@ -1113,7 +1175,7 @@ void DRDraw::doSelectAll()
     {
         if ( canCancel() ) doCancel();
         else if ( canCommit() ) doCommit();
-        if ( hasSelection() ) doSelectNone2();
+        if ( hasSelection() ) pSelectionManager->doSelectNone();
     }
     else 
         setTool( ToolManipulate );
@@ -1128,7 +1190,7 @@ void DRDraw::doSelectAll()
     pSelectRectangle->setRect( boundingRect() ); 
     doSelectAll( boundingRect() );
     // was anything other than self selected?
-    if ( vectorSelected.count() <= 1 ) 
+    if ( hasSelection() ) 
     {
         doCancel();
         return;
@@ -1149,16 +1211,7 @@ void DRDraw::doSelectNone()
 {
     if ( canCancel() ) doCancel();
     else if ( canCommit() ) doCommit();
-    if ( hasSelection() ) doSelectNone2();
-}
-
-void DRDraw::doSelectNone2()
-{
-    while ( vectorSelected.count() )
-    {
-printf( "[PAH][%s][%s][%d] vectorSelected.count()=%d\n", __FILE__, __FUNCTION__, __LINE__, vectorSelected.count() );
-        setSelected( vectorSelected.at( 0 ), false );
-    }
+    if ( hasSelection() ) pSelectionManager->doSelectNone();
 }
 
 void DRDraw::doCrop()
@@ -1246,17 +1299,23 @@ void DRDraw::doRotate( int nDegrees )
 
 void DRDraw::doDelete()
 {
+    // now delete selected
+    QList<ADObject*> l = pSelectionManager->getSelected();
+    for ( ADObject *p : l )
+    {
+        if ( p == pObject )
+        {
+            pObject = nullptr;
+            pHandle = nullptr;
+        }
+        slotDelete( p );
+    }
+
+    // cancel selector (if any)
     if ( canCancel() )
     {
         doCancel();
         return;
-    }
-    // now delete selected
-    while ( vectorSelected.count() )
-    {
-        DRObject *p = vectorSelected.at( 0 );
-        setSelected( p, false );
-        slotDelete( p );
     }
 
     emit signalChanged();
@@ -1283,7 +1342,7 @@ void DRDraw::doCommit()
         if ( pHandle ) pObject->doDrop( pHandle );
         if ( pObject->isSelector() )
         {
-            doSelectNone2();
+            pSelectionManager->doSelectNone();
             slotDelete( pObject );
         }
         else 
@@ -1302,26 +1361,43 @@ void DRDraw::doCommit()
  */
 void DRDraw::doCancel()
 {
-    // do commit if we are just manipulating an existing object
-    if ( !bDrawing ) return doCommit();
     // we are doing the initial drawing for an object so...
-    // stop tracking
-    if ( bTracking )
+    if ( bDrawing )
     {
-        ((DRPolyline *)pObject)->doDoubleClick();
-        bTracking = false;
-        bMoving = false;
-        pHandle = nullptr;
+        // stop tracking
+        if ( bTracking )
+        {
+            ((DRPolyline *)pObject)->doDoubleClick();
+            bTracking = false;
+            bMoving = false;
+            pHandle = nullptr;
+        }
+        // delete current object
+        if ( pObject )
+        {
+            bDrawing = false; // must be before doSelectNone
+            if ( pHandle ) pObject->doDrop( pHandle );
+            slotDelete( pObject );
+            pHandle = nullptr;
+            pObject = nullptr;
+            emit signalChanged();
+        }
     }
-    // delete current object
-    if ( pObject )
+    else if ( hasSelector() )
     {
-        bDrawing = false; // must be before doSelectNone
+        // unselect
+        if ( hasSelection() ) pSelectionManager->doSelectNone();
+        // delete selector
         if ( pHandle ) pObject->doDrop( pHandle );
-        if ( pObject->isSelector() ) doSelectNone2();
         slotDelete( pObject );
+        pHandle = nullptr;
         pObject = nullptr;
         emit signalChanged();
+    }
+    else
+    {
+        // do commit if we are just manipulating an existing object
+        doCommit();
     }
 }
 
@@ -1360,7 +1436,13 @@ bool DRDraw::isDrawing()
 
 bool DRDraw::hasSelection()
 {
-    return vectorSelected.count();
+    return pSelectionManager->hasSelection();
+}
+
+bool DRDraw::hasSelector()
+{
+    if ( !pObject ) return false;
+    return pObject->isSelector();
 }
 
 bool DRDraw::canCut()
@@ -1408,16 +1490,18 @@ bool DRDraw::canDelete()
     return hasSelection();
 }
 
+// can commit new object
 bool DRDraw::canCommit()
-{
-    return hasSelection();
-    // return isDrawing();
-}
-
-bool DRDraw::canCancel()
 {
     // return hasSelection();
     return isDrawing();
+}
+
+// can cancel new object or selector
+bool DRDraw::canCancel()
+{
+    // return hasSelection();
+    return isDrawing() || hasSelector();
 }
 
 bool DRDraw::canScale()
@@ -1475,85 +1559,60 @@ void DRDraw::slotCommitted()
 */
 }
 
+/*!
+ * \brief Select/unselect given objects.
+ * 
+ * \author pharvey (2026-10-31)
+ * 
+ * \param p      
+ * \param nState 
+ */
 void DRDraw::setSelected( QList<DRObject *> listObjects, bool b )
 {
     for ( DRObject *p : listObjects )
     {
-        // add it
-        if ( b )
-        {
-            if ( vectorSelected.contains( p ) )
-            {
-                qDebug() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Object already in selection.";
-                return;
-            }
-            vectorSelected.append( p );
-            if ( p->isSelected() )
-            {
-                qDebug() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Object already selected.";
-                return;
-            }
-            p->setSelected( DRObject::SelectionStateMinimal );
-        }
-        // remove it
-        else
-        {
-            if ( !vectorSelected.contains( p ) )
-            {
-                qDebug() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Object was not in selection.";
-                return;
-            }
-            vectorSelected.removeAll( p );
-            if ( !p->isSelected() )
-            {
-                qDebug() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Object is not selected.";
-                return;
-            }
-            p->setSelected( DRObject::SelectionStateNone );
-        }
+        setSelected( p, b );
     }
+}
+
+/*!
+ * \brief Select/unselect object.
+ * 
+ * \author pharvey (2026-10-31)
+ * 
+ * \param p      
+ * \param nState 
+ */
+void DRDraw::setSelected( DRObject *p, bool b )
+{
+    pSelectionManager->setSelected( p, b );
     emit signalChanged();
 }
 
-void DRDraw::setSelected( DRObject *p, bool b )
-{
-    if ( b ) setSelected( p, DRObject::SelectionStateStandard );
-    else setSelected( p, DRObject::SelectionStateNone );
-}
-
+/*!
+ * \brief Set the object select state.
+ * 
+ * This will harmonize ADObject::bSelected with DRObject::nSelectionState. 
+ * 
+ * \author pharvey (2026-10-31)
+ * 
+ * \param p      
+ * \param nState 
+ */
 void DRDraw::setSelected( DRObject *p, DRObject::SelectionStates nState )
 {
     Q_ASSERT( p );
 
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-    // remove it
     if ( nState == DRObject::SelectionStateNone )
     {
-        if ( !vectorSelected.contains( p ) )
-        {
-            qInfo() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Object was not in selection.";
-            return;
-        }
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-        vectorSelected.removeAll( p );
-        if ( !p->isSelected() )
-        {
-            qInfo() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Object is not selected.";
-            return;
-        }
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-        p->setSelected( nState );
+        pSelectionManager->setSelected( pObject, false );
     }
-    // add/change it
     else
     {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-        if ( !vectorSelected.contains( p ) ) vectorSelected.append( p );
-        p->setSelected( nState );
+        if ( !p->isSelected() ) pSelectionManager->setSelected( pObject );
     }
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
+    p->setSelected( nState );
     emit signalChanged();
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 }
 
 DRObject* DRDraw::getObject( const QPointF &point )
@@ -1698,7 +1757,7 @@ LHandle* DRDraw::getHandle( const QPointF &point )
         if ( !pGraphicsObject ) continue;
         DRObject *pObject = dynamic_cast<DRObject *>( pGraphicsObject->getObject() );
         if ( !pObject ) continue;
-        if ( !pObject->isSelected() ) continue;
+        if ( !pObject->isSelector() && !pObject->isSelected() ) continue;
         LHandle *pHandle = pObject->getHandle( point );
         if ( pHandle ) return pHandle;
     }
@@ -1718,19 +1777,13 @@ void DRDraw::doSelectAll( const QRectF &rect )
         DRObject *pObject = dynamic_cast<DRObject *>( pGraphicsObject->getObject() );
         if ( !pObject ) continue;
         if ( !rect.contains( pObject->boundingRect() ) ) continue;
-        setSelected( pObject, DRObject::SelectionStateMinimal );
+        pSelectionManager->setSelected( pObject );
+        if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
     }
 }
 
 void DRDraw::doSelectAll( const QPolygonF &polygon )
 {
-    // unselect all (without cancelling drawing)
-    // NOTE: any selector object is not in vectorSelected so will be unaffected
-    while ( vectorSelected.count() )
-    {
-        setSelected( vectorSelected.at( 0 ), false );
-    }
-
     QList<QGraphicsItem *> listItems = pGraphics->childItems();
 
     foreach( QGraphicsItem * pItem, listItems )
@@ -1751,7 +1804,8 @@ void DRDraw::doSelectAll( const QPolygonF &polygon )
             if ( polygon.containsPoint( pLine->getBegin(), Qt::OddEvenFill ) &&
                  polygon.containsPoint( pLine->getEnd(), Qt::OddEvenFill ) )
             {
-                setSelected( pObject, DRObject::SelectionStateMinimal );
+                pSelectionManager->setSelected( pObject );
+                if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
             }
         }
         else if ( pObject->inherits( "DRPolyline" ) )
@@ -1762,7 +1816,8 @@ void DRDraw::doSelectAll( const QPolygonF &polygon )
             {
                 if ( !polygon.containsPoint( point, Qt::OddEvenFill ) ) break;
             }
-            setSelected( pObject, DRObject::SelectionStateMinimal );
+            pSelectionManager->setSelected( pObject );
+            if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
         }
         else
         {
@@ -1773,7 +1828,8 @@ void DRDraw::doSelectAll( const QPolygonF &polygon )
                  polygon.containsPoint( rectObject.bottomLeft(), Qt::OddEvenFill ) &&
                  polygon.containsPoint( rectObject.bottomRight(), Qt::OddEvenFill ) )
             {
-                setSelected( pObject, DRObject::SelectionStateMinimal );
+                pSelectionManager->setSelected( pObject );
+                if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
             }
         }
     }

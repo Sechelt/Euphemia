@@ -17,8 +17,8 @@
 
 #include "DRDraw.h"
 
-#define DRRectangleBaseBegin 0
-#define DRRectangleBaseMove 1
+#define DRRectangleBaseMove 0
+#define DRRectangleBaseBegin 1
 #define DRRectangleBaseEnd 2
 
 DRRectangleBase::DRRectangleBase( DRDraw *pCanvas, const QPointF &pointPos )
@@ -99,18 +99,18 @@ void DRRectangleBase::doMove( LHandle *pHandle, const QPointF &pointPos )
     // adjust our geometry
     if ( bBind )
     {
-        if ( pHandle == vectorHandles[DRRectangleBaseBegin] )
+        if ( pHandle == vectorHandles[DRRectangleBaseMove] )
+        {
+            QPointF pointDiff = pointPos - r.center();
+            r.setTopLeft( r.topLeft() + pointDiff );
+            r.setBottomRight( r.bottomRight() + pointDiff );
+        }
+        else if ( pHandle == vectorHandles[DRRectangleBaseBegin] )
         {
             QPointF pointDelta = pointPos - r.topLeft();
             qreal nDelta = pointDelta.x() > pointDelta.y() ? pointDelta.x() : pointDelta.y();
             r.setTopLeft( r.topLeft() + QPointF( nDelta, nDelta ) );
             r.setBottomRight( r.bottomRight() - QPointF( nDelta, nDelta ) );
-        }
-        else if ( pHandle == vectorHandles[DRRectangleBaseMove] )
-        {
-            QPointF pointDiff = pointPos - r.center();
-            r.setTopLeft( r.topLeft() + pointDiff );
-            r.setBottomRight( r.bottomRight() + pointDiff );
         }
         else if ( pHandle == vectorHandles[DRRectangleBaseEnd] )
         {
@@ -122,15 +122,15 @@ void DRRectangleBase::doMove( LHandle *pHandle, const QPointF &pointPos )
     }
     else
     {
-        if ( pHandle == vectorHandles[DRRectangleBaseBegin] )
-        {
-            r.setTopLeft( pointPos );
-        }
-        else if ( pHandle == vectorHandles[DRRectangleBaseMove] )
+        if ( pHandle == vectorHandles[DRRectangleBaseMove] )
         {
             QPointF pointDiff = pointPos - r.center();
             r.setTopLeft( r.topLeft() + pointDiff );
             r.setBottomRight( r.bottomRight() + pointDiff );
+        }
+        else if ( pHandle == vectorHandles[DRRectangleBaseBegin] )
+        {
+            r.setTopLeft( pointPos );
         }
         else if ( pHandle == vectorHandles[DRRectangleBaseEnd] )
         {
@@ -145,14 +145,14 @@ void DRRectangleBase::doMove( LHandle *pHandle, const QPointF &pointPos )
     // their parent is the viewport so...
     QPointF pointView = getView()->mapFromScene( pointPos );
 
-    if ( pHandle == vectorHandles[DRRectangleBaseBegin] )
+    if ( pHandle == vectorHandles[DRRectangleBaseMove] )
+    {
+        doSyncHandles();
+    }
+    else if ( pHandle == vectorHandles[DRRectangleBaseBegin] )
     {
         pHandle->setCenter( pointView );
         doSyncHandleTypes();
-        doSyncHandles();
-    }
-    else if ( pHandle == vectorHandles[DRRectangleBaseMove] )
-    {
         doSyncHandles();
     }
     else if ( pHandle == vectorHandles[DRRectangleBaseEnd] )

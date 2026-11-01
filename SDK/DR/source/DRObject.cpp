@@ -19,6 +19,8 @@
 DRObject::DRObject( DRDraw *pLayer, const QPointF &pointPos, const QString &stringName )
     : LObject( pLayer, stringName )
 {
+    bSelectable = true;
+
     // pointPos will probably have to get used but for now we accept 0,0 as the standard
     Q_UNUSED( pointPos );
     // setPos( pointPos );
@@ -76,24 +78,47 @@ QRectF DRObject::boundingRect() const
 }
 
 /*!
- * \brief Update our selection state.
+ * \brief Select/unselect object.
  * 
- * \author pharvey (10/3/25)
+ * Will call DRObject::setSelected(SelectionStates) to harmonize.
+ * 
+ * WARNING: DO NOT call this directly when using an ADObjectSelectionManager.
+ * 
+ * \author pharvey (2026-10-31)
  * 
  * \param b      
  */
 void DRObject::setSelected( bool b )
 {
-    if ( b )
-        setSelected( SelectionStateStandard );
-    else
-        setSelected( SelectionStateNone );
-    LObject::setSelected( b );
+// qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Current: " << isSelected() << " Requested: " << b;
+    AWObject::setSelected( b ); 
+    if ( isSelected() ) setSelected( SelectionStateStandard );
+    else setSelected( SelectionStateNone );
 }
 
+/*!
+ * \brief Change state.
+ * 
+ * WARNING: Changing to/from SelectionStateNone must be done via setSelected(bool).
+ *          Exception when isSelector
+ * 
+ * \author pharvey (2026-10-31)
+ * 
+ * \param n      
+ */
 void DRObject::setSelected( SelectionStates n )
 {
+// qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Selected: " << isSelected() << " Current: " << getSelectionStateString( nSelectionState ) << " Requested: " << getSelectionStateString( n );
     if ( n == nSelectionState ) return;
+
+    // sanity check
+    if ( !isSelector() )
+    {
+        // invalid request to switch TO SelectionStateNone?
+        if ( n == SelectionStateNone ) Q_ASSERT( !isSelected() );
+        // invalid request to switch FROM SelectionStateNone?
+        else Q_ASSERT( isSelected() );
+    }
 
     // undo current state
     if ( nSelectionState != SelectionStateNone ) doDisconnectSettings();
@@ -103,8 +128,6 @@ void DRObject::setSelected( SelectionStates n )
     nSelectionState = n;
     if ( nSelectionState != SelectionStateNone ) doConnectSettings();
     if ( nSelectionState != SelectionStateNone && nSelectionState != SelectionStateMinimal ) doCreateHandles();
-
-    LObject::setSelected( nSelectionState != SelectionStateNone );
 
     if ( pGraphics ) pGraphics->update();
     emit signalChanged();
@@ -159,9 +182,9 @@ LHandle *DRObject::getHandle( const QPointF &pointPos )
     return nullptr;
 }
 
-QString DRObject::getSelectionStateString()
+QString DRObject::getSelectionStateString( SelectionStates n )
 {
-    switch ( nSelectionState )
+    switch ( n )
     {
         case SelectionStateNone:
             return "SelectionStateNone";
@@ -299,11 +322,6 @@ bool DRObject::doLoad( QDomElement *pdomElemThis )
     return true;
 }
 
-bool DRObject::isSelected()
-{
-    return nSelectionState != SelectionStateNone;
-}
-
 /*!
  * \brief Return a handle of given type that is below the given handle.
  * 
@@ -372,13 +390,14 @@ void DRObject::doCreateHandles()
                 QRect rectView = pView->mapFromScene( r ).boundingRect();
 
                 // Order matters when handles share a position. Last handle will be found first.
+                // Also; DRRectangleBase assumes a particular order.
                 LHandle *pHandle;
 
-                pHandle = new LHandle( this, pView, LHandle::TypeSizeTopLeft, rectView.topLeft() );
+                pHandle = new LHandle( this, pView, LHandle::TypeDrag, rectView.center() );
                 vectorHandles.append( pHandle );
                 pHandle->show();
 
-                pHandle = new LHandle( this, pView, LHandle::TypeDrag, rectView.center() );
+                pHandle = new LHandle( this, pView, LHandle::TypeSizeTopLeft, rectView.topLeft() );
                 vectorHandles.append( pHandle );
                 pHandle->show();
 
@@ -464,6 +483,26 @@ void DRObject::doCreateHandles()
                 pHandle->show();
             }
             break;
+        case SelectionStateMove:
+            {
+                Q_ASSERT( vectorHandles.count() == 0 );
+                LGraphicsView *pView = getView();
+                Q_ASSERT( getView() );
+
+                QRectF r = boundingRect();
+
+                // their parent will be the viewport so...
+                QRect rectView = pView->mapFromScene( r ).boundingRect();
+
+                // Order matters when handles share a position. Last handle will be found first.
+                // Also; DRRectangleBase assumes a particular order.
+                LHandle *pHandle;
+
+                pHandle = new LHandle( this, pView, LHandle::TypeDrag, rectView.center() );
+                vectorHandles.append( pHandle );
+                pHandle->show();
+            }
+            break;
         case SelectionStateNone:
         case SelectionStateMinimal:
         case SelectionStateGradient:
@@ -490,8 +529,8 @@ void DRObject::doSyncHandles()
             {
                 QRect rectView = getView()->mapFromScene( boundingRect() ).boundingRect();
 
-                vectorHandles[0]->setCenter( rectView.topLeft() );
-                vectorHandles[1]->setCenter( rectView.center() );
+                vectorHandles[0]->setCenter( rectView.center() );
+                vectorHandles[1]->setCenter( rectView.topLeft() );
                 vectorHandles[2]->setCenter( rectView.bottomRight() );
             }
             break;
@@ -516,6 +555,12 @@ void DRObject::doSyncHandles()
                 vectorHandles[0]->setCenter( pointBase );
                 vectorHandles[1]->setCenter( pointIndicator );
         }
+            break;
+        case SelectionStateMove:
+            {
+                QRect rectView = getView()->mapFromScene( boundingRect() ).boundingRect();
+                vectorHandles[0]->setCenter( rectView.center() );
+            }
             break;
         case SelectionStateNone:
         case SelectionStateMinimal:

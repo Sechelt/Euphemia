@@ -31,6 +31,7 @@ public:
     {
         SelectionStateNone,         /*!< not selected                                               */
         SelectionStateMinimal,      /*!< multi-object selection: - no DRObject handles              */
+        SelectionStateMove,         /*!< move only                                                  */
         SelectionStateStandard,     /*!< manipulation: size, move, plus class dependent             */
         SelectionStateScale,        /*!< transform: scale                                           */
         SelectionStateShear,        /*!< transform: shear                                           */
@@ -44,8 +45,8 @@ public:
     virtual QRectF boundingRect() const override;
     virtual void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 ) override;
 
+    virtual void setSelected( bool b = true ) override;
     virtual void setSelected( SelectionStates );
-    virtual void setSelected( bool b = true );
     virtual void setPen( const QPen &pen );
     virtual void setBrush( const QBrush &brush );
     virtual void setFont( const CBD::CBDText &font );
@@ -58,7 +59,7 @@ public:
     virtual QRectF          getRect() const = 0;
     virtual LHandle *       getGrab( const QPointF &pointPos, bool bSizing = false );
     virtual LHandle *       getHandle( const QPointF &pointPos );
-    virtual QString         getSelectionStateString();
+    virtual QString         getSelectionStateString( SelectionStates n );
 
     virtual void doMoveBy( const QPointF & ) = 0;
     virtual void doMove( LHandle *, const QPointF & ) = 0;
@@ -76,13 +77,12 @@ public:
     virtual QDomElement doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent ) override;
     virtual bool        doLoad( QDomElement *pdomElem ) override;
 
-    virtual bool isSelected();
-    virtual bool isSelector() { return false; }
+    virtual bool isSelector() { return false; } /*!< concept of a selector is introduced here               */
 
 signals:
-   void signalChanged();                /*!< echoed to app via DRDraw so app can update menus ect   */ 
-   void signalPreCommit();              /*!< so DRDraw can push to undo stack                       */
-   void signalCommitted();              /*!< so DRDraw can update modified status                   */
+   void signalChanged();                        /*!< echoed to app via DRDraw so app can update menus ect   */ 
+   void signalPreCommit();                      /*!< so DRDraw can push to undo stack                       */
+   void signalCommitted();                      /*!< so DRDraw can update modified status                   */
 
 protected:
     // some common settings
@@ -96,10 +96,10 @@ protected:
     bool            bAutoCommit;                /*!< mouse release automatically unselects  */
 
     //
-    SelectionStates     nSelectionState = SelectionStateNone;
-    DRDraw *            pLayer;                     /*!< layer we are drawing on (which is a QGraphicsObject)                                   */
-    QVector<LHandle*>   vectorHandles;              /*!< Handles are children of canvas widget and are shown on top of shape due to z-order.    */
-    LHandle *           pHandle = nullptr;          /*!< Handle being moved.                                                                    */
+    SelectionStates     nSelectionState = SelectionStateNone;   /*!< this is independent of ADObject::bSelected but SelectionStateNone should be eq to false    */
+    DRDraw *            pLayer;                                 /*!< layer we are drawing on (which is a QGraphicsObject)                                       */
+    QVector<LHandle*>   vectorHandles;                          /*!< Handles are children of canvas widget and are shown on top of shape due to z-order.        */
+    LHandle *           pHandle = nullptr;                      /*!< Handle being moved.                                                                        */
 
     // transform handle positions relative to center
     // - they need to be realtive so we can restore even if the rect has moved or changed size

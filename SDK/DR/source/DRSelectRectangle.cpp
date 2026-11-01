@@ -61,7 +61,7 @@ void DRSelectRectangle::doMove( LHandle *pHandle, const QPointF &point )
     if ( bDrawing ) return;
 
     QVector<DRObject *> vectorSelected = pLayer->getSelected();
-printf( "[PAH][%s][%s][%d] Selected: %lld\n", __FILE__, __FUNCTION__, __LINE__, vectorSelected.count() );
+// printf( "[PAH][%s][%s][%d] Selected: %lld\n", __FILE__, __FUNCTION__, __LINE__, vectorSelected.count() );
 
     // move selected objects
     if ( pHandle->getType() == LHandle::TypeDrag ) 

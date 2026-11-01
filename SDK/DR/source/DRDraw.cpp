@@ -39,6 +39,11 @@ DRDraw::DRDraw( LFile *pParent, const QString &stringName )
     pSelectionManager = new ADObjectSelectionManager( this );
     // see DDiagram for how this works
     // connect( pSelectionManager, SIGNAL(signalChangedSelection()), SLOT(slotChangedSelection()) );
+
+    // settings
+    pSettingGeneral = g_SSettings->getSetting( "LSGeneral" ); Q_ASSERT( pSettingGeneral );
+    slotRefreshGeneral();
+    connect( pSettingGeneral, SIGNAL(signalChanged()), SLOT(slotRefreshGeneral()) );
 }
 
 DRDraw::~DRDraw()
@@ -630,6 +635,7 @@ void DRDraw::doMouseReleaseEventSelectRectangle( QGraphicsSceneMouseEvent *pEven
             // set tool but do not unselect
             setTool( ToolManipulate, false );
             emit signalChanged();
+            emit signalChangedToolState();
             return;
         }
         // nothing selected so delete selector but leave tool alone
@@ -722,16 +728,18 @@ void DRDraw::doMousePressEventManipulate( QGraphicsSceneMouseEvent *pEvent )
         // any selection state cycle will happen in mouse release
         return;
     }
-    else if ( pObject ) 
-    {
-        if ( canCommit() ) doCommit();
-        if ( hasSelection() ) pSelectionManager->doSelectNone();
-    }
+
+    // commit ie drawing/manipulation and cancel ie selector
+    if ( canCommit() ) doCommit(); else if ( canCancel() ) doCancel();
+    Q_ASSERT( !pObject );
 
     //
     // CLICKED ON NOTHING
     //
-    if ( !pObjectClicked ) return; 
+    if ( !pObjectClicked )
+    {
+        return; 
+    }
 
     //
     // CLICKED ON AN OBJECT (not already selected)
@@ -759,7 +767,6 @@ void DRDraw::doMouseReleaseEventManipulate( QGraphicsSceneMouseEvent *pEvent )
     // Handle - so we were probably moving it...
     if ( pHandle )
     {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
         Q_ASSERT( pObject );
         // manipulate self and selected if isSelector   
         pObject->doDrop( pHandle, pointCurrent );
@@ -893,7 +900,12 @@ void DRDraw::doMouseReleaseEventCreate( QGraphicsSceneMouseEvent *pEvent )
         }
         pHandle = nullptr;
         bMoving = false;
+        if ( bDrawing && bAutoCommit )
+        {
+            bDrawing = false;
+        }
         setTool( ToolManipulate, false );
+        emit signalChangedToolState();
         return;
     }
 }
@@ -1329,6 +1341,7 @@ void DRDraw::doDelete()
  */
 void DRDraw::doCommit()
 {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     if ( bTracking )
     {
         ((DRPolyline *)pObject)->doDoubleClick();
@@ -1336,12 +1349,14 @@ void DRDraw::doCommit()
         bMoving     = false;
         pHandle     = nullptr;
     }
+
     if ( pObject )
     {
         bDrawing = false; // must be before doSelectNone
         if ( pHandle ) pObject->doDrop( pHandle );
         if ( pObject->isSelector() )
         {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
             pSelectionManager->doSelectNone();
             slotDelete( pObject );
         }
@@ -1349,13 +1364,14 @@ void DRDraw::doCommit()
             setSelected( pObject, false );
         pObject = nullptr;
         emit signalChanged();
+        emit signalChangedToolState();
     }
 }
 
 /*!
- * \brief Cancel drawing and/or manipulation.
+ * \brief Cancel drawing, manipulation or selection.
  *  
- * Will also delete current object. 
+ * Will delete current object if drawing. 
  *  
  * \author pharvey (3/30/23)
  */
@@ -1381,6 +1397,7 @@ void DRDraw::doCancel()
             pHandle = nullptr;
             pObject = nullptr;
             emit signalChanged();
+            emit signalChangedToolState();
         }
     }
     else if ( hasSelector() )
@@ -1393,6 +1410,7 @@ void DRDraw::doCancel()
         pHandle = nullptr;
         pObject = nullptr;
         emit signalChanged();
+        emit signalChangedToolState();
     }
     else
     {
@@ -1493,15 +1511,13 @@ bool DRDraw::canDelete()
 // can commit new object
 bool DRDraw::canCommit()
 {
-    // return hasSelection();
     return isDrawing();
 }
 
 // can cancel new object or selector
 bool DRDraw::canCancel()
 {
-    // return hasSelection();
-    return isDrawing() || hasSelector();
+    return isDrawing() || hasSelector() || hasSelection();
 }
 
 bool DRDraw::canScale()
@@ -1840,6 +1856,11 @@ void DRDraw::doClear()
     image.fill( colorBackground );
     setModified( false );
     pGraphics->update();
+}
+
+void DRDraw::slotRefreshGeneral()
+{
+    bAutoCommit = pSettingGeneral->property( "bAutoCommit" ).toInt();
 }
 
 

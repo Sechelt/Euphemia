@@ -175,6 +175,31 @@ protected slots:
     void slotCommitted();
 
 protected:
+    // state
+    Tools               nTool               = ToolManipulate;               /*!< We decide whether this gets changed or not. Others make requests ie via setTool. */
+    MouseEventStates    nMouseEventState    = MouseEventStateManipulate;    /*!< ready to manipulate            */
+    // state modifiers
+    bool            bMoving     = false;    /*!< true if Press was followed by a Move                           */
+    bool            bTracking   = false;    /*!< true if we are initializing a polyline based object            */
+    bool            bDrawing    = false;    /*!< true if we are initializing a new object                       */
+
+    // settings
+    SSetting *          pSettingGeneral;
+    bool                bAutoCommit;
+
+    //
+    QImage                      image;      
+    int                         nMaxUndo    = 10;
+    QStack<QImage>              stackUndo;  
+    QStack<QImage>              stackRedo;  
+    ADObjectSelectionManager *  pSelectionManager;  /*!< use a selection manager to select/unselect objects DO NOT SELECT OBJECTS DIRECTLY  */
+
+    //
+    QPointF         pointPress;                     /*!< point when Press                                                                   */
+    QPointF         pointCurrent;                   /*!< store mouse pos in case mouse goes off scene (or even view)                        */
+    DRObject *      pObject     = nullptr;          /*!< shape being created/manipulated (can be a DRSelect*)                               */
+    LHandle *       pHandle     = nullptr;          /*!< handle being moved                                                                 */
+
     void paint( QPainter *, const QStyleOptionGraphicsItem *, QWidget * ) override {}; // DRObjects paint themselves, the rest is transparent, and thats enough
 
     void setSelected( QList<DRObject*>, bool b = true );
@@ -194,25 +219,8 @@ protected:
     bool isBackgroundTransparent() { return colorBackground.alpha() == 0; }
     // end
 
-    // state
-    Tools               nTool               = ToolManipulate;               /*!< We decide whether this gets changed or not. Others make requests ie via setTool. */
-    MouseEventStates    nMouseEventState    = MouseEventStateManipulate;    /*!< ready to manipulate            */
-    // state modifiers
-    bool            bMoving     = false;    /*!< true if Press was followed by a Move                           */
-    bool            bTracking   = false;    /*!< true if we are initializing a polyline based object            */
-    bool            bDrawing    = false;    /*!< true if we are initializing a new object                       */
-
-    QImage                      image;      
-    int                         nMaxUndo    = 10;
-    QStack<QImage>              stackUndo;  
-    QStack<QImage>              stackRedo;  
-    ADObjectSelectionManager *  pSelectionManager;  /*!< use a selection manager to select/unselect objects DO NOT SELECT OBJECTS DIRECTLY  */
-
-    //
-    QPointF         pointPress;                     /*!< point when Press                                                                   */
-    QPointF         pointCurrent;                   /*!< store mouse pos in case mouse goes off scene (or even view)                        */
-    DRObject *      pObject     = nullptr;          /*!< shape being created/manipulated (can be a DRSelect*)                               */
-    LHandle *       pHandle     = nullptr;          /*!< handle being moved                                                                 */
+protected slots:
+    virtual void slotRefreshGeneral();
 };
 
 #endif

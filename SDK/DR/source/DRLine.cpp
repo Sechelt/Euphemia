@@ -100,6 +100,10 @@ LHandle *DRLine::getGrab( const QPointF &pointPos, bool bSizing )
 
 void DRLine::doMoveBy( const QPointF &pointOffset )
 {
+    getGraphics()->doPrepareGeometryChange();
+    pointBegin += pointOffset;
+    pointEnd += pointOffset;
+    if ( vectorHandles.count() ) doSyncHandles();
 }
 
 void DRLine::doMove( LHandle *pHandle, const QPointF &pointPos )

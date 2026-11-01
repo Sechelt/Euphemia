@@ -21,7 +21,6 @@ ADObjectSelectionManager::ADObjectSelectionManager( ADObject *p )
 void ADObjectSelectionManager::setSelected( ADObject *p, bool bSelect )
 {
     Q_ASSERT( p );
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 
     bool bHasSelection = hasSelection();
 

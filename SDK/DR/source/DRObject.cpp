@@ -190,6 +190,8 @@ QString DRObject::getSelectionStateString( SelectionStates n )
             return "SelectionStateNone";
         case SelectionStateMinimal:
             return "SelectionStateMinimal";
+        case SelectionStateMove:
+            return "SelectionStateMove";
         case SelectionStateStandard:
             return "SelectionStateStandard";
         case SelectionStateScale:
@@ -210,6 +212,9 @@ void DRObject::doSelectionStateCycle()
     {
         case SelectionStateNone:
             setSelected( SelectionStateStandard );
+            break;
+        case SelectionStateMove:
+            setSelected( SelectionStateMove );
             break;
         case SelectionStateStandard:
             setSelected( SelectionStateScale );
@@ -635,7 +640,7 @@ void DRObject::slotRefreshBrush()
 
 void DRObject::slotRefreshFont()
 {
-    // font = pSettingFont->property( "font" ).value<CBD::CBDText>();
+    font.font = pSettingFont->property( "font" ).value<QFont>();
     if ( pGraphics ) pGraphics->update();
 }
 

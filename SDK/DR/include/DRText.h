@@ -28,6 +28,7 @@ public:
 
 protected:
     SSetting *pSettingText;
+
     QString stringText;
     Qt::AlignmentFlag nHAlign = Qt::AlignHCenter;
     Qt::AlignmentFlag nVAlign = Qt::AlignVCenter;

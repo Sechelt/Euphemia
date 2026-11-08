@@ -17,8 +17,6 @@
 #include <LGraphicsLayer.h>
 #include <LGraphicsScene.h>
 
-// #define DDRAW_DEBUG_DRAW 1
-
 DRDraw::DRDraw( LFile *pParent, const QString &stringName )
     : LLayer( pParent, stringName )
 {
@@ -37,8 +35,7 @@ DRDraw::DRDraw( LFile *pParent, const QString &stringName )
     mapMeta.insert( "DRText", ADMeta( QIcon( ":PA/Text" ), "DRText", "Text" ) );
 
     pSelectionManager = new ADObjectSelectionManager( this );
-    // see DDiagram for how this works
-    // connect( pSelectionManager, SIGNAL(signalChangedSelection()), SLOT(slotChangedSelection()) );
+    connect( pSelectionManager, SIGNAL(signalChangedSelection()), this, SIGNAL(signalSelectionChanged()) );
 
     // settings
     pSettingGeneral = g_SSettings->getSetting( "LSGeneral" ); Q_ASSERT( pSettingGeneral );
@@ -82,33 +79,10 @@ void DRDraw::setTool( int n, bool bCancelDrawing )
             pSelectionManager->doSelectNone();
         }
     }
+    else
+        setToolState( ToolStateIdle );
 
     nTool = (Tools)n;
-
-    switch ( nTool )
-    {
-        case ToolSelectRectangle:
-            nMouseEventState = MouseEventStateSelectRectangle;
-            break;
-        case ToolSelectPolygon:
-            nMouseEventState = MouseEventStateSelectPolygon;
-            break;
-        case ToolManipulate:
-            nMouseEventState = MouseEventStateManipulate;
-            break;
-        case ToolDrawArc:
-        case ToolDrawChord:
-        case ToolDrawImage:
-        case ToolDrawPie:
-        case ToolDrawLine:
-        case ToolDrawRectangle:
-        case ToolDrawEllipse:
-        case ToolDrawPolygon:
-        case ToolDrawPolyline:
-        case ToolDrawText:
-            nMouseEventState = MouseEventStateCreate;
-            break;
-    }
 
     emit signalChangedTool();
 }
@@ -170,8 +144,8 @@ QDomDocument DRDraw::getCopyXML()
 
 QImage DRDraw::getCopyImage()
 {
-    if ( !pObject ) return QImage();
-    return pObject->getImage();
+    if ( !pObjectDrawing ) return QImage();
+    return pObjectDrawing->getImage();
 }
 
 QWidget* DRDraw::getToolBar( QWidget *pParent )
@@ -204,24 +178,29 @@ QWidget* DRDraw::getToolBar( QWidget *pParent )
 
 QWidget* DRDraw::getPanel( QWidget *pParent )
 {
+// qInfo() <<__FILE__ << __FUNCTION__ << __LINE__ << getToolString() << hasSelection();
     switch ( nTool )
     {
         case ToolSelectRectangle:
         case ToolSelectPolygon:
         case ToolManipulate:
-            if ( hasSelection() ) 
             {
-                DRObject *p = (DRObject *)(pSelectionManager->getSelected().at( 0 ));
-                Q_ASSERT( p );
-                QString s = p->metaObject()->className();
-                if ( s == "DRLine" )
-                    return g_SSettings->getSetting( "LSLine" )->getPanel( pParent );
-                else if ( s == "DRRectangle" )
-                    return g_SSettings->getSetting( "LSRectangle" )->getPanel( pParent );
-                else if ( s == "DREllipse" )
-                    return g_SSettings->getSetting( "LSEllipse" )->getPanel( pParent );
-                else if ( s == "DRText" )
-                    return g_SSettings->getSetting( "LSText" )->getPanel( pParent );
+                // scan selected until we find an object that has a panel...
+                QList<ADObject*> l = pSelectionManager->getSelected();
+                for ( ADObject *p : l )
+                {
+                    DRObject *pObject = (DRObject*)p;
+                    QString s = p->metaObject()->className();
+                    // we know these objects have panels...
+                    if ( s == "DRLine" )
+                        return g_SSettings->getSetting( "LSLine" )->getPanel( pParent );
+                    else if ( s == "DRRectangle" )
+                        return g_SSettings->getSetting( "LSRectangle" )->getPanel( pParent );
+                    else if ( s == "DREllipse" )
+                        return g_SSettings->getSetting( "LSEllipse" )->getPanel( pParent );
+                    else if ( s == "DRText" )
+                        return g_SSettings->getSetting( "LSText" )->getPanel( pParent );
+                }
             }
             break;
         case ToolDrawArc:
@@ -304,7 +283,7 @@ ADObject* DRDraw::getObject( const QString &s, ADObject * )
 
     if ( g_Transaction->getState() == ADTransaction::TransactionPaste )
     {
-        setSelected( pObject );
+        pSelectionManager->setSelected( pObject );
     }
 
     // announce the birth of a new child
@@ -350,18 +329,18 @@ QString DRDraw::getToolString()
     return "unknown";
 }
 
-QString DRDraw::getMouseEventStateString()
+QString DRDraw::getToolStateString()
 {
-    switch (nMouseEventState ) 
+    switch ( nToolState ) 
     {
-        case MouseEventStateSelectRectangle:
-            return "MouseEventStateSelectRectangle";
-        case MouseEventStateSelectPolygon:
-            return "MouseEventStateSelectPolygon";
-        case MouseEventStateManipulate:
-            return "MouseEventStateManipulate";
-        case MouseEventStateCreate:
-            return "MouseEventStateCreate";
+        case ToolStateIdle:
+            return "ToolStateIdle";
+        case ToolStateDraw: 
+            return "ToolStateDraw";
+        case ToolStateDrawManipulate:
+            return "ToolStateDrawManipulate";
+        case ToolStateManipulate:
+            return "ToolStateManipulate";
     }
     return "unknown";
 }
@@ -402,9 +381,6 @@ QRectF DRDraw::getSelectedBoundingRect()
 /*!
  * \brief Mouse press event. 
  *  
- * Not a lot is done here because we do not know if we are a Press + Release or 
- * a Press + Move + Release. The \sa doMoveEvent has most of the logic.
- *  
  * \author pharvey (3/27/23)
  * 
  * \param pEvent 
@@ -413,46 +389,33 @@ void DRDraw::doMousePressEvent( QGraphicsSceneMouseEvent *pEvent )
 {
     Q_ASSERT( pGraphics );
 
-#ifdef DDRAW_DEBUG_DRAW 
-    qInfo() << "\n[INFO]" << __FILE__ << __FUNCTION__ << __LINE__ << "\nnTool=" << getToolString() << "\nnMouseEventState=" << getMouseEventStateString() << "\nbMoving=" << bMoving << "\nbTracking=" << bTracking << "\nbDrawing=" << bDrawing << "\npObject=" << pObject << "\npHandle=" << pHandle << "\nvectorSelected=" << vectorSelected.count();
-    if ( pObject ) qInfo() << "SelectionState=" << pObject->getSelectionStateString();
-#endif
-
-    /****************************************** 
-     * Off-Scene 
-     * - happens when outside of scene but within view 
-     * - we will ignore all Move and double-click events
-     * - tracking can recover by bringing the mouse back to the scene and clicking or double clicking
-     ******************************************/
+    //
+    // Off-Scene 
+    // - happens when outside of scene but within view 
+    // - we will ignore all Move and double-click events
+    // - tracking can recover by bringing the mouse back to the scene and clicking or double clicking
+    //
     if ( !pGraphics->scene()->sceneRect().contains( pEvent->scenePos() ) )
     {
-        if ( !bTracking ) pointPress = QPointF();
-#ifdef DDRAW_DEBUG_DRAW 
-    qInfo() << "\n[INFO]" << __FILE__ << __FUNCTION__ << __LINE__ << "\nnTool=" << getToolString() << "\nnMouseEventState=" << getMouseEventStateString() << "\nbMoving=" << bMoving << "\nbTracking=" << bTracking << "\nbDrawing=" << bDrawing << "\npObject=" << pObject << "\npHandle=" << pHandle << "\nvectorSelected=" << vectorSelected.count();
-    if ( pObject ) qInfo() << "SelectionState=" << pObject->getSelectionStateString();
-#endif
+        if ( !isTracking() ) pointPress = QPointF();
         return;
     }
 
-    switch ( nMouseEventState )
+    switch ( nToolState )
     {
-        case MouseEventStateSelectRectangle:
-            doMousePressEventSelectRectangle( pEvent );
+        case ToolStateIdle:
+            doMousePressEventIdle( pEvent );
             break;
-        case MouseEventStateSelectPolygon:
-            doMousePressEventSelectPolygon( pEvent );
+        case ToolStateDraw:
+            doMousePressEventDraw( pEvent );
             break;
-        case MouseEventStateManipulate:
+        case ToolStateDrawManipulate:
+            doMousePressEventDrawManipulate( pEvent );
+            break;
+        case ToolStateManipulate:
             doMousePressEventManipulate( pEvent );
             break;
-        case MouseEventStateCreate:
-            doMousePressEventCreate( pEvent );
-            break;
     }
-#ifdef DDRAW_DEBUG_DRAW 
-    qInfo() << "\n[INFO]" << __FILE__ << __FUNCTION__ << __LINE__ << "\nnTool=" << getToolString() << "\nnMouseEventState=" << getMouseEventStateString() << "\nbMoving=" << bMoving << "\nbTracking=" << bTracking << "\nbDrawing=" << bDrawing << "\npObject=" << pObject << "\npHandle=" << pHandle << "\nvectorSelected=" << vectorSelected.count();
-    if ( pObject ) qInfo() << "SelectionState=" << pObject->getSelectionStateString();
-#endif
 }
 
 /*!
@@ -463,7 +426,6 @@ void DRDraw::doMousePressEvent( QGraphicsSceneMouseEvent *pEvent )
  *  
  * This can mean; 
  *  
- * - adding points to a polygon to initialize it (tracking) 
  * - creating a new object (and initalizing it by moving one of its handles)
  * - moving a handle on a selected object 
  * 
@@ -474,26 +436,27 @@ void DRDraw::doMousePressEvent( QGraphicsSceneMouseEvent *pEvent )
 void DRDraw::doMouseMoveEvent( QGraphicsSceneMouseEvent *pEvent )
 {
     Q_ASSERT( pGraphics );
-    /****************************************** 
-     * Off-Scene
-     * - was press event outside of scene
-     ******************************************/
-    if ( pointPress.isNull() ) return;
+
+    if ( pointPress.isNull() ) return; // press within view but outside of scene
 
     // ignore invalid move
     if ( !pGraphics->scene()->sceneRect().contains( pEvent->scenePos() ) ) return;
     pointCurrent = pEvent->scenePos(); // we need a valid point for doRelease even when release Off-Scene
 
-    switch ( nMouseEventState )
+    switch ( nToolState )
     {
-        case MouseEventStateSelectRectangle:
-            return doMouseMoveEventSelectRectangle( pEvent );
-        case MouseEventStateSelectPolygon:
-            return doMouseMoveEventSelectPolygon( pEvent );
-        case MouseEventStateManipulate:
-            return doMouseMoveEventManipulate( pEvent );
-        case MouseEventStateCreate:
-            return doMouseMoveEventCreate( pEvent );
+        case ToolStateIdle:
+            doMouseMoveEventIdle( pEvent );
+            break;
+        case ToolStateDraw:
+            doMouseMoveEventDraw( pEvent );
+            break;
+        case ToolStateDrawManipulate:
+            doMouseMoveEventDrawManipulate( pEvent );
+            break;
+        case ToolStateManipulate:
+            doMouseMoveEventManipulate( pEvent );
+            break;
     }
 }
 
@@ -515,401 +478,360 @@ void DRDraw::doMouseReleaseEvent( QGraphicsSceneMouseEvent *pEvent )
 {
     Q_ASSERT( pGraphics );
 
-#ifdef DDRAW_DEBUG_DRAW 
-    qInfo() << "\n[INFO]" << __FILE__ << __FUNCTION__ << __LINE__ << "\nnTool=" << getToolString() << "\nnMouseEventState=" << getMouseEventStateString() << "\nbMoving=" << bMoving << "\nbTracking=" << bTracking << "\nbDrawing=" << bDrawing << "\npObject=" << pObject << "\npHandle=" << pHandle << "\nvectorSelected=" << vectorSelected.count();
-    if ( pObject ) qInfo() << "SelectionState=" << pObject->getSelectionStateString();
-#endif
     /****************************************** 
      * Press (off-scene)
      ******************************************/
-    if ( pointPress.isNull() ) 
-    {
-#ifdef DDRAW_DEBUG_DRAW 
-    qInfo() << "\n[INFO]" << __FILE__ << __FUNCTION__ << __LINE__ << "\nnTool=" << getToolString() << "\nnMouseEventState=" << getMouseEventStateString() << "\nbMoving=" << bMoving << "\nbTracking=" << bTracking << "\nbDrawing=" << bDrawing << "\npObject=" << pObject << "\npHandle=" << pHandle << "\nvectorSelected=" << vectorSelected.count();
-    if ( pObject ) qInfo() << "SelectionState=" << pObject->getSelectionStateString();
-#endif
-        return;
-    }
+    if ( pointPress.isNull() ) return;
     if ( pGraphics->scene()->sceneRect().contains( pEvent->scenePos() ) ) pointCurrent = pEvent->scenePos();
 
-    switch ( nMouseEventState )
+    switch ( nToolState )
     {
-        case MouseEventStateSelectRectangle:
-            doMouseReleaseEventSelectRectangle( pEvent );
+        case ToolStateIdle:
+            doMouseReleaseEventIdle( pEvent );
             break;
-        case MouseEventStateSelectPolygon:
-            doMouseReleaseEventSelectPolygon( pEvent );
+        case ToolStateDraw:
+            doMouseReleaseEventDraw( pEvent );
             break;
-        case MouseEventStateManipulate:
+        case ToolStateDrawManipulate:
+            doMouseReleaseEventDrawManipulate( pEvent );
+            break;
+        case ToolStateManipulate:
             doMouseReleaseEventManipulate( pEvent );
             break;
-        case MouseEventStateCreate:
-            doMouseReleaseEventCreate( pEvent );
+    }
+}
+
+void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
+{
+    // we may have a selection but the following makes us idle (no need to commit/cancel)
+    Q_ASSERT( !pObjectDrawing );
+    Q_ASSERT( !pHandleMoving );
+
+    if ( pEvent->buttons() != Qt::LeftButton ) return;
+
+    // what did we press on (if anything)?
+    pointPress      = pEvent->scenePos();
+    pointCurrent    = pointPress;
+    pObjectPress    = nullptr;
+    pHandlePress    = getHandle( pointPress );
+    if ( pHandlePress ) 
+        pObjectPress = (DRObject*)pHandlePress->getLayerObject();
+    else
+        pObjectPress = getObject( pointPress ); // no handle as object is not selected
+
+    // each tool type is handled a bit differently 
+    switch ( nTool )
+    {
+        case ToolManipulate:
+            {
+                if ( pHandlePress ) 
+                {
+                    pHandleMoving = pHandlePress;
+                    setToolState( ToolStateManipulate );
+                    return;
+                }
+                if ( pObjectPress )
+                {
+                    if ( pObjectPress->isSelected() )
+                        pObjectPress->doSelectionStateCycle();
+                    else
+                    {
+                        pSelectionManager->doSelectNone();
+                        pSelectionManager->setSelected( pObjectPress );
+                    }
+                    return;
+                }
+                pSelectionManager->doSelectNone();
+                return;
+            }
+            return;
+        case ToolSelectPolygon:
+                {
+                    pSelectionManager->doSelectNone();
+                    pObjectDrawing = getObject( nTool, pointPress );       // first point
+                    // select when doubleclick because that is when we know what handles to create
+                    setToolState( ToolStateDraw );
+                }
+                return;
+        case ToolDrawPolygon:
+        case ToolDrawPolyline:
+            {
+                pObjectDrawing = getObject( nTool, pointPress );       // first point
+                // select when doubleclick because that is when we know what handles to create
+                setToolState( ToolStateDraw );
+            }
+            return;
+        case ToolSelectRectangle:
+            {
+                pSelectionManager->doSelectNone();
+                pObjectDrawing = getObject( nTool, pointPress );
+                pObjectDrawing->setSelected( DRObject::SelectionStateStandard ); // needed as selectors are !isSelectable()
+                pHandleMoving = pObjectDrawing->getGrab( pointPress, true ); // get the sizing handle
+                Q_ASSERT( pHandleMoving );
+                setToolState( ToolStateDraw );
+            }
+            return;
+        case ToolDrawArc:
+        case ToolDrawChord:
+        case ToolDrawImage:
+        case ToolDrawPie:
+        case ToolDrawLine:
+        case ToolDrawRectangle:
+        case ToolDrawEllipse:
+        case ToolDrawText:
+            {
+                // we could defer create until move but for now keep it simple and create here
+                pSelectionManager->doSelectNone();
+                pObjectDrawing = getObject( nTool, pointPress );
+                pSelectionManager->setSelected( pObjectDrawing );
+                pHandleMoving = pObjectDrawing->getGrab( pointPress, true ); // get the sizing handle
+                Q_ASSERT( pHandleMoving );
+                setToolState( ToolStateDraw );
+            }
+            return;
+    }
+}
+
+void DRDraw::doMouseMoveEventIdle( QGraphicsSceneMouseEvent *pEvent )
+{
+    if ( pEvent->buttons() != Qt::LeftButton ) return;
+
+    // nothing to do
+    // could use to confirm draw for non-polygon objects
+}
+
+void DRDraw::doMouseReleaseEventIdle( QGraphicsSceneMouseEvent *pEvent )
+{
+    Q_UNUSED( pEvent );
+    // nothing to do
+}
+
+void DRDraw::doMousePressEventDraw( QGraphicsSceneMouseEvent *pEvent )
+{
+    if ( pEvent->buttons() != Qt::LeftButton ) return;
+
+    switch ( nTool )
+    {
+        case ToolSelectPolygon:
+        case ToolDrawPolygon:
+        case ToolDrawPolyline:
+            Q_ASSERT( pObjectDrawing );
+            Q_ASSERT( pObjectDrawing->inherits( "DRPolyline" ) );
+            ((DRPolyline *)pObjectDrawing)->doPress( pEvent->scenePos() ); // appends point
+            break;
+        case ToolSelectRectangle:
+        case ToolManipulate:
+        case ToolDrawArc:
+        case ToolDrawChord:
+        case ToolDrawImage:
+        case ToolDrawPie:
+        case ToolDrawLine:
+        case ToolDrawRectangle:
+        case ToolDrawEllipse:
+        case ToolDrawText:
             break;
     }
-#ifdef DDRAW_DEBUG_DRAW 
-    qInfo() << "\n[INFO]" << __FILE__ << __FUNCTION__ << __LINE__ << "\nnTool=" << getToolString() << "\nnMouseEventState=" << getMouseEventStateString() << "\nbMoving=" << bMoving << "\nbTracking=" << bTracking << "\nbDrawing=" << bDrawing << "\npObject=" << pObject << "\npHandle=" << pHandle << "\nvectorSelected=" << vectorSelected.count();
-    if ( pObject ) qInfo() << "SelectionState=" << pObject->getSelectionStateString();
-#endif
 }
 
-void DRDraw::doMousePressEventSelectRectangle( QGraphicsSceneMouseEvent *pEvent )
+void DRDraw::doMouseMoveEventDraw( QGraphicsSceneMouseEvent *pEvent )
 {
-    if ( pEvent->buttons() != Qt::LeftButton ) return;
-
-    Q_ASSERT( !bTracking );
-    Q_ASSERT( !bMoving );
-    Q_ASSERT( !pObject );
-    Q_ASSERT( !pHandle );
-
-    pSelectionManager->doSelectNone();
-    pointCurrent = pointPress = pEvent->scenePos();
-    pObject = getObject( ToolSelectRectangle, pointPress );
-    Q_ASSERT( pObject );
-
-    pObject->setSelected( DRObject::SelectionStateStandard );
-
-    pHandle = pObject->getGrab( pointPress, true );
-    Q_ASSERT( pHandle );
-    bDrawing = true;
-    bMoving = true;
+    switch ( nTool )
+    {
+        case ToolSelectPolygon:
+        case ToolDrawPolygon:
+        case ToolDrawPolyline:
+            Q_ASSERT( pObjectDrawing );
+            Q_ASSERT( pObjectDrawing->inherits( "DRPolyline" ) );
+            ((DRPolyline *)pObjectDrawing)->doMove( pEvent->scenePos() ); // updates our working point
+            break;
+        case ToolSelectRectangle:
+        case ToolManipulate:
+        case ToolDrawArc:
+        case ToolDrawChord:
+        case ToolDrawImage:
+        case ToolDrawPie:
+        case ToolDrawLine:
+        case ToolDrawRectangle:
+        case ToolDrawEllipse:
+        case ToolDrawText:
+            if ( pEvent->buttons() != Qt::LeftButton ) return;
+            Q_ASSERT( pObjectDrawing );
+            Q_ASSERT( pHandleMoving );
+            pObjectDrawing->doMove( pHandleMoving, pointCurrent );
+            break;
+    }
 }
 
-void DRDraw::doMouseMoveEventSelectRectangle( QGraphicsSceneMouseEvent *pEvent )
-{
-    if ( pEvent->buttons() != Qt::LeftButton ) return;
-
-    Q_ASSERT( !bTracking );
-    Q_ASSERT( pObject );
-    Q_ASSERT( pHandle );
-
-    // have we moved
-    if ( pointCurrent == pointPress ) return;
-
-    pObject->doMove( pHandle, pointCurrent );
-}
-
-/*!
- * \brief Complete selection.
- *
- * If bDrawing
- *  If rect contains >0 objects THEN
- *      - select all objects and switch to Minimal state (no handles)
- *      - switch to manipulate tool 
- *  Else 
- *      - delete the selector and stay with selector tool
- * Else
- *  
- * 
- * \author pharvey (2026-10-31)
- * 
- * \param pEvent 
- */
-void DRDraw::doMouseReleaseEventSelectRectangle( QGraphicsSceneMouseEvent *pEvent )
+void DRDraw::doMouseReleaseEventDraw( QGraphicsSceneMouseEvent *pEvent )
 {
     Q_UNUSED( pEvent );
-    Q_ASSERT( !bTracking );
-    Q_ASSERT( pHandle );
-    Q_ASSERT( bMoving );
-
-    // wrong mouse button but that info is lost so we check this way 
-    if ( !pObject ) return;
-
-    pObject->doDrop( pHandle, pointCurrent );
-    QRectF r = pObject->getRect();
-    pHandle = nullptr;
-    bMoving = false;
-
-    if ( bDrawing )
+    switch ( nTool )
     {
-        // drawing (not manipulating)
-        bDrawing = false;
-        doSelectAll( r );    
-        if ( hasSelection() )
+        case ToolSelectRectangle:
+            {
+                Q_ASSERT( pObjectDrawing );
+                Q_ASSERT( pHandleMoving );
+                DRSelectRectangle *p = (DRSelectRectangle*)pObjectDrawing;
+                p->doDrop( pHandleMoving, pointCurrent );
+                pHandleMoving = nullptr;
+                doSelectAll( p->getRect() );    
+                slotDelete( pObjectDrawing );
+                pObjectDrawing = nullptr;
+                setTool( ToolManipulate, false );
+                emit signalChanged();
+            }
+            break;
+        case ToolSelectPolygon:
+        case ToolDrawPolygon:
+        case ToolDrawPolyline:
+            // these end with a double click
+            break;
+        case ToolManipulate:
+            break;
+        case ToolDrawArc:
+        case ToolDrawChord:
+        case ToolDrawImage:
+        case ToolDrawPie:
+        case ToolDrawLine:
+        case ToolDrawRectangle:
+        case ToolDrawEllipse:
+        case ToolDrawText:
+            pObjectDrawing->doDrop( pHandleMoving, pointCurrent );
+            pHandleMoving = nullptr;
+            if ( bAutoCommit )
+            {
+                doCommit();
+                setModified();
+            }
+            else
+            {
+                setToolState( ToolStateDrawManipulate );
+            }
+            break;
+    }
+}
+
+void DRDraw::doMousePressEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
+{
+    if ( pEvent->buttons() != Qt::LeftButton ) return;
+
+    Q_ASSERT( pObjectDrawing );
+    Q_ASSERT( !pHandleMoving );
+    Q_ASSERT( isToolDraw() );
+
+    // what did we press on (if anything)?
+    pointPress      = pEvent->scenePos();
+    pointCurrent    = pointPress;
+
+    pObjectPress    = nullptr;
+    pHandlePress    = getHandle( pointPress );
+    if ( pHandlePress ) 
+        pObjectPress = (DRObject*)pHandlePress->getLayerObject();
+    else
+        pObjectPress = getObject( pointPress ); // no handle as object is not selected
+
+    // do we need to commit/cancel current?
+    if ( pObjectPress != pObjectDrawing || !pHandlePress )
+    {
+        if ( bAutoCommit )
         {
-            // something selected so
-            // shrink selection rectangle to just what we need
-            DRSelectRectangle *pSelectRectangle = (DRSelectRectangle *)pObject;
-            pSelectRectangle->setRect( getSelectedBoundingRect() );   
-            pSelectRectangle->setSelected( DRObject::SelectionStateMove );    
-            // set tool but do not unselect
-            setTool( ToolManipulate, false );
-            emit signalChanged();
-            emit signalChangedToolState();
-            return;
+            doCommit();
+            setModified();
         }
-        // nothing selected so delete selector but leave tool alone
-        slotDelete( pObject );
-        pObject = nullptr;
-        return;
+        else
+            doCancel();
+        return; // we are back to Idle so leave here
+    }
+
+    pHandleMoving = pHandlePress;
+}
+
+void DRDraw::doMouseMoveEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
+{
+    if ( pEvent->buttons() != Qt::LeftButton ) return;
+
+    switch ( nTool )
+    {
+        case ToolSelectRectangle:
+        case ToolSelectPolygon:
+        case ToolManipulate:
+            break;
+        case ToolDrawArc:
+        case ToolDrawChord:
+        case ToolDrawImage:
+        case ToolDrawPie:
+        case ToolDrawLine:
+        case ToolDrawRectangle:
+        case ToolDrawEllipse:
+        case ToolDrawPolygon:
+        case ToolDrawPolyline:
+        case ToolDrawText:
+            if ( !pHandleMoving ) return;
+            Q_ASSERT( pObjectDrawing );
+            Q_ASSERT( pHandleMoving );
+            pObjectDrawing->doDrop( pHandleMoving, pointCurrent ); // move a handle
+            break;
     }
 }
 
-void DRDraw::doMousePressEventSelectPolygon( QGraphicsSceneMouseEvent *pEvent )
+void DRDraw::doMouseReleaseEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
 {
-    Q_ASSERT( 1 == 2 );
-
-    if ( bTracking )
+    switch ( nTool )
     {
-        Q_ASSERT( pObject->inherits( "DRSelectPolygon" ) );
-        ((DRSelectPolygon *)pObject)->doPress( pEvent->scenePos() );
-        return;
+        case ToolSelectRectangle:
+        case ToolSelectPolygon:
+        case ToolManipulate:
+            break;
+        case ToolDrawArc:
+        case ToolDrawChord:
+        case ToolDrawImage:
+        case ToolDrawPie:
+        case ToolDrawLine:
+        case ToolDrawRectangle:
+        case ToolDrawEllipse:
+        case ToolDrawPolygon:
+        case ToolDrawPolyline:
+        case ToolDrawText:
+            Q_ASSERT( pObjectDrawing );
+            if ( !pHandleMoving ) return; // could be here after a double click
+            pObjectDrawing->doDrop( pHandleMoving, pointCurrent ); // move a handle
+            pHandleMoving = nullptr;
+            break;
     }
-
-    pointCurrent = pointPress = pEvent->scenePos();
-}
-
-void DRDraw::doMouseMoveEventSelectPolygon( QGraphicsSceneMouseEvent *pEvent )
-{
-    Q_ASSERT( bTracking );
-    if ( bTracking )
-    {
-        Q_ASSERT( pObject->inherits( "DRPolyline" ) );
-        ((DRPolyline *)pObject)->doMove( pEvent->scenePos() );
-        return;
-    }
-}
-
-void DRDraw::doMouseReleaseEventSelectPolygon( QGraphicsSceneMouseEvent *pEvent )
-{
-    Q_UNUSED( pEvent );
-    Q_ASSERT( !bTracking );
-#ifdef CBD_TODO
-    printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
-#endif
-
-    // did not move (press/release only)?
-    if ( !bMoving )
-    {
-        return;
-    }
-
-    bMoving = false;
 }
 
 void DRDraw::doMousePressEventManipulate( QGraphicsSceneMouseEvent *pEvent )
 {
+    Q_UNUSED( pEvent );
+
     if ( pEvent->buttons() != Qt::LeftButton ) return;
 
-    Q_ASSERT( !bTracking );
-    Q_ASSERT( !pHandle );
-
-    pointCurrent = pointPress = pEvent->scenePos();
-
-    //
-    // WHAT DID WE CLICK ON?
-    //
-    DRObject *pObjectClicked = nullptr;
-    LHandle * pHandleClicked = nullptr;
-
-    // Handles can sometimes be outside of the shapes bounding rect. So lets start by going after a handle...
-    pHandleClicked = getHandle( pointPress );
-// printf( "[PAH][%s][%s][%d] %p\n", __FILE__, __FUNCTION__, __LINE__, pHandleClicked );
-    if ( pHandleClicked )
-    {
-        // Get the object the handle is working with...
-        pObjectClicked = dynamic_cast<DRObject *>( pHandleClicked->getLayerObject() );
-        Q_ASSERT( pObjectClicked );
-
-    }
-    else
-    {
-        // No handle so lets see if we clicked on an object...
-        pObjectClicked = getObject( pointPress );
-    }
-
-    //
-    // CLICKED ON OBJECT ALREADY SELECTED?
-    //
-    if ( pObject && pObject == pObjectClicked ) 
-    {
-// printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-        pHandle = pHandleClicked; // may be nullptr
-        // any selection state cycle will happen in mouse release
-        return;
-    }
-
-    // commit ie drawing/manipulation and cancel ie selector
-    if ( canCommit() ) doCommit(); else if ( canCancel() ) doCancel();
-    Q_ASSERT( !pObject );
-
-    //
-    // CLICKED ON NOTHING
-    //
-    if ( !pObjectClicked )
-    {
-        return; 
-    }
-
-    //
-    // CLICKED ON AN OBJECT (not already selected)
-    //
-    pObject = pObjectClicked;
-    pHandle = pHandleClicked;   // may be nullptr
-    // setSelected( pObject );
+    // does not happen 
+    // we catch this in Idle and then go back to Idle upon release
 }
 
 void DRDraw::doMouseMoveEventManipulate( QGraphicsSceneMouseEvent *pEvent )
 {
     if ( pEvent->buttons() != Qt::LeftButton ) return;
-    if ( !pHandle ) return;
-    Q_ASSERT( pObject );
-    
-// printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-    // manipulate self and selected if isSelector   
-    pObject->doMove( pHandle, pointCurrent );
+
+    Q_ASSERT( nTool == ToolManipulate );
+    Q_ASSERT( pHandleMoving );
+
+    DRObject *p = (DRObject*)pHandleMoving->getLayerObject();
+    p->doMove( pHandleMoving, pointCurrent );
 }
 
 void DRDraw::doMouseReleaseEventManipulate( QGraphicsSceneMouseEvent *pEvent )
 {
-    Q_UNUSED( pEvent );
+    Q_ASSERT( nTool == ToolManipulate );
+    Q_ASSERT( pHandleMoving );
 
-    // Handle - so we were probably moving it...
-    if ( pHandle )
-    {
-        Q_ASSERT( pObject );
-        // manipulate self and selected if isSelector   
-        pObject->doDrop( pHandle, pointCurrent );
-        setModified();
-        pHandle = nullptr;
-        return;
-    }
-
-    // No object? Then we are done here.
-    if ( !pObject ) return;
-
-    // no handle but we could be changing selection of an object...
-    if ( pObject->isSelected() )
-    {
-        // setSelected( pObject, false );
-        pObject->doSelectionStateCycle();
-    }
-    else
-    {
-        setSelected( pObject );
-    }
-
-    return;
+    DRObject *p = (DRObject*)pHandleMoving->getLayerObject();
+    p->doDrop( pHandleMoving, pointCurrent );
+    setModified();
+    pHandleMoving = nullptr;
+    setToolState( ToolStateIdle );
 }
-
-void DRDraw::doMousePressEventCreate( QGraphicsSceneMouseEvent *pEvent )
-{
-    /****************************************** 
-     * Tracking
-     ******************************************/
-    if ( bTracking )
-    {
-        Q_ASSERT( pObject->inherits( "DRPolyline" ) );
-        ((DRPolyline *)pObject)->doPress( pEvent->scenePos() );
-        return;
-    }
-
-    /****************************************** 
-     * Prep For Move/Release
-     ******************************************/
-    Q_ASSERT( !bMoving );
-    Q_ASSERT( !pHandle );
-    pointCurrent = pointPress = pEvent->scenePos();
-}
-
-void DRDraw::doMouseMoveEventCreate( QGraphicsSceneMouseEvent *pEvent )
-{
-    /****************************************** 
-     * Tracking
-     ******************************************/
-    if ( bTracking )
-    {
-        Q_ASSERT( pObject->inherits( "DRPolyline" ) );
-        ((DRPolyline *)pObject)->doMove( pEvent->scenePos() );
-        return;
-    }
-
-    // NOTE: tracking       - buttons() will return last button pressed even when released
-    //       no tracking    - buttons() will return button currently pressed (if any)
-    if ( pEvent->buttons() != Qt::LeftButton ) return;
-
-    /****************************************** 
-     * Init Move 
-     * - we want a handle to move 
-     * - may create a new object to get a handle
-     ******************************************/
-    if ( !bMoving )
-    {
-#ifdef DDRAW_DEBUG_DRAW 
-        qInfo() << "\n[INFO]" << __FILE__ << __FUNCTION__ << __LINE__ << "\nnTool=" << getToolString() << "\nnMouseEventState=" << getMouseEventStateString() << "\nbMoving=" << bMoving << "\nbTracking=" << bTracking << "\nbDrawing=" << bDrawing << "\npObject=" << pObject << "\npHandle=" << pHandle << "\nvectorSelected=" << vectorSelected.count();
-        if ( pObject ) qInfo() << "SelectionState=" << pObject->getSelectionStateString();
-#endif
-        // have object? try to grab one of its handles
-        if ( pObject ) pHandle = pObject->getGrab( pointPress );
-        // no handle? try a different object
-        if ( !pHandle )
-        {
-            // have object? stop using it
-            if ( hasSelection() ) pSelectionManager->doSelectNone();
-            //
-            // create new object
-            //
-            pObject = getObject( nTool, pointPress );
-            bDrawing = true;
-            Q_ASSERT( pObject );
-            setSelected( pObject );
-            // polyline based objects are initialized with tracking (and no handles until done)
-            if ( pObject->inherits( "DRPolyline" ) )
-            {
-                bTracking = true;
-                ((DRPolyline *)pObject)->doMove( pEvent->scenePos() );
-                bMoving = true; // needed for doReleaseEvent that happens after doDoubleClickEvent
-                return;
-            }
-            // get the sizing handle
-            pHandle = pObject->getGrab( pointPress, true );
-#ifdef DDRAW_DEBUG_DRAW 
-            qInfo() << "\n[INFO]" << __FILE__ << __FUNCTION__ << __LINE__ << "\nnTool=" << getToolString() << "\nnMouseEventState=" << getMouseEventStateString() << "\nbMoving=" << bMoving << "\nbTracking=" << bTracking << "\nbDrawing=" << bDrawing << "\npObject=" << pObject << "\npHandle=" << pHandle << "\nvectorSelected=" << vectorSelected.count();
-            if ( pObject ) qInfo() << "SelectionState=" << pObject->getSelectionStateString();
-#endif
-            Q_ASSERT( pHandle );
-        }
-        bMoving = true;
-    }
-
-    /****************************************** 
-     * Move (handle)
-     ******************************************/
-    if ( pHandle ) pObject->doMove( pHandle, pEvent->scenePos() );
-}
-
-void DRDraw::doMouseReleaseEventCreate( QGraphicsSceneMouseEvent *pEvent )
-{
-    Q_UNUSED( pEvent );
-
-    /****************************************** 
-     * Tracking
-     ******************************************/
-    if ( bTracking ) return; // created new point in Press - nothing to do here
-
-    /****************************************** 
-     * Press + Move (a handle)
-     ******************************************/
-    if ( bMoving )
-    {
-        // in some cases - doDrop will result in the handle being deleted by the object
-        if ( pHandle )
-        {
-            pObject->doDrop( pHandle, pointCurrent );
-            setModified();
-        }
-        pHandle = nullptr;
-        bMoving = false;
-        if ( bDrawing && bAutoCommit )
-        {
-            bDrawing = false;
-        }
-        setTool( ToolManipulate, false );
-        emit signalChangedToolState();
-        return;
-    }
-}
-
 
 void DRDraw::doDragEnterEvent( QGraphicsSceneDragDropEvent * )
 {
@@ -935,10 +857,24 @@ void DRDraw::doContextMenuEvent( QGraphicsSceneContextMenuEvent * )
 
 }
 
+/*!
+ * \brief Handle double click event.
+ *
+ * This is used when drawing a DRPolyline based object to terminate the tracking.  
+ * 
+ * \note a double-click results in; doPressEvent + doDoubleClickEvent + doReleaseEvent
+ *
+ * \sa doMousePressEventSelectPolygon
+ * \sa doMouseMoveEventSelectPolygon
+ * \sa doMouseReleaseEventSelectPolygon
+ *
+ * \author pharvey (2026-11-02)
+ * 
+ * \param pEvent 
+ */
 void DRDraw::doMouseDoubleClickEvent( QGraphicsSceneMouseEvent *pEvent )
 {
     Q_ASSERT( pGraphics );
-    // NOTE: a double-click results in; doPressEvent + doDoubleClickEvent + doReleaseEvent
 
     /****************************************** 
      * Original Press Was Off-Scene
@@ -948,20 +884,41 @@ void DRDraw::doMouseDoubleClickEvent( QGraphicsSceneMouseEvent *pEvent )
     // double-click is Off-Scene - ignore
     if ( !pGraphics->scene()->sceneRect().contains( pEvent->scenePos() ) ) return;
 
-    /****************************************** 
-     * Tracking - lets end it
-     ******************************************/
-    if ( bTracking )
+    switch ( nTool )
     {
-        // initializing done - adopt same logic as other DRObject's for further manipulation
-        // which is all about moving handles
-        ((DRPolyline *)pObject)->doDoubleClick( pEvent->scenePos() );
-        bTracking = false;
-        pHandle = nullptr;
-        setModified();
-        return;
+        case ToolSelectPolygon:
+            {
+                Q_ASSERT( pObjectDrawing );
+                DRPolygon *p = (DRPolygon*)pObjectDrawing;
+                p->doDoubleClick( pEvent->scenePos() );
+                pHandleMoving = nullptr;
+                doSelectAll( p->getPolygon() );    
+                slotDelete( pObjectDrawing );
+                pObjectDrawing = nullptr;
+                setTool( ToolManipulate, false );
+                emit signalChanged();
+            }
+            break;
+        case ToolDrawPolygon:
+        case ToolDrawPolyline:
+            ((DRPolyline *)pObjectDrawing)->doDoubleClick( pEvent->scenePos() );
+            pSelectionManager->setSelected( pObjectDrawing );
+            setToolState( ToolStateDrawManipulate );
+            pHandleMoving = nullptr;
+            setModified();
+            break;
+        case ToolManipulate:
+        case ToolSelectRectangle:
+        case ToolDrawArc:
+        case ToolDrawChord:
+        case ToolDrawImage:
+        case ToolDrawPie:
+        case ToolDrawLine:
+        case ToolDrawRectangle:
+        case ToolDrawEllipse:
+        case ToolDrawText:
+            break;
     }
-    // doReleaseEvent gets called next
 }
 
 QDomElement DRDraw::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent )
@@ -1131,7 +1088,7 @@ void DRDraw::doPaste( const QImage &i )
         pSelectionManager->doSelectNone();
     }
 
-    pObject = getObject( i );
+    pObjectDrawing = getObject( i );
 }
 
 void DRDraw::doPaste( QDomElement * )
@@ -1192,12 +1149,12 @@ void DRDraw::doSelectAll()
     else 
         setTool( ToolManipulate );
 
-    Q_ASSERT( !pObject );
-    pObject = getObject( ToolSelectRectangle, QPointF( 0, 0 ) );
-    bDrawing = true;
-    Q_ASSERT( pObject );
+    Q_ASSERT( !pObjectDrawing );
+    pObjectDrawing = getObject( ToolSelectRectangle, QPointF( 0, 0 ) );
+    setToolState( ToolStateIdle );
+    Q_ASSERT( pObjectDrawing );
 
-    DRSelectRectangle *pSelectRectangle = (DRSelectRectangle *)pObject;
+    DRSelectRectangle *pSelectRectangle = (DRSelectRectangle *)pObjectDrawing;
     pSelectRectangle->setDrawing( false );
     pSelectRectangle->setRect( boundingRect() ); 
     doSelectAll( boundingRect() );
@@ -1208,14 +1165,14 @@ void DRDraw::doSelectAll()
         return;
     }
     pSelectRectangle->setRect( getSelectedBoundingRect() );
-    setSelected( pObject, DRObject::SelectionStateStandard ); // selected self in doSelectAll but switch to standard handles
+    setSelected( pObjectDrawing, DRObject::SelectionStateStandard ); // selected self in doSelectAll but switch to standard handles
 }
 
 /*!
  * \brief Unselect any selected objects.
  * 
- * Caller must deal with pObject as needed and this can be done by calling doCommit or doCancel.
- * Special action may be required if pObject is a selector - but not in here!
+ * Caller must deal with pObjectDrawing as needed and this can be done by calling doCommit or doCancel.
+ * Special action may be required if pObjectDrawing is a selector - but not in here!
  *
  * \author pharvey (10/19/25)
  */
@@ -1234,7 +1191,7 @@ void DRDraw::doCrop()
 /*
     if ( !canCopy() ) return;                                                            
                                                                                          
-    QImage i = pObject->getCopy();                                                       
+    QImage i = pObjectDrawing->getCopy();                                                       
     doCancel();                                                                          
     slotPreCommit();                                                                     
     image = i;                                                                           
@@ -1250,7 +1207,7 @@ void DRDraw::doScale( qreal nX, qreal nY, Qt::AspectRatioMode n )
 #endif
 /*
     // try shape first                                                                   
-    if ( pObject && pObject->doScale( nX, nY, n ) ) return;                              
+    if ( pObjectDrawing && pObjectDrawing->doScale( nX, nY, n ) ) return;                              
     // cancel any drawing and flip entire canvas                                         
     if ( isDrawing() ) doCancel();                                                       
     slotPreCommit();                                                                     
@@ -1268,7 +1225,7 @@ void DRDraw::doFlipX()
     return;
 
     // try shape first
-    if ( pObject && pObject->doFlipX() ) return;
+    if ( pObjectDrawing && pObjectDrawing->doFlipX() ) return;
     // cancel any drawing and flip entire canvas
     if ( canCancel() ) doCancel();
     slotPreCommit();
@@ -1284,7 +1241,7 @@ void DRDraw::doFlipY()
     return;
 
     // try shape first
-    if ( pObject && pObject->doFlipY() ) return;
+    if ( pObjectDrawing && pObjectDrawing->doFlipY() ) return;
     // cancel any drawing and flip entire canvas
     if ( canCancel() ) doCancel();
     slotPreCommit();
@@ -1299,7 +1256,7 @@ void DRDraw::doRotate( int nDegrees )
 #endif
 /*
     // try shape first                                                                   
-    if ( pObject && pObject->doRotate( nDegrees ) ) return;                              
+    if ( pObjectDrawing && pObjectDrawing->doRotate( nDegrees ) ) return;                              
     // cancel any drawing and rotate entire canvas                                       
     if ( isDrawing() ) doCancel();                                                       
     slotPreCommit();                                                                     
@@ -1315,10 +1272,10 @@ void DRDraw::doDelete()
     QList<ADObject*> l = pSelectionManager->getSelected();
     for ( ADObject *p : l )
     {
-        if ( p == pObject )
+        if ( p == pObjectDrawing )
         {
-            pObject = nullptr;
-            pHandle = nullptr;
+            pObjectDrawing = nullptr;
+            pHandleMoving = nullptr;
         }
         slotDelete( p );
     }
@@ -1334,89 +1291,53 @@ void DRDraw::doDelete()
 }
 
 /*!
- * \brief Cancel drawing and/or manipulation.
- *  
- *  
+ * \brief Commit drawing and/or manipulation.
+ * 
+ * Keeps the current object.
+ * Unselects all.
+ * Set tool state to idle.
+ * 
+ * \note tool stays the same
+ * \note selector is NOT valid here as they are auto deleted
+ * 
  * \author pharvey (3/30/23)
  */
 void DRDraw::doCommit()
 {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-    if ( bTracking )
-    {
-        ((DRPolyline *)pObject)->doDoubleClick();
-        bTracking   = false;
-        bMoving     = false;
-        pHandle     = nullptr;
-    }
+    Q_ASSERT( isDrawing() );
+    Q_ASSERT( !pObjectDrawing->isSelector() );
 
-    if ( pObject )
-    {
-        bDrawing = false; // must be before doSelectNone
-        if ( pHandle ) pObject->doDrop( pHandle );
-        if ( pObject->isSelector() )
-        {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
-            pSelectionManager->doSelectNone();
-            slotDelete( pObject );
-        }
-        else 
-            setSelected( pObject, false );
-        pObject = nullptr;
-        emit signalChanged();
-        emit signalChangedToolState();
-    }
+    pSelectionManager->doSelectNone();
+
+    pObjectDrawing = nullptr;
+    pHandleMoving = nullptr;
+    setToolState( ToolStateIdle );
+    emit signalChanged();
 }
 
 /*!
- * \brief Cancel drawing, manipulation or selection.
+ * \brief Cancel drawing and/or manipulation.
  *  
- * Will delete current object if drawing. 
- *  
+ * Will delete current object.
+ * Set tool state to idle.
+ * 
+ * \note tool state does NOT have to be ToolStateDraw
+ * \note tool stays the same
+ * \note selector is NOT valid here as they are auto deleted
+ * 
  * \author pharvey (3/30/23)
  */
 void DRDraw::doCancel()
 {
-    // we are doing the initial drawing for an object so...
-    if ( bDrawing )
-    {
-        // stop tracking
-        if ( bTracking )
-        {
-            ((DRPolyline *)pObject)->doDoubleClick();
-            bTracking = false;
-            bMoving = false;
-            pHandle = nullptr;
-        }
-        // delete current object
-        if ( pObject )
-        {
-            bDrawing = false; // must be before doSelectNone
-            if ( pHandle ) pObject->doDrop( pHandle );
-            slotDelete( pObject );
-            pHandle = nullptr;
-            pObject = nullptr;
-            emit signalChanged();
-            emit signalChangedToolState();
-        }
-    }
-    else if ( hasSelector() )
-    {
-        // unselect
-        if ( hasSelection() ) pSelectionManager->doSelectNone();
-        // delete selector
-        if ( pHandle ) pObject->doDrop( pHandle );
-        slotDelete( pObject );
-        pHandle = nullptr;
-        pObject = nullptr;
-        emit signalChanged();
-        emit signalChangedToolState();
-    }
-    else
-    {
-        // do commit if we are just manipulating an existing object
-        doCommit();
-    }
+    Q_ASSERT( pObjectDrawing );
+    Q_ASSERT( !pObjectDrawing->isSelector() );
+
+    slotDelete( pObjectDrawing );
+
+    pObjectDrawing = nullptr;
+    pHandleMoving = nullptr;
+    setToolState( ToolStateIdle );
+    emit signalChanged();
 }
 
 void DRDraw::doPushUndo()
@@ -1433,7 +1354,7 @@ void DRDraw::doPushUndo()
 
 void DRDraw::doZoomChanged( int nZoom )
 {
-    // if ( pObject ) pObject->doZoomChanged( nZoom );
+    // if ( pObjectDrawing ) pObjectDrawing->doZoomChanged( nZoom );
 #ifdef CBD_TODO
     printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
@@ -1441,7 +1362,7 @@ void DRDraw::doZoomChanged( int nZoom )
 
 void DRDraw::doScrollChanged( int nX, int nY )
 {
-    // if ( pObject ) pObject->doScrollChanged( nX, nY );
+    // if ( pObjectDrawing ) pObjectDrawing->doScrollChanged( nX, nY );
 #ifdef CBD_TODO
     printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
@@ -1449,7 +1370,38 @@ void DRDraw::doScrollChanged( int nX, int nY )
 
 bool DRDraw::isDrawing()
 {
-    return bDrawing;
+    if ( nToolState == ToolStateDraw || nToolState == ToolStateDrawManipulate )
+    {
+        Q_ASSERT( pObjectDrawing );
+        return true;
+    }
+
+    return false;
+}
+
+/*!
+ * \brief Is tracking on/off.
+ * 
+ * Tracking is on when a DRPolyline is being drawn.
+ * This is the only time when mouse pos changes matter when no button pressed.
+ * 
+ * \author pharvey (2026-11-04)
+ * 
+ * \return bool 
+ */
+bool DRDraw::isTracking()
+{
+    if ( nToolState == ToolStateDraw )
+    {
+        Q_ASSERT( pObjectDrawing );
+        return pObjectDrawing->inherits( "DRPolyline" );
+    }
+    return false;
+}
+
+bool DRDraw::isSelectionToolConfig()    
+{ 
+    return isToolSelector(); 
 }
 
 bool DRDraw::hasSelection()
@@ -1459,8 +1411,8 @@ bool DRDraw::hasSelection()
 
 bool DRDraw::hasSelector()
 {
-    if ( !pObject ) return false;
-    return pObject->isSelector();
+    if ( !pObjectDrawing ) return false;
+    return pObjectDrawing->isSelector();
 }
 
 bool DRDraw::canCut()
@@ -1517,7 +1469,7 @@ bool DRDraw::canCommit()
 // can cancel new object or selector
 bool DRDraw::canCancel()
 {
-    return isDrawing() || hasSelector() || hasSelection();
+    return isDrawing();
 }
 
 bool DRDraw::canScale()
@@ -1575,6 +1527,13 @@ void DRDraw::slotCommitted()
 */
 }
 
+void DRDraw::setToolState( ToolStates n )
+{
+    if ( n == nToolState ) return;
+    nToolState = n;
+    emit signalChangedToolState();
+}
+
 /*!
  * \brief Select/unselect given objects.
  * 
@@ -1621,11 +1580,11 @@ void DRDraw::setSelected( DRObject *p, DRObject::SelectionStates nState )
 
     if ( nState == DRObject::SelectionStateNone )
     {
-        pSelectionManager->setSelected( pObject, false );
+        pSelectionManager->setSelected( pObjectDrawing, false );
     }
     else
     {
-        if ( !p->isSelected() ) pSelectionManager->setSelected( pObject );
+        if ( !p->isSelected() ) pSelectionManager->setSelected( pObjectDrawing );
     }
     p->setSelected( nState );
     emit signalChanged();
@@ -1794,7 +1753,7 @@ void DRDraw::doSelectAll( const QRectF &rect )
         if ( !pObject ) continue;
         if ( !rect.contains( pObject->boundingRect() ) ) continue;
         pSelectionManager->setSelected( pObject );
-        if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
+        // if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
     }
 }
 
@@ -1821,7 +1780,7 @@ void DRDraw::doSelectAll( const QPolygonF &polygon )
                  polygon.containsPoint( pLine->getEnd(), Qt::OddEvenFill ) )
             {
                 pSelectionManager->setSelected( pObject );
-                if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
+                // if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
             }
         }
         else if ( pObject->inherits( "DRPolyline" ) )
@@ -1833,7 +1792,7 @@ void DRDraw::doSelectAll( const QPolygonF &polygon )
                 if ( !polygon.containsPoint( point, Qt::OddEvenFill ) ) break;
             }
             pSelectionManager->setSelected( pObject );
-            if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
+            // if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
         }
         else
         {
@@ -1845,7 +1804,7 @@ void DRDraw::doSelectAll( const QPolygonF &polygon )
                  polygon.containsPoint( rectObject.bottomRight(), Qt::OddEvenFill ) )
             {
                 pSelectionManager->setSelected( pObject );
-                if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
+                // if ( pObject->isSelected() ) setSelected( pObject, DRObject::SelectionStateMinimal );
             }
         }
     }

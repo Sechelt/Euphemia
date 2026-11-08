@@ -83,11 +83,9 @@ void PAPolyline::doPress( PMouseEvent *pEvent )
     {
     case StateIdle:
         doDrawState( pEvent->pos() );
-        polygon.boundingRect();
         break;
     case StateDraw:
         polygon.append( pEvent->pos() );
-        polygon.boundingRect();
         pointMouse = pEvent->pos();
         update();
         break;

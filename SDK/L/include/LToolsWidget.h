@@ -38,7 +38,8 @@ protected:
     QWidget *           pScrollableWidgetTools  = nullptr;
     QActionGroup *      pActionGroup            = nullptr;
     QVector<QAction*>   vectorActions;
-    int                 nTool = -1;
+    int                 nTool                   = -1;
+    bool                bSelectionToolConfig    = false;        /*!< true if we get tool config based upon selection ie tool is a selector/manipulator   */
 
     QScrollArea *       pScrollAreaPanel        = nullptr;
     QWidget *           pScrollableWidgetPanel  = nullptr;
@@ -62,6 +63,7 @@ protected slots:
     void slotTriggered( QAction * );
     void slotChangedCurrent();
     void slotChangedTool();
+    void slotSelectionChanged();
 };
 
 #endif

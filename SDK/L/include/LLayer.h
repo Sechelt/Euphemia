@@ -157,9 +157,10 @@ public:
     virtual void doZoomChanged( int nZoom );
     virtual void doScrollChanged( int nX, int nY );
 
-    virtual bool isModified()       { return bModified; }
-    virtual bool isDrawing()        { return false; } 
-    virtual bool isVisible()        { return bVisible; }
+    virtual bool isModified()               { return bModified; }
+    virtual bool isDrawing()                { return false;     } 
+    virtual bool isVisible()                { return bVisible;  }
+    virtual bool isSelectionToolConfig()    { return false;     } // only consider making true if tool config is based upon selection not just the tool
 
     virtual bool hasSelection()     { return false; }
     virtual bool hasXML()           { return false; }
@@ -187,7 +188,8 @@ signals:
     void signalChangedToolState();
     void signalPixelSelectionMoved( const QPoint &pointTopLeft );
     void signalPixelRefreshImage();
-    void signalToolConfig( int nTool );                             /*!< layer emits this to let the main window create/delete a tool config (ie in tool bar). Logic for this varies depending upon the layer class. */
+    void signalToolConfig( int nTool );                             /*!< layer emits this to let the main window create/delete a tool config (ie in tool bar). Logic for this varies depending upon the layer class.    */
+    void signalSelectionChanged();                                  /*!< used to support isSelectionToolConfig as ADObject::signalSelected(ADObject*,bool) will not be in sync with selection manager with signals      */
 
 protected slots:
     virtual void slotRefreshGrid();

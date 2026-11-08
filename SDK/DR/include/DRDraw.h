@@ -47,6 +47,13 @@ class DRDraw : public LLayer
 {
     Q_OBJECT
 public:
+    /*!
+     * \brief Supported tools.
+     * 
+     * A tool is usually selected by the User but ToolManipulate will be selected when ToolSelectRectangle/ToolSelectPolygon results in a selection.
+     * 
+     * \sa nTool
+     */
     enum Tools
     {
         ToolSelectRectangle,
@@ -64,12 +71,16 @@ public:
         ToolDrawText                    /*!< shape: draw a text                                      */ 
     };
 
-    enum MouseEventStates
+    /*!
+     * \brief A tool can be in one of these states.
+     * \sa nToolState
+     */
+    enum ToolStates
     {
-        MouseEventStateSelectRectangle,
-        MouseEventStateSelectPolygon,
-        MouseEventStateManipulate,
-        MouseEventStateCreate            /*!< nTool == ToolDraw* and 0 object selected               */
+        ToolStateIdle,                  /*!< tool selected but not drawing (!pObjectDrawing)                   */
+        ToolStateDraw,                  /*!< we are drawing a new pObjectDrawing                               */
+        ToolStateDrawManipulate,        /*!< we are manipulating a new pObjectDrawing                          */
+        ToolStateManipulate             /*!< manipulating a selected object(s) (!pObjectDrawing)               */
     };
 
     DRDraw( LFile *pParent, const QString &stringName = QString() );
@@ -92,7 +103,7 @@ public:
     QWidget *           getPanel( QWidget * ) override;
     ADObject *          getObject( const QString &s, ADObject * ) override;
     QString             getToolString();
-    QString             getMouseEventStateString();
+    QString             getToolStateString();
     QVector<DRObject*>  getSelected();
     QRectF              getSelectedBoundingRect();
 
@@ -100,21 +111,21 @@ public:
     void doMouseMoveEvent( QGraphicsSceneMouseEvent *pEvent ) override;
     void doMouseReleaseEvent( QGraphicsSceneMouseEvent *pEvent ) override;
 
-    void doMousePressEventSelectRectangle( QGraphicsSceneMouseEvent *pEvent );
-    void doMouseMoveEventSelectRectangle( QGraphicsSceneMouseEvent *pEvent );
-    void doMouseReleaseEventSelectRectangle( QGraphicsSceneMouseEvent *pEvent );
+    void doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent );
+    void doMouseMoveEventIdle( QGraphicsSceneMouseEvent *pEvent );
+    void doMouseReleaseEventIdle( QGraphicsSceneMouseEvent *pEvent );
 
-    void doMousePressEventSelectPolygon( QGraphicsSceneMouseEvent *pEvent );
-    void doMouseMoveEventSelectPolygon( QGraphicsSceneMouseEvent *pEvent );
-    void doMouseReleaseEventSelectPolygon( QGraphicsSceneMouseEvent *pEvent );
+    void doMousePressEventDraw( QGraphicsSceneMouseEvent *pEvent );
+    void doMouseMoveEventDraw( QGraphicsSceneMouseEvent *pEvent );
+    void doMouseReleaseEventDraw( QGraphicsSceneMouseEvent *pEvent );
+
+    void doMousePressEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent );
+    void doMouseMoveEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent );
+    void doMouseReleaseEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent );
 
     void doMousePressEventManipulate( QGraphicsSceneMouseEvent *pEvent );
     void doMouseMoveEventManipulate( QGraphicsSceneMouseEvent *pEvent );
     void doMouseReleaseEventManipulate( QGraphicsSceneMouseEvent *pEvent );
-
-    void doMousePressEventCreate( QGraphicsSceneMouseEvent *pEvent );
-    void doMouseMoveEventCreate( QGraphicsSceneMouseEvent *pEvent );
-    void doMouseReleaseEventCreate( QGraphicsSceneMouseEvent *pEvent );
 
     void doDragEnterEvent( QGraphicsSceneDragDropEvent *pEvent ) override;
     void doDragMoveEvent( QGraphicsSceneDragDropEvent *pEvent ) override;
@@ -147,6 +158,12 @@ public:
     void doScrollChanged( int nX, int nY ) override;
 
     bool isDrawing() override;
+    bool isTracking();
+    bool isToolDraw()               { return (!isToolSelector()); }
+    bool isToolSelector()           { return (isToolSelectorArea() || nTool == ToolManipulate); };
+    bool isToolSelectorArea()       { return (nTool == ToolSelectRectangle || nTool == ToolSelectPolygon); }
+    bool isToolPolyline()           { return (nTool == ToolSelectPolygon || nTool == ToolDrawPolygon || nTool == ToolDrawPolyline); }
+    bool isSelectionToolConfig() override;
 
     bool hasSelection() override;
     bool hasSelector();
@@ -175,13 +192,9 @@ protected slots:
     void slotCommitted();
 
 protected:
-    // state
-    Tools               nTool               = ToolManipulate;               /*!< We decide whether this gets changed or not. Others make requests ie via setTool. */
-    MouseEventStates    nMouseEventState    = MouseEventStateManipulate;    /*!< ready to manipulate            */
-    // state modifiers
-    bool            bMoving     = false;    /*!< true if Press was followed by a Move                           */
-    bool            bTracking   = false;    /*!< true if we are initializing a polyline based object            */
-    bool            bDrawing    = false;    /*!< true if we are initializing a new object                       */
+    // state - start
+    Tools               nTool               = ToolManipulate;               
+    ToolStates          nToolState          = ToolStateIdle;                /*!< no pObjectDrawing */
 
     // settings
     SSetting *          pSettingGeneral;
@@ -197,11 +210,14 @@ protected:
     //
     QPointF         pointPress;                     /*!< point when Press                                                                   */
     QPointF         pointCurrent;                   /*!< store mouse pos in case mouse goes off scene (or even view)                        */
-    DRObject *      pObject     = nullptr;          /*!< shape being created/manipulated (can be a DRSelect*)                               */
-    LHandle *       pHandle     = nullptr;          /*!< handle being moved                                                                 */
+    DRObject *      pObjectPress        = nullptr;  /*!< object clicked on (if any)                                                         */
+    LHandle *       pHandlePress        = nullptr;  /*!< handle clicked on (if any)                                                         */
+    DRObject *      pObjectDrawing      = nullptr;  /*!< shape being; ToolStateDraw or ToolStateDrawManipulate                              */
+    LHandle *       pHandleMoving       = nullptr;  /*!< handle being moved can use LHandle::getLayerObject() to get object                 */
 
     void paint( QPainter *, const QStyleOptionGraphicsItem *, QWidget * ) override {}; // DRObjects paint themselves, the rest is transparent, and thats enough
 
+    void setToolState( ToolStates n );
     void setSelected( QList<DRObject*>, bool b = true );
     void setSelected( DRObject*, bool b = true );
     void setSelected( DRObject*, DRObject::SelectionStates );

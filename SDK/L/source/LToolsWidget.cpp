@@ -66,14 +66,22 @@ void LToolsWidget::doConnectLayer( LLayer *p )
 {
     Q_ASSERT( pLayers );
     Q_ASSERT( !pLayer );
+
     pLayer = p;
     if ( !pLayer ) return;
+    bSelectionToolConfig = pLayer->isSelectionToolConfig();
 
     doInitActions( pLayer->getTools() );
     doInitButtons();
     doInitPanel();
 
+    // catch tool change
+    // - activate the button
+    // - set config panel (if any)
+    //          - an exception is when the tool is 'select/manipulate'
+    //          in which case we set panel based upon selection not tool
     connect( pLayer, SIGNAL(signalChangedTool()), this, SLOT(slotChangedTool()) );
+    if ( bSelectionToolConfig ) connect( pLayer, SIGNAL(signalSelectionChanged()), this, SLOT(slotSelectionChanged()) );
 }
 
 void LToolsWidget::doDisconnectLayer()
@@ -85,7 +93,9 @@ void LToolsWidget::doDisconnectLayer()
     if ( pLayers->hasLayer( pLayer ) )
     {
         disconnect( pLayer, SIGNAL( signalChangedTool() ), this, SLOT( slotChangedTool() ) );
+        if ( bSelectionToolConfig ) disconnect( pLayer, SIGNAL(signalSelectionChanged()), this, SLOT(slotSelectionChanged()) );
     }
+    bSelectionToolConfig = false;
 
     doFiniPanel();
     doFiniButtons();
@@ -253,4 +263,9 @@ void LToolsWidget::slotChangedTool()
     if ( n >= 0 ) doConnectTool( n );
 }
 
+void LToolsWidget::slotSelectionChanged()
+{
+    doFiniPanel();
+    doInitPanel();
+}
 

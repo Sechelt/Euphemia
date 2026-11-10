@@ -533,7 +533,10 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
                 if ( pObjectPress )
                 {
                     if ( pObjectPress->isSelected() )
-                        pObjectPress->doSelectionStateCycle();
+                    {
+printf( "[PAH][%s][%s][%d] ToDo: Transform\n", __FILE__, __FUNCTION__, __LINE__ );
+//                        pObjectPress->doSelectionStateCycle();
+                    }
                     else
                     {
                         pSelectionManager->doSelectNone();

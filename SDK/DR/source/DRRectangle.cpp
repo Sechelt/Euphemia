@@ -63,15 +63,18 @@ void DRRectangle::doMove( LHandle *pHandle, const QPointF &pointPos )
     getGraphics()->doPrepareGeometryChange();
 
     // rounded corners
-    if ( pHandle == vectorHandles[DRRectangleHRound] )
+    if ( nSelectionState == SelectionStateStandard )
     {
-        pSettingRectangle->setProperty( "nXRadius", getXRadiusValidated( getXRadius( pointPos ) ) );
-        return;
-    }
-    else if ( pHandle == vectorHandles[DRRectangleVRound] )
-    {
-        pSettingRectangle->setProperty( "nYRadius", getYRadiusValidated( getYRadius( pointPos ) ) );
-        return;
+        if ( pHandle == vectorHandles[DRRectangleHRound] )
+        {
+            pSettingRectangle->setProperty( "nXRadius", getXRadiusValidated( getXRadius( pointPos ) ) );
+            return;
+        }
+        else if ( pHandle == vectorHandles[DRRectangleVRound] )
+        {
+            pSettingRectangle->setProperty( "nYRadius", getYRadiusValidated( getYRadius( pointPos ) ) );
+            return;
+        }
     }
 
     //
@@ -231,6 +234,8 @@ void DRRectangle::doCreateHandles()
 
     DRRectangleBase::doCreateHandles();
 
+    if ( nSelectionState != SelectionStateStandard ) return;
+
     // DRRectangleHRound
     pHandle = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( getXRadiusPoint( nXRadius ) ) );
     vectorHandles.append( pHandle );
@@ -245,6 +250,8 @@ void DRRectangle::doCreateHandles()
 void DRRectangle::doSyncHandles()
 {
     DRRectangleBase::doSyncHandles();
+
+    if ( nSelectionState != SelectionStateStandard ) return;
 
     vectorHandles[DRRectangleHRound]->setCenter( getView()->mapFromScene( getXRadiusPoint( nXRadius ) ) );
     vectorHandles[DRRectangleVRound]->setCenter( getView()->mapFromScene( getYRadiusPoint( nYRadius ) ) );
@@ -261,8 +268,11 @@ void DRRectangle::slotRefreshRectangle()
 
     if ( !vectorHandles.count() ) return;
 
-    vectorHandles[DRRectangleHRound]->setCenter( getView()->mapFromScene( getXRadiusPoint( nXRadius ) ) );
-    vectorHandles[DRRectangleVRound]->setCenter( getView()->mapFromScene( getYRadiusPoint( nYRadius ) ) );
+    if ( nSelectionState == SelectionStateStandard )
+    {
+        vectorHandles[DRRectangleHRound]->setCenter( getView()->mapFromScene( getXRadiusPoint( nXRadius ) ) );
+        vectorHandles[DRRectangleVRound]->setCenter( getView()->mapFromScene( getYRadiusPoint( nYRadius ) ) );
+    }
 
     getGraphics()->update();
 }

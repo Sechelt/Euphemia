@@ -94,9 +94,17 @@ void DRRectangleBase::doMove( LHandle *pHandle, const QPointF &pointPos )
 {
     Q_ASSERT( pHandle );
 
+    if ( nSelectionState != SelectionStateStandard )
+    {
+printf( "[PAH][%s][%s][%d] ToDo: Transform\n", __FILE__, __FUNCTION__, __LINE__ );
+        return;
+    }
+
     getGraphics()->doPrepareGeometryChange();
 
     // adjust our geometry
+    if ( nSelectionState != SelectionStateStandard ) return;
+
     if ( bBind )
     {
         if ( pHandle == vectorHandles[DRRectangleBaseMove] )

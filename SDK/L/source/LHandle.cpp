@@ -61,6 +61,8 @@ void LHandle::paintEvent( QPaintEvent *pEvent )
 
     switch ( nType )
     {
+        case TypeHRound:
+        case TypeVRound:
         case TypeMovePoint:
         case TypeGradientIntermediate:
         case TypeGradientRadius:

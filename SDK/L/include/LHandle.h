@@ -58,6 +58,8 @@ public:
         TypeSizeTopLeft,
         TypeSizeBottomRight,
         TypeSizeBottomLeft,
+        TypeHRound,                 // to round corners of a rect
+        TypeVRound,                 // to round corners of a rect
         TypeFillSeed,
         TypeGradientStart,
         TypeGradientStop,

@@ -39,9 +39,14 @@ public:
 
 protected:
     SSetting *      pSettingRectangle;
-    bool            bBind       = false;
+    bool            bBind       = false;    /*!< bind x and y (ensure we have a square)     */
 
     QRectF r;
+
+    // index of handles
+    int nIndexHandleMove    = 0;
+    int nIndexHandleBegin   = 1;
+    int nIndexHandleEnd     = 2;
 
     virtual void doConnectSettings() override;
     virtual void doDisconnectSettings() override;

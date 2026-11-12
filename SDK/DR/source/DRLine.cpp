@@ -15,10 +15,6 @@
 
 #include "DRDraw.h"
 
-#define DRLineBegin 0
-#define DRLineMove 1
-#define DRLineEnd 2
-
 DRLine::DRLine( DRDraw *pCanvas, const QPointF &pointPos )
     : DRObject( pCanvas, pointPos )
 {
@@ -92,7 +88,7 @@ LHandle *DRLine::getGrab( const QPointF &pointPos, bool bSizing )
     if ( bSizing ) 
     {
         if ( nSelectionState != SelectionStateStandard ) return nullptr;
-        return vectorHandles.at( DRLineEnd );
+        return vectorHandles.at( nIndexHandleEnd );
     }
 
     return DRObject::getGrab( pointPos ); 
@@ -113,12 +109,12 @@ void DRLine::doMove( LHandle *pHandle, const QPointF &pointPos )
     pGraphics->doPrepareGeometryChange();
 
     // adjust our geometry
-    if ( pHandle == vectorHandles[DRLineBegin] )
+    if ( pHandle == vectorHandles[nIndexHandleBegin] )
     {
         // move the begin 
         pointBegin = pointPos;
     }
-    else if ( pHandle == vectorHandles[DRLineMove] )
+    else if ( pHandle == vectorHandles[nIndexHandleMove] )
     {
         // get diff
         QRectF r( pointBegin, pointEnd );
@@ -128,7 +124,7 @@ void DRLine::doMove( LHandle *pHandle, const QPointF &pointPos )
         pointBegin += pointDiff;
         pointEnd += pointDiff;
     }
-    else if ( pHandle == vectorHandles[DRLineEnd] )
+    else if ( pHandle == vectorHandles[nIndexHandleEnd] )
     {
         // move the end 
         pointEnd = pointPos;
@@ -139,7 +135,7 @@ void DRLine::doMove( LHandle *pHandle, const QPointF &pointPos )
     QPointF  pointViewPos    = getView()->mapFromScene( pointPos );
     QPointF  pointViewEnd    = getView()->mapFromScene( pointEnd );
 
-    if ( pHandle == vectorHandles[DRLineBegin] )
+    if ( pHandle == vectorHandles[nIndexHandleBegin] )
     {
         pHandle->setCenter( pointViewBegin );
         // get center
@@ -147,15 +143,15 @@ void DRLine::doMove( LHandle *pHandle, const QPointF &pointPos )
         r.setTopLeft( pointViewBegin );
         r.setBottomRight( pointViewEnd );
         // adjust move handle
-        vectorHandles[DRLineMove]->setCenter( r.center() );
+        vectorHandles[nIndexHandleMove]->setCenter( r.center() );
     }
-    else if ( pHandle == vectorHandles[DRLineMove] )
+    else if ( pHandle == vectorHandles[nIndexHandleMove] )
     {
-        vectorHandles[DRLineBegin]->setCenter( pointViewBegin );
-        vectorHandles[DRLineMove]->setCenter( pointViewPos );
-        vectorHandles[DRLineEnd]->setCenter( pointViewEnd );
+        vectorHandles[nIndexHandleBegin]->setCenter( pointViewBegin );
+        vectorHandles[nIndexHandleMove]->setCenter( pointViewPos );
+        vectorHandles[nIndexHandleEnd]->setCenter( pointViewEnd );
     }
-    else if ( pHandle == vectorHandles[DRLineEnd] )
+    else if ( pHandle == vectorHandles[nIndexHandleEnd] )
     {
         pHandle->setCenter( pointViewEnd );
         // get center
@@ -163,7 +159,7 @@ void DRLine::doMove( LHandle *pHandle, const QPointF &pointPos )
         r.setTopLeft( pointViewBegin );
         r.setBottomRight( pointViewEnd );
         // adjust move handle
-        vectorHandles[DRLineMove]->setCenter( r.center() );
+        vectorHandles[nIndexHandleMove]->setCenter( r.center() );
     }
     // update();
 }
@@ -317,7 +313,7 @@ void DRLine::doCreateHandles()
     r.setBottomRight( pointViewEnd );
     r = r.normalized();
 
-    pHandle = new LHandle( this, getView(), LHandle::TypeDrag, r.center() );
+    pHandle = new LHandle( this, getView(), LHandle::FunctionMove, r.center() );
     vectorHandles.append( pHandle );
     pHandle->show();
 
@@ -331,9 +327,9 @@ void DRLine::doSyncHandles()
 {
     QRectF rectView = getView()->mapFromScene( QRectF( pointBegin, pointEnd ).normalized() ).boundingRect();
 
-    vectorHandles[DRLineBegin]->setCenter( rectView.topLeft() );
-    vectorHandles[DRLineMove]->setCenter( rectView.center() );
-    vectorHandles[DRLineEnd]->setCenter( rectView.bottomRight() );
+    vectorHandles[nIndexHandleBegin]->setCenter( rectView.topLeft() );
+    vectorHandles[nIndexHandleMove]->setCenter( rectView.center() );
+    vectorHandles[nIndexHandleEnd]->setCenter( rectView.bottomRight() );
 }
 
 void DRLine::slotRefreshLine()

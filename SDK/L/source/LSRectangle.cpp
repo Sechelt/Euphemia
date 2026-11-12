@@ -101,9 +101,9 @@ LSRectangleToolBar::LSRectangleToolBar( QWidget *p )
 
     QHBoxLayout *pLayout = new QHBoxLayout( this );
 
-    pBind = new QCheckBox( tr("Bind Horiz/Vert Lengths"), this );
+    pBind = new QCheckBox( tr("Bind (x/y)"), this );
     pBind->setTristate( false );
-    pBind->setToolTip( tr("geometry: change V/H lengths the same amount to create a square or a circle") );
+    pBind->setToolTip( tr("geometry: change (x/y) lengths the same amount to create a square or a circle") );
     pBind->setCheckState( pSetting->getBind() ? Qt::Checked : Qt::Unchecked );
     pLayout->addWidget( pBind );
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
@@ -209,7 +209,7 @@ LSRectanglePanel::LSRectanglePanel( QWidget *p )
 
     pBind = new QCheckBox( this );
     pBind->setTristate( false );
-    pBind->setToolTip( tr("geometry: change V/H lengths the same amount to create a square or a circle") );
+    pBind->setToolTip( tr("geometry: change (x/y) lengths the same amount to create a square or a circle") );
     pBind->setCheckState( pSetting->getBind() ? Qt::Checked : Qt::Unchecked );
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pBind, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotBind(Qt::CheckState)) );
@@ -248,7 +248,7 @@ LSRectanglePanel::LSRectanglePanel( QWidget *p )
     connect( pMode, SIGNAL(currentIndexChanged(int)), SLOT(slotMode(int)) );
 
     QFormLayout *pLayout = new QFormLayout( this );
-    pLayout->addRow( tr("Bind"), pBind );
+    pLayout->addRow( tr("Bind (x/y)"), pBind );
     pLayout->addRow( tr("XRadius"), pXRadius );
     pLayout->addRow( tr("YRadius"), pYRadius );
     pLayout->addRow( tr("Mode"), pMode );

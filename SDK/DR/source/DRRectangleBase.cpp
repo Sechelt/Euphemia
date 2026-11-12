@@ -17,10 +17,6 @@
 
 #include "DRDraw.h"
 
-#define DRRectangleBaseMove 0
-#define DRRectangleBaseBegin 1
-#define DRRectangleBaseEnd 2
-
 DRRectangleBase::DRRectangleBase( DRDraw *pCanvas, const QPointF &pointPos )
     : DRObject( pCanvas, pointPos )
 {
@@ -77,7 +73,7 @@ LHandle *DRRectangleBase::getGrab( const QPointF &pointPos, bool bSizing )
     if ( bSizing ) 
     {
         if ( nSelectionState != SelectionStateStandard ) return nullptr;
-        return vectorHandles.at( DRRectangleBaseEnd );
+        return vectorHandles.at( nIndexHandleEnd );
     }
 
     return DRObject::getGrab( pointPos ); 
@@ -94,80 +90,75 @@ void DRRectangleBase::doMove( LHandle *pHandle, const QPointF &pointPos )
 {
     Q_ASSERT( pHandle );
 
-    if ( nSelectionState != SelectionStateStandard )
-    {
-printf( "[PAH][%s][%s][%d] ToDo: Transform\n", __FILE__, __FUNCTION__, __LINE__ );
-        return;
-    }
-
     getGraphics()->doPrepareGeometryChange();
 
     // adjust our geometry
-    if ( nSelectionState != SelectionStateStandard ) return;
-
-    if ( bBind )
+    if ( nSelectionState == SelectionStateStandard )
     {
-        if ( pHandle == vectorHandles[DRRectangleBaseMove] )
+        if ( bBind )
         {
-            QPointF pointDiff = pointPos - r.center();
-            r.setTopLeft( r.topLeft() + pointDiff );
-            r.setBottomRight( r.bottomRight() + pointDiff );
+            if ( pHandle->getType() == LHandle::FunctionMove )
+            {
+                QPointF pointDiff = pointPos - r.center();
+                r.setTopLeft( r.topLeft() + pointDiff );
+                r.setBottomRight( r.bottomRight() + pointDiff );
+            }
+            else if ( pHandle->getType() == LHandle::TypeSizeTopLeft )
+            {
+                QPointF pointDelta = pointPos - r.topLeft();
+                qreal nDelta = pointDelta.x() > pointDelta.y() ? pointDelta.x() : pointDelta.y();
+                r.setTopLeft( r.topLeft() + QPointF( nDelta, nDelta ) );
+                r.setBottomRight( r.bottomRight() - QPointF( nDelta, nDelta ) );
+            }
+            else if ( pHandle->getType() == LHandle::TypeSizeBottomRight )
+            {
+                QPointF pointDelta = pointPos - r.bottomRight();
+                qreal nDelta = pointDelta.x() > pointDelta.y() ? pointDelta.x() : pointDelta.y();
+                r.setTopLeft( r.topLeft() - QPointF( nDelta, nDelta ) );
+                r.setBottomRight( r.bottomRight() + QPointF( nDelta, nDelta ) );
+            }
         }
-        else if ( pHandle == vectorHandles[DRRectangleBaseBegin] )
+        else
         {
-            QPointF pointDelta = pointPos - r.topLeft();
-            qreal nDelta = pointDelta.x() > pointDelta.y() ? pointDelta.x() : pointDelta.y();
-            r.setTopLeft( r.topLeft() + QPointF( nDelta, nDelta ) );
-            r.setBottomRight( r.bottomRight() - QPointF( nDelta, nDelta ) );
+            if ( pHandle->getType() == LHandle::FunctionMove )
+            {
+                QPointF pointDiff = pointPos - r.center();
+                r.setTopLeft( r.topLeft() + pointDiff );
+                r.setBottomRight( r.bottomRight() + pointDiff );
+            }
+            else if ( pHandle->getType() == LHandle::TypeSizeTopLeft )
+            {
+                r.setTopLeft( pointPos );
+            }
+            else if ( pHandle->getType() == LHandle::TypeSizeBottomRight )
+            {
+                r.setBottomRight( pointPos );
+            }
         }
-        else if ( pHandle == vectorHandles[DRRectangleBaseEnd] )
-        {
-            QPointF pointDelta = pointPos - r.bottomRight();
-            qreal nDelta = pointDelta.x() > pointDelta.y() ? pointDelta.x() : pointDelta.y();
-            r.setTopLeft( r.topLeft() - QPointF( nDelta, nDelta ) );
-            r.setBottomRight( r.bottomRight() + QPointF( nDelta, nDelta ) );
-        }
-    }
-    else
-    {
-        if ( pHandle == vectorHandles[DRRectangleBaseMove] )
-        {
-            QPointF pointDiff = pointPos - r.center();
-            r.setTopLeft( r.topLeft() + pointDiff );
-            r.setBottomRight( r.bottomRight() + pointDiff );
-        }
-        else if ( pHandle == vectorHandles[DRRectangleBaseBegin] )
-        {
-            r.setTopLeft( pointPos );
-        }
-        else if ( pHandle == vectorHandles[DRRectangleBaseEnd] )
-        {
-            r.setBottomRight( pointPos );
-        }
-    }
 
-    r = r.normalized();
+        r = r.normalized();
 
-    // adjust handles
+        // adjust handles
 
-    // their parent is the viewport so...
-    QPointF pointView = getView()->mapFromScene( pointPos );
+        // their parent is the viewport so...
+        QPointF pointView = getView()->mapFromScene( pointPos );
 
-    if ( pHandle == vectorHandles[DRRectangleBaseMove] )
-    {
-        doSyncHandles();
-    }
-    else if ( pHandle == vectorHandles[DRRectangleBaseBegin] )
-    {
-        pHandle->setCenter( pointView );
-        doSyncHandleTypes();
-        doSyncHandles();
-    }
-    else if ( pHandle == vectorHandles[DRRectangleBaseEnd] )
-    {
-        pHandle->setCenter( pointView );
-        doSyncHandleTypes();
-        doSyncHandles();
+        if ( pHandle->getType() == LHandle::FunctionMove )
+        {
+            doSyncHandles();
+        }
+        else if ( pHandle->getType() == LHandle::TypeSizeTopLeft )
+        {
+            pHandle->setCenter( pointView );
+            doSyncHandleTypes();
+            doSyncHandles();
+        }
+        else if ( pHandle->getType() == LHandle::TypeSizeBottomRight )
+        {
+            pHandle->setCenter( pointView );
+            doSyncHandleTypes();
+            doSyncHandles();
+        }
     }
 }
 

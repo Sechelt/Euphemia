@@ -38,6 +38,10 @@ public:
     virtual bool        doLoad( QDomElement *pdomElem ) override;
 
 protected:
+    // index of additional handles
+    int nIndexHandleStartAngle = 3;
+    int nIndexHandleSpanAngle = 4;
+
     // keeping track of points here simplifies some operations
     QPointF pointStart;     /*!< last handle pos for nStartAngle                                            */
     QPointF pointStop;      /*!< last handle pos for nSpan                                                  */

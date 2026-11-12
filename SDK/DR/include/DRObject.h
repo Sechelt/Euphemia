@@ -112,7 +112,6 @@ protected:
     qreal nShearH   = 0;          // shear horizontal
     qreal nShearV   = 0;          // shear vertical
 
-
     virtual void doDraw( QPainter *pPainter ) = 0;
 
     virtual LHandle *  getHandleUnder( LHandle *pHandle, LHandle::Type n );

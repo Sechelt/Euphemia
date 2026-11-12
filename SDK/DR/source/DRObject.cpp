@@ -108,7 +108,6 @@ void DRObject::setSelected( bool b )
  */
 void DRObject::setSelected( SelectionStates n )
 {
-// qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Selected: " << isSelected() << " Current: " << getSelectionStateString( nSelectionState ) << " Requested: " << getSelectionStateString( n );
     if ( n == nSelectionState ) return;
 
     // sanity check
@@ -379,8 +378,6 @@ LHandle *DRObject::getHandlePrev( LHandle *pHandle, LHandle::Type nType )
  */
 void DRObject::doCreateHandles()
 {
-//    if ( !bInitTransform ) bInitTransform();
-
     switch ( nSelectionState )
     {
         case SelectionStateStandard:
@@ -389,16 +386,16 @@ void DRObject::doCreateHandles()
                 LGraphicsView *pView = getView();
                 Q_ASSERT( getView() );
 
+                // default is per rect
                 QRectF r = boundingRect();
 
                 // their parent will be the viewport so...
                 QRect rectView = pView->mapFromScene( r ).boundingRect();
 
                 // Order matters when handles share a position. Last handle will be found first.
-                // Also; DRRectangleBase assumes a particular order.
                 LHandle *pHandle;
 
-                pHandle = new LHandle( this, pView, LHandle::TypeDrag, rectView.center() );
+                pHandle = new LHandle( this, pView, LHandle::FunctionMove, rectView.center() );
                 vectorHandles.append( pHandle );
                 pHandle->show();
 

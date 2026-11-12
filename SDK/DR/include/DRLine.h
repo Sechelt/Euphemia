@@ -46,6 +46,11 @@ protected:
     LSLine::LineEndStyles   nBeginStyle = LSLine::LineEndNone;
     LSLine::LineEndStyles   nEndStyle   = LSLine::LineEndNone;
 
+    // index of handles
+    int nIndexHandleBegin = 0;
+    int nIndexHandleMove = 1;
+    int nIndexHandleEnd = 2;
+
     virtual void doDraw( QPainter * ) override;
     virtual void doDrawLineEnds( QPainter *pPainter );
     virtual void doDrawLineEnd( QPainter *pPainter, LSLine::LineEndStyles nStyle, const QLineF &line );

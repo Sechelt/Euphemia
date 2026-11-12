@@ -103,14 +103,22 @@ bool PAPasteRectangle::doScale( qreal nX, qreal nY, Qt::AspectRatioMode nRatio )
 
 bool PAPasteRectangle::doFlipX()
 {
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 10, 0 )
+    image = image.flipped( Qt::Horizontal );
+#else
     image = image.mirrored( true, false );
+#endif
     update();
     return true;
 }
 
 bool PAPasteRectangle::doFlipY()
 {
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 10, 0 )
+    image = image.flipped( Qt::Vertical );
+#else
     image = image.mirrored( false, true );
+#endif
     update();
     return true;
 }

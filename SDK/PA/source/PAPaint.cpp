@@ -408,7 +408,11 @@ void PAPaint::doFlipX()
     // cancel any drawing and flip entire canvas
     if ( isDrawing() ) doCancel();
     slotPreCommit();
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 10, 0 )
+    image = image.flipped( Qt::Horizontal );
+#else
     image = image.mirrored( true, false );
+#endif
     slotCommitted();
 }
 
@@ -419,7 +423,11 @@ void PAPaint::doFlipY()
     // cancel any drawing and flip entire canvas
     if ( isDrawing() ) doCancel();
     slotPreCommit();
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 10, 0 )
+    image = image.flipped( Qt::Vertical );
+#else
     image = image.mirrored( false, true );
+#endif
     slotCommitted();
 }
 

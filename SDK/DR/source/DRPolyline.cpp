@@ -180,7 +180,10 @@ void DRPolyline::doPress( const QPointF &point )
 
 void DRPolyline::doMoveBy( const QPointF &pointOffset )
 {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
+#ifdef CBD_TODO
+    Q_UNUSED( pointOffset );
+    printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
+#endif
 }
 
 void DRPolyline::doMove( const QPointF &point )

@@ -178,7 +178,6 @@ QWidget* DRDraw::getToolBar( QWidget *pParent )
 
 QWidget* DRDraw::getPanel( QWidget *pParent )
 {
-// qInfo() <<__FILE__ << __FUNCTION__ << __LINE__ << getToolString() << hasSelection();
     switch ( nTool )
     {
         case ToolSelectRectangle:
@@ -189,7 +188,6 @@ QWidget* DRDraw::getPanel( QWidget *pParent )
                 QList<ADObject*> l = pSelectionManager->getSelected();
                 for ( ADObject *p : l )
                 {
-                    DRObject *pObject = (DRObject*)p;
                     QString s = p->metaObject()->className();
                     // we know these objects have panels...
                     if ( s == "DRLine" )
@@ -533,10 +531,7 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
                 if ( pObjectPress )
                 {
                     if ( pObjectPress->isSelected() )
-                    {
-printf( "[PAH][%s][%s][%d] ToDo: Transform\n", __FILE__, __FUNCTION__, __LINE__ );
-//                        pObjectPress->doSelectionStateCycle();
-                    }
+                        pObjectPress->doSelectionStateCycle();
                     else
                     {
                         pSelectionManager->doSelectNone();
@@ -779,6 +774,7 @@ void DRDraw::doMouseMoveEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
 
 void DRDraw::doMouseReleaseEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
 {
+    Q_UNUSED( pEvent );
     switch ( nTool )
     {
         case ToolSelectRectangle:
@@ -826,6 +822,7 @@ void DRDraw::doMouseMoveEventManipulate( QGraphicsSceneMouseEvent *pEvent )
 
 void DRDraw::doMouseReleaseEventManipulate( QGraphicsSceneMouseEvent *pEvent )
 {
+    Q_UNUSED( pEvent );
     Q_ASSERT( nTool == ToolManipulate );
     Q_ASSERT( pHandleMoving );
 
@@ -1206,6 +1203,9 @@ void DRDraw::doCrop()
 void DRDraw::doScale( qreal nX, qreal nY, Qt::AspectRatioMode n )
 {
 #ifdef CBD_TODO
+    Q_UNUSED( nX );
+    Q_UNUSED( nY );
+    Q_UNUSED( n );
     printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
 /*
@@ -1232,7 +1232,11 @@ void DRDraw::doFlipX()
     // cancel any drawing and flip entire canvas
     if ( canCancel() ) doCancel();
     slotPreCommit();
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 10, 0 )
+    image = image.flipped( Qt::Horizontal );
+#else
     image = image.mirrored( true, false );
+#endif
     slotCommitted();
 }
 
@@ -1248,13 +1252,18 @@ void DRDraw::doFlipY()
     // cancel any drawing and flip entire canvas
     if ( canCancel() ) doCancel();
     slotPreCommit();
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 10, 0 )
+    image = image.flipped( Qt::Vertical );
+#else
     image = image.mirrored( false, true );
+#endif
     slotCommitted();
 }
 
 void DRDraw::doRotate( int nDegrees )
 {
 #ifdef CBD_TODO
+    Q_UNUSED( nDegrees );
     printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
 /*
@@ -1359,6 +1368,7 @@ void DRDraw::doZoomChanged( int nZoom )
 {
     // if ( pObjectDrawing ) pObjectDrawing->doZoomChanged( nZoom );
 #ifdef CBD_TODO
+    Q_UNUSED( nZoom );
     printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
 }
@@ -1367,6 +1377,8 @@ void DRDraw::doScrollChanged( int nX, int nY )
 {
     // if ( pObjectDrawing ) pObjectDrawing->doScrollChanged( nX, nY );
 #ifdef CBD_TODO
+    Q_UNUSED( nX );
+    Q_UNUSED( nY );
     printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
 }

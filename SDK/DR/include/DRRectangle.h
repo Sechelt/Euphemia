@@ -35,6 +35,10 @@ protected:
     qreal           nXRadius    = 0;
     qreal           nYRadius    = 0;
 
+    // index of additional handles
+    int nIndexHandleHRound = 3;
+    int nIndexHandleVRound = 4;
+
     qreal   getXRadius( const QPointF &point );
     qreal   getYRadius( const QPointF &point );
     qreal   getXRadiusValidated( qreal nXRadius );

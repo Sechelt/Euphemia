@@ -1149,23 +1149,8 @@ void DRDraw::doSelectAll()
     else 
         setTool( ToolManipulate );
 
-    Q_ASSERT( !pObjectDrawing );
-    pObjectDrawing = getObject( ToolSelectRectangle, QPointF( 0, 0 ) );
     setToolState( ToolStateIdle );
-    Q_ASSERT( pObjectDrawing );
-
-    DRSelectRectangle *pSelectRectangle = (DRSelectRectangle *)pObjectDrawing;
-    pSelectRectangle->setDrawing( false );
-    pSelectRectangle->setRect( boundingRect() ); 
-    doSelectAll( boundingRect() );
-    // was anything other than self selected?
-    if ( hasSelection() ) 
-    {
-        doCancel();
-        return;
-    }
-    pSelectRectangle->setRect( getSelectedBoundingRect() );
-    setSelected( pObjectDrawing, DRObject::SelectionStateStandard ); // selected self in doSelectAll but switch to standard handles
+    pSelectionManager->doSelectAll( false );
 }
 
 /*!
@@ -1467,6 +1452,7 @@ bool DRDraw::canSelectAll()
 
 bool DRDraw::canSelectNone()
 {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     return hasSelection();
 }
 

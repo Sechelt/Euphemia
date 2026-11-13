@@ -250,7 +250,7 @@ bool EFile::doExport()
 
 bool EFile::doPrint()
 {
-    QMessageBox::information( 0, tr("Print..."), tr("Not implemented yet.") );
+    QMessageBox::information( 0, tr("Print..."), tr("Not implemented yet.\nTry Export.") );
     return false;
 }
 

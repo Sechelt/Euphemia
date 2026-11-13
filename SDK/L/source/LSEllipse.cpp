@@ -112,9 +112,9 @@ LSEllipsePanel::LSEllipsePanel( QWidget *p )
 
     pBind = new QCheckBox( this );
     pBind->setTristate( false );
-    pBind->setToolTip( tr("geometry: change V/H lengths the same amount to create a circle") );
+    pBind->setToolTip( tr("geometry: change x/y lengths the same amount to create a circle") );
     pBind->setCheckState( pSetting->getBind() ? Qt::Checked : Qt::Unchecked );
-    pLayout->addRow( tr("Bind"), pBind );
+    pLayout->addRow( tr("Bind (x/y)"), pBind );
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
     connect( pBind, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(slotBind(Qt::CheckState)) );
 #else

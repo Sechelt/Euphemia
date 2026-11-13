@@ -68,6 +68,7 @@ void LToolsWidget::doConnectLayer( LLayer *p )
     Q_ASSERT( !pLayer );
 
     pLayer = p;
+    nTool = pLayer->getTool();
     if ( !pLayer ) return;
     bSelectionToolConfig = pLayer->isSelectionToolConfig();
 
@@ -164,7 +165,6 @@ void LToolsWidget::doInitActions( QVector<LTool> vectorTools )
 {
     Q_ASSERT( !pActionGroup );
 
-    int nTool = pLayer->getTool();
     pActionGroup = new QActionGroup( this );
     foreach( LTool tool, vectorTools )
     {

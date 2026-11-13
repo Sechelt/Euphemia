@@ -964,8 +964,8 @@ void EMainWindow::doConnectLayer()
     pActionDelete->setEnabled( pLayer->canDelete() ); 
     pActionUndo->setEnabled( pLayer->canUndo() ); 
     pActionRedo->setEnabled( pLayer->canRedo() ); 
-    pActionSelectAll->setEnabled( true ); 
-    pActionSelectNone->setEnabled( pLayer->hasSelection() ); 
+    pActionSelectAll->setEnabled( pLayer->canSelectAll() ); 
+    pActionSelectNone->setEnabled( pLayer->canSelectNone() ); 
     pActionCommit->setEnabled( pLayer->canCommit() ); 
     pActionCancel->setEnabled( pLayer->canCancel() ); 
     pActionRegionCrop->setEnabled( pLayer->canCrop() ); 
@@ -976,6 +976,8 @@ void EMainWindow::doConnectLayer()
     connect( pLayer, SIGNAL(signalChanged()), this, SLOT(slotChangedLayer()) );
     connect( pLayer, SIGNAL(signalChangedToolState()), this, SLOT(slotChangedLayerToolState()) );
     connect( pLayer, SIGNAL(signalChangedTool()), this, SLOT(slotChangedTool()) );
+
+    connect( pLayer, SIGNAL(signalSelectionChanged()), this, SLOT(slotChangedLayer()) );
 }
 
 void EMainWindow::doDisconnectLayer()
@@ -1002,6 +1004,8 @@ void EMainWindow::doDisconnectLayer()
     disconnect( pLayer, SIGNAL(signalChangedToolState()), this, SLOT(slotChangedLayerToolState()) );
     disconnect( pLayer, SIGNAL(signalChangedTool()), this, SLOT(slotChangedTool()) );
     
+    disconnect( pLayer, SIGNAL(signalSelectionChanged()), this, SLOT(slotChangedLayer()) );
+        
     doDisconnectTool();
 
     pLayer = nullptr;
@@ -1804,8 +1808,8 @@ void EMainWindow::slotChangedLayer() // layer modified state
     pActionDelete->setEnabled( pLayer->canDelete() ); 
     pActionUndo->setEnabled( pLayer->canUndo() ); 
     pActionRedo->setEnabled( pLayer->canRedo() ); 
-    pActionSelectAll->setEnabled( true ); 
-    pActionSelectNone->setEnabled( pLayer->hasSelection() );
+    pActionSelectAll->setEnabled( pLayer->canSelectAll() ); 
+    pActionSelectNone->setEnabled( pLayer->canSelectNone() );
 
     // region
     pActionRegionCrop->setEnabled( pLayer->canCrop() ); 

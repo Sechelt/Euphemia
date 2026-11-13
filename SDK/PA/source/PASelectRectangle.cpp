@@ -133,12 +133,16 @@ void PASelectRectangle::doDelete()
 
 void PASelectRectangle::doSelectAll()
 {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     if ( nState != StateIdle ) return;
     // fake doDraw to cover all
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     r = QRect( QPoint( 0, 0 ), pLayer->getImageRef()->size() );
     nState = StateDraw;
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     // go straight into manipulate
     doManipulateState();
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
 }
 
 QImage PASelectRectangle::getMask()

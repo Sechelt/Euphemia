@@ -4,7 +4,7 @@
 #include "PMModel.h" 
 
 PMLine::PMLine( PMModel *pParent )
-: DLinePoly( pParent ), PMObject( this )
+: DLine90Auto( pParent ), PMObject( this )
 {
 #ifdef DEBUG_DESTRUCTORS
     qDebug( "[PAH][%s][%d] CONSTRUCT BEGIN: %s %p", __FILE__, __LINE__, metaObject()->className(), this );

@@ -1363,6 +1363,7 @@ void EMainWindow::slotRedo()
 
 void EMainWindow::slotUndoLevels()
 {
+    QMessageBox::information( this, tr("Undo Levels"), tr("Changing levels is not implemented.") );
 }
 
 void EMainWindow::slotSelectAll()

@@ -27,7 +27,7 @@ LMRelationship::LMRelationship( LMModel *pParent )
     // 
     bGenerate               = true;
     nDominant               = CBD::EOLNeither;
-    ComposedFlagBegin       = ComposedNone;
+    ComposedFlagBegin       = ComposedCrowsFoot;
     ComposedFlagEnd         = ComposedNone;
     stringBeginCardinality  = "0,n";
     stringEndCardinality    = "0,1";

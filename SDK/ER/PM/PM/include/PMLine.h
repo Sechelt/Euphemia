@@ -1,13 +1,13 @@
 #ifndef H_PMLine
 #define H_PMLine
 
-#include <DLinePoly.h>
+#include <DLine90Auto.h>
 
 #include "PMObject.h"
 
 class PMModel;
 
-class PMLine : public DLinePoly, public PMObject
+class PMLine : public DLine90Auto, public PMObject
 {
     Q_OBJECT
 public:

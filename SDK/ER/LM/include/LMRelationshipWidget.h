@@ -10,9 +10,15 @@ public:
     LMRelationshipDetailsWidget( LMRelationship *pRelationship, CBD::EOLTypes nEOL, QWidget *pParent );
 
 protected slots:
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+    void slotDominant( Qt::CheckState n );
+    void slotIdentified( Qt::CheckState n );
+    void slotDependent( Qt::CheckState n );
+#else
     void slotDominant( int n );
     void slotIdentified( int n );
     void slotDependent( int n );
+#endif
     void slotCardinalityMin( const QString &s );
     void slotCardinalityMax( const QString &s );
     void slotRole( const QString &s );
@@ -39,7 +45,11 @@ public:
     LMRelationshipWidget( LMRelationship *pRelationship, Qt::Orientation nOrientation, QWidget *pParent );
 
 protected slots:
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+    void slotGenerate( Qt::CheckState n );
+#else
     void slotGenerate( int n );
+#endif
     void slotModified();
 
 protected:

@@ -73,17 +73,29 @@ LMRelationshipDetailsWidget::LMRelationshipDetailsWidget( LMRelationship *p, CBD
     connect( pRelationship, SIGNAL(signalModified()), SLOT(slotModified()) );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+void LMRelationshipDetailsWidget::slotDominant( Qt::CheckState n )
+#else
 void LMRelationshipDetailsWidget::slotDominant( int n )
+#endif
 {
     pRelationship->setDominant( nEOL, n );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+void LMRelationshipDetailsWidget::slotIdentified( Qt::CheckState n )
+#else
 void LMRelationshipDetailsWidget::slotIdentified( int n )
+#endif
 {
     pRelationship->setIdentified( nEOL, n );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+void LMRelationshipDetailsWidget::slotDependent( Qt::CheckState n )
+#else
 void LMRelationshipDetailsWidget::slotDependent( int n )
+#endif
 {
     pRelationship->setDependent( nEOL, n );
 }
@@ -155,7 +167,11 @@ LMRelationshipWidget::LMRelationshipWidget( LMRelationship *p, Qt::Orientation n
     connect( pRelationship, SIGNAL(signalModified()), SLOT(slotModified()) );
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+void LMRelationshipWidget::slotGenerate( Qt::CheckState n )
+#else
 void LMRelationshipWidget::slotGenerate( int n )
+#endif
 {
     if ( n ) pRelationship->setGenerate();
     else pRelationship->setGenerate( false );

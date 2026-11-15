@@ -31,7 +31,7 @@ SLReference::~SLReference()
 
 ADObject *SLReference::getObject( const QString &s, ADObject * )
 {
-    AWObject *p = nullptr;
+    ADObject *p = nullptr;
 
     // translate any alias
     QString stringClass = getClass( s );

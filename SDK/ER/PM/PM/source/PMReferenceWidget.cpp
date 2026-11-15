@@ -156,12 +156,18 @@ PMReferenceColumnsDisplayWidget::PMReferenceColumnsDisplayWidget( PMReference *p
     : QWidget( pwidgetParent )
 {
     this->pReference = pReference;
-
+    // do we an existing PMReferenceColumnDisplay...
     QList<ADObject*> l = pReference->getObjects( QString(), QString(), "PMReferenceColumnDisplay" );
     if ( l.count() ) 
+    {
+        // use first one
         pColumnDisplay = (PMReferenceColumnDisplay *)l.first(); 
+    }
     else
+    {
+        // create one
         pColumnDisplay = (PMReferenceColumnDisplay*)pReference->getObject( "PMReferenceColumnDisplay" );
+    }
 
     QHBoxLayout *pLayout = new QHBoxLayout( this );
 

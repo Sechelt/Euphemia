@@ -31,7 +31,7 @@ MSAReference::~MSAReference()
 
 ADObject *MSAReference::getObject( const QString &s, ADObject * )
 {
-    AWObject *p = nullptr;
+    ADObject *p = nullptr;
 
     // translate any alias
     QString stringClass = getClass( s );
@@ -39,9 +39,7 @@ ADObject *MSAReference::getObject( const QString &s, ADObject * )
     if ( stringClass == "MSAReferenceColumn" )
         p = new MSAReferenceColumn( this );
     else
-    {
         return PMReference::getObject( stringClass );
-    }
 
     if ( !p )
     {

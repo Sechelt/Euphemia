@@ -31,13 +31,15 @@ SQL92Reference::~SQL92Reference()
 
 ADObject *SQL92Reference::getObject( const QString &s, ADObject * )
 {
-    AWObject *p = nullptr;
+    ADObject *p = nullptr;
 
     // translate any alias
     QString stringClass = getClass( s );
 
     if ( stringClass == "SQL92ReferenceColumn" )
         p = new SQL92ReferenceColumn( this );
+    else
+        return PMReference::getObject( stringClass );
 
     if ( !p )
     {

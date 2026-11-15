@@ -32,13 +32,15 @@ ODBCReference::~ODBCReference()
 
 ADObject *ODBCReference::getObject( const QString &s, ADObject * )
 {
-    AWObject *p = nullptr;
+    ADObject *p = nullptr;
 
     // translate any alias
     QString stringClass = getClass( s );
 
     if ( stringClass == "PMReferenceColumn" )
         p = new PMReferenceColumn( this );
+    else
+        return PMReference::getObject( stringClass );
 
     if ( !p )
     {

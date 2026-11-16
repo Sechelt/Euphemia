@@ -115,7 +115,7 @@ void DRPie::doMove( LHandle *pHandle, const QPointF &pointPos )
     {
         // todo
 #ifdef CBD_TODO
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
+printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
 
     }
@@ -132,7 +132,7 @@ printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     {
         // todo
 #ifdef CBD_TODO
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
+printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
     }
 

@@ -131,7 +131,7 @@ public:
     void doSelectAll() override;
     void doSelectNone() override;
     void doDelete() override;
-    void doCommit() override;
+    void doCommit( bool bSelectNone = true ) override;
     void doCancel() override;
     void doCrop() override;
     void doScale( qreal nX, qreal nY, Qt::AspectRatioMode n = Qt::IgnoreAspectRatio ) override;

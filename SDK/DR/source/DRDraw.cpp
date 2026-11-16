@@ -697,14 +697,9 @@ void DRDraw::doMouseReleaseEventDraw( QGraphicsSceneMouseEvent *pEvent )
             pObjectDrawing->doDrop( pHandleMoving, pointCurrent );
             pHandleMoving = nullptr;
             if ( bAutoCommit )
-            {
-                doCommit();
-                setModified();
-            }
+                doCommit( false );
             else
-            {
-                setToolState( ToolStateDrawManipulate );
-            }
+                setToolState( ToolStateDrawManipulate ); // manipulate without commit 
             break;
     }
 }
@@ -742,6 +737,7 @@ void DRDraw::doMousePressEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
     }
 
     pHandleMoving = pHandlePress;
+    if ( pHandleMoving && pHandleMoving->getType() == LHandle::FunctionMove ) pHandleMoving->setCursor( QCursor() );
 }
 
 void DRDraw::doMouseMoveEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
@@ -775,6 +771,7 @@ void DRDraw::doMouseMoveEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
 void DRDraw::doMouseReleaseEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
 {
     Q_UNUSED( pEvent );
+
     switch ( nTool )
     {
         case ToolSelectRectangle:
@@ -793,6 +790,7 @@ void DRDraw::doMouseReleaseEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent
         case ToolDrawText:
             Q_ASSERT( pObjectDrawing );
             if ( !pHandleMoving ) return; // could be here after a double click
+            if ( pHandleMoving->getType() == LHandle::FunctionMove ) pHandleMoving->setCursor( QCursor( Qt::OpenHandCursor ) );
             pObjectDrawing->doDrop( pHandleMoving, pointCurrent ); // move a handle
             pHandleMoving = nullptr;
             break;
@@ -1299,17 +1297,23 @@ void DRDraw::doDelete()
  * 
  * \author pharvey (3/30/23)
  */
-void DRDraw::doCommit()
+void DRDraw::doCommit( bool bSelectNone )
 {
     Q_ASSERT( isDrawing() );
     Q_ASSERT( !pObjectDrawing->isSelector() );
 
-    pSelectionManager->doSelectNone();
-
-    pObjectDrawing = nullptr;
     pHandleMoving = nullptr;
-    setToolState( ToolStateIdle );
-    emit signalChanged();
+
+    if ( bSelectNone ) 
+    {
+        pSelectionManager->doSelectNone();
+        pObjectDrawing = nullptr;
+        setToolState( ToolStateIdle );
+        setModified();
+        emit signalChanged();
+    }
+    else
+        setToolState( ToolStateDrawManipulate ); // manipulate without changing the tool
 }
 
 /*!
@@ -1452,7 +1456,6 @@ bool DRDraw::canSelectAll()
 
 bool DRDraw::canSelectNone()
 {
-printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     return hasSelection();
 }
 

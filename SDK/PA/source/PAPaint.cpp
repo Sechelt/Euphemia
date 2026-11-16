@@ -452,8 +452,9 @@ void PAPaint::doDelete()
     if ( isDrawing() ) doCancel();
 }
 
-void PAPaint::doCommit()
+void PAPaint::doCommit( bool bSelectNone )
 {
+    Q_UNUSED( bSelectNone );
     Q_ASSERT( pTool );
 
     // doCommit() should trigger PAPaint::slotCommitted()

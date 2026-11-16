@@ -139,7 +139,7 @@ public:
     virtual void doSelectAll() = 0;
     virtual void doSelectNone() = 0;
     virtual void doDelete() = 0;
-    virtual void doCommit() = 0;
+    virtual void doCommit( bool bSelectNone = true ) = 0;
     virtual void doCancel() = 0;
     virtual void doCrop() = 0;
     virtual void doScale( qreal nX, qreal nY, Qt::AspectRatioMode n = Qt::IgnoreAspectRatio ) = 0;

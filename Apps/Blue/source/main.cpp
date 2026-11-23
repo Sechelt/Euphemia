@@ -21,7 +21,7 @@
 #include <SPen.h>       
 #include <SRuler.h>       
 #include <SBrush.h>     
-#include <SFont.h>      
+#include <SText.h>      
 
 #include <LSGeneral.h>     
 #include <LSBackground.h>     
@@ -160,7 +160,7 @@ int main( int argc, char *argv[] )
     g_SSettings->doInsert( "SPen", new SPen() );       
     g_SSettings->doInsert( "SRuler", new SRuler() );       
     g_SSettings->doInsert( "SBrush", new SBrush() );     
-    g_SSettings->doInsert( "SFont", new SFont() );      
+    g_SSettings->doInsert( "SText", new SText() );      
 
     g_SSettings->doInsert( "LSGeneral", new LSGeneral() );     
     g_SSettings->doInsert( "LSBackground", new LSBackground() );     

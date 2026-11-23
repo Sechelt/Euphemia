@@ -46,6 +46,14 @@
 DRPie::DRPie( DRDraw *pLayer, const QPointF &pointPos )
     : DRRectangleBase( pLayer, pointPos )
 {
+    // juggle around handles
+    nHandlesAlloc           = 5;
+    nIndexHandleStartAngle  = 0;
+    nIndexHandleSpanAngle   = 1;
+    nIndexHandleMove        = 2;
+    nIndexHandleTopLeft     = 3;
+    nIndexHandleBottomRight = 4;
+
     r = QRectF( pointPos.isNull() ? QPointF( 0, 0 ) : pointPos, QSize( 1, 1 ) );
     pointStart = r.center();
     pointStop = r.center();
@@ -221,33 +229,37 @@ void DRPie::doDraw( QPainter *pPainter )
     }
 }
 
-void DRPie::doCreateHandles()
+void DRPie::doCreateHandlesStandard()
 {
+    Q_ASSERT( nSelectionState == SelectionStateStandard );
     Q_ASSERT( vectorHandles.count() == 0 );
 
-    DRRectangleBase::doCreateHandles();
+    DRRectangleBase::doCreateHandlesStandard();
 
-    // angle handles must be after rect handles
+    vectorHandles[nIndexHandleStartAngle] = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStart ) );
+    vectorHandles[nIndexHandleSpanAngle] = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStop ) );
 
-    // DRPieStartAngle
-    pHandle = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStart ) );
-    pHandle->setToolTip( tr("start angle") );
-    vectorHandles.append( pHandle );
-    pHandle->show();
+    vectorHandles[nIndexHandleStartAngle]->setToolTip( tr("start angle") );
+    vectorHandles[nIndexHandleSpanAngle]->setToolTip( tr("stop angle") );
 
-    // DRPieSpanAngle
-    pHandle = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStop ) );
-    pHandle->setToolTip( tr("stop angle") );
-    vectorHandles.append( pHandle );
-    pHandle->show();
+    // make z-order the same order as vectorHandles
+    for ( int n = 0; n < vectorHandles.count(); n++ )
+    {
+        vectorHandles[n]->raise();
+    }
+
+    vectorHandles[nIndexHandleStartAngle]->show();
+    vectorHandles[nIndexHandleSpanAngle]->show();
 }
 
-void DRPie::doSyncHandles()
+void DRPie::doSyncHandlesStandard()
 {
-    DRRectangleBase::doSyncHandles();
+    Q_ASSERT( nSelectionState == SelectionStateStandard );
+    Q_ASSERT( vectorHandles.count() > 0 );
 
-    vectorHandles[DRPieStartAngle]->setCenter( getView()->mapFromScene( pointStart ) );
-    vectorHandles[DRPieSpanAngle]->setCenter( getView()->mapFromScene( pointStop ) );
+    DRRectangleBase::doSyncHandlesStandard();
+
+    vectorHandles[nIndexHandleStartAngle]->setCenter( getView()->mapFromScene( pointStart ) );
+    vectorHandles[nIndexHandleSpanAngle]->setCenter( getView()->mapFromScene( pointStop ) );
 }
-
 

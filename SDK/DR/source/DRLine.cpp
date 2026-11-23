@@ -18,14 +18,15 @@
 DRLine::DRLine( DRDraw *pCanvas, const QPointF &pointPos )
     : DRObject( pCanvas, pointPos )
 {
+    nHandlesAlloc = 3;
+
     if ( pointPos.isNull() )
         pointBegin = pointEnd = QPointF( 0, 0 );
     else
         pointBegin = pointEnd = pointPos;
 
-    pSettingLine = g_SSettings->getSetting( "LSLine" ); Q_ASSERT( pSettingLine );
+    pSettingLine = (LSLine*)g_SSettings->getSetting( "LSLine" ); Q_ASSERT( pSettingLine );
     slotRefreshLine();
-    connect( pSettingLine, SIGNAL(signalChanged()), SLOT(slotRefreshLine()) );
 }
 
 DRLine::~DRLine()
@@ -291,45 +292,55 @@ void DRLine::doDrawLineEndBall( QPainter *pPainter, const QLineF &line )
     pPainter->drawEllipse( line.p1(), nSize, nSize );
 }
 
-void DRLine::doCreateHandles()
+void DRLine::doConnectSettings()
 {
-    Q_ASSERT( vectorHandles.count() == 0 );
-
-    // their parent will be the viewport so...
-    QPointF pointViewBegin   = getView()->mapFromScene( pointBegin );
-    QPointF pointViewEnd     = getView()->mapFromScene( pointEnd );
-
-    // Order matters when handles share a position. Last handle will be found first.
-    LHandle *pHandle;
-
-    // DRLineBegin
-    pHandle = new LHandle( this, getView(), LHandle::TypeMovePoint, pointViewBegin );
-    vectorHandles.append( pHandle );
-    pHandle->show();
-
-    // DRLineMove
-    QRectF r;
-    r.setTopLeft( pointViewBegin );
-    r.setBottomRight( pointViewEnd );
-    r = r.normalized();
-
-    pHandle = new LHandle( this, getView(), LHandle::FunctionMove, r.center() );
-    vectorHandles.append( pHandle );
-    pHandle->show();
-
-    // DRLineEnd
-    pHandle = new LHandle( this, getView(), LHandle::TypeMovePoint, pointViewEnd );
-    vectorHandles.append( pHandle );
-    pHandle->show();
+    DRObject::doConnectSettings();
+    pSettingLine->setSelected( nBeginStyle, nEndStyle, nBeginSize, nEndSize );
+    connect( pSettingLine, SIGNAL(signalChanged()), this, SLOT(slotRefreshLine()) );
 }
 
-void DRLine::doSyncHandles()
+void DRLine::doDisconnectSettings()
 {
-    QRectF rectView = getView()->mapFromScene( QRectF( pointBegin, pointEnd ).normalized() ).boundingRect();
+    DRObject::doDisconnectSettings();
+    disconnect( pSettingLine, SIGNAL(signalChanged()), this, SLOT(slotRefreshLine()) );
+}
 
-    vectorHandles[nIndexHandleBegin]->setCenter( rectView.topLeft() );
-    vectorHandles[nIndexHandleMove]->setCenter( rectView.center() );
-    vectorHandles[nIndexHandleEnd]->setCenter( rectView.bottomRight() );
+void DRLine::doCreateHandlesStandard()
+{
+    Q_ASSERT( nSelectionState == SelectionStateStandard );
+    Q_ASSERT( vectorHandles.count() == 0 );
+    LGraphicsView *pView = getView();
+    Q_ASSERT( pView );
+
+    QPointF pointViewMove   = pView->mapFromScene( boundingRect().center() );
+    QPointF pointViewBegin  = pView->mapFromScene( pointBegin );
+    QPointF pointViewEnd    = pView->mapFromScene( pointEnd );
+
+    // Order matters when handles share a position. Last handle will be found first.
+    vectorHandles.resize( nHandlesAlloc );
+    vectorHandles[nIndexHandleMove] = new LHandle( this, pView, LHandle::FunctionMove, pointViewMove );
+    vectorHandles[nIndexHandleBegin]= new LHandle( this, pView, LHandle::TypeMovePoint, pointViewBegin );
+    vectorHandles[nIndexHandleEnd]  = new LHandle( this, pView, LHandle::TypeMovePoint, pointViewEnd );
+
+    vectorHandles[nIndexHandleMove]->setToolTip( tr("move") );
+    vectorHandles[nIndexHandleBegin]->setToolTip( tr("begin") );
+    vectorHandles[nIndexHandleEnd]->setToolTip( tr("end") );
+
+    vectorHandles[nIndexHandleMove]->show();
+    vectorHandles[nIndexHandleBegin]->show();
+    vectorHandles[nIndexHandleEnd]->show();
+}
+
+void DRLine::doSyncHandlesStandard()
+{
+    LGraphicsView *pView = getView();
+    QPointF pointViewMove   = pView->mapFromScene( boundingRect().center() );
+    QPointF pointViewBegin  = pView->mapFromScene( pointBegin );
+    QPointF pointViewEnd    = pView->mapFromScene( pointEnd );
+
+    vectorHandles[nIndexHandleMove]->setCenter( pointViewMove );
+    vectorHandles[nIndexHandleBegin]->setCenter( pointViewBegin );
+    vectorHandles[nIndexHandleEnd]->setCenter( pointViewEnd );
 }
 
 void DRLine::slotRefreshLine()

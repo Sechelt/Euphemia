@@ -128,6 +128,7 @@ public:
     virtual QWidget *           getLayerPanel( QWidget *pParent ) = 0;              /*!< return layers panel widget (could be nullptr)              */
     virtual QWidget *           getToolBar( QWidget *pParent ) = 0;                 /*!< IF tool THEN return its tool bar widget (could be nullptr) */
     virtual QWidget *           getPanel( QWidget *pParent ) = 0;                   /*!< IF tool THEN return its panel widget (could be nullptr)    */
+    virtual QWidget *           getToolBox( QWidget *pParent ) = 0;                 /*!< FOR all tools return its panel widgets (must not be null ) */
 
     virtual void doCut() = 0;
     virtual void doCopy() = 0;

@@ -42,6 +42,14 @@
 DRArc::DRArc( DRDraw *pLayer, const QPointF &pointPos )
     : DRRectangleBase( pLayer, pointPos )
 {
+    // juggle around handles
+    nHandlesAlloc           = 5;
+    nIndexHandleStartAngle  = 0;
+    nIndexHandleSpanAngle   = 1;
+    nIndexHandleMove        = 2;
+    nIndexHandleTopLeft     = 3;
+    nIndexHandleBottomRight = 4;
+
     pointStart = r.center();
     pointStop = r.center();
     // angles: we use positive values only - so span is always clockwise
@@ -129,7 +137,7 @@ void DRArc::doMove( LHandle *pHandle, const QPointF &pointPos )
     //
 
     // adjust our geometry
-    if ( pHandle == vectorHandles[nIndexHandleBegin] )
+    if ( pHandle == vectorHandles[nIndexHandleTopLeft] )
     {
         // todo
     }
@@ -142,7 +150,7 @@ void DRArc::doMove( LHandle *pHandle, const QPointF &pointPos )
         pointStart += pointDiff;
         pointStop += pointDiff;
     }
-    else if ( pHandle == vectorHandles[nIndexHandleEnd] )
+    else if ( pHandle == vectorHandles[nIndexHandleBottomRight] )
     {
         // todo
     }
@@ -198,35 +206,39 @@ void DRArc::doDraw( QPainter *pPainter )
     }
 }
 
-void DRArc::doCreateHandles()
+void DRArc::doCreateHandlesStandard()
 {
+    Q_ASSERT( nSelectionState == SelectionStateStandard );
     Q_ASSERT( vectorHandles.count() == 0 );
 
-    DRRectangleBase::doCreateHandles();
+    DRRectangleBase::doCreateHandlesStandard();
 
-    if ( nSelectionState != SelectionStateStandard ) return;
+    vectorHandles[nIndexHandleStartAngle] = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStart ) );
+    vectorHandles[nIndexHandleSpanAngle] = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStop ) );
 
-    // angle handles must be after rect handles
+    vectorHandles[nIndexHandleStartAngle]->setToolTip( tr("start angle") );
+    vectorHandles[nIndexHandleSpanAngle]->setToolTip( tr("stop angle") );
 
-    pHandle = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStart ) );
-    pHandle->setToolTip( tr("start angle") );
-    vectorHandles.append( pHandle );
-    pHandle->show();
+    // make z-order the same order as vectorHandles
+    for ( int n = 0; n < vectorHandles.count(); n++ )
+    {
+        vectorHandles[n]->raise();
+    }
 
-    pHandle = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStop ) );
-    pHandle->setToolTip( tr("stop angle") );
-    vectorHandles.append( pHandle );
-    pHandle->show();
+    vectorHandles[nIndexHandleStartAngle]->show();
+    vectorHandles[nIndexHandleSpanAngle]->show();
 }
 
-void DRArc::doSyncHandles()
+void DRArc::doSyncHandlesStandard()
 {
-    DRRectangleBase::doSyncHandles();
+    Q_ASSERT( nSelectionState == SelectionStateStandard );
+    Q_ASSERT( vectorHandles.count() > 0 );
 
-    if ( nSelectionState != SelectionStateStandard ) return;
+    DRRectangleBase::doSyncHandlesStandard();
 
     vectorHandles[nIndexHandleStartAngle]->setCenter( getView()->mapFromScene( pointStart ) );
     vectorHandles[nIndexHandleSpanAngle]->setCenter( getView()->mapFromScene( pointStop ) );
 }
+
 
 

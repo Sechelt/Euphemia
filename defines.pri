@@ -42,7 +42,7 @@ VERSION=6.0.0
 
 
 # This will enable terminal output for "ToDo" messages.
-DEFINES += CBD_TODO
+# DEFINES += CBD_TODO
 
 # Enable old style color picker (does not work on newer desktops such was Wayland)
 # DEFINES += CBD_OLDCOLORPICKER

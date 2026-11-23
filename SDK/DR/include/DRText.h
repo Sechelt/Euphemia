@@ -10,7 +10,7 @@
 #ifndef H_DRText
 #define H_DRText
 
-#include <SSetting.h>
+#include <LSText.h>
 
 #include "DRRectangleBase.h"
 
@@ -27,11 +27,9 @@ public:
     virtual bool        doLoad( QDomElement *pdomElem ) override;
 
 protected:
-    SSetting *pSettingText;
+    LSText *pSettingText;
 
     QString stringText;
-    Qt::AlignmentFlag nHAlign = Qt::AlignHCenter;
-    Qt::AlignmentFlag nVAlign = Qt::AlignVCenter;
 
     virtual void doDraw( QPainter * ) override;
     virtual void doConnectSettings() override;

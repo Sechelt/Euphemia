@@ -10,10 +10,18 @@
 #ifndef H_DRImage
 #define H_DRImage
 
-#include <SSetting.h>
+#include <DRSImage.h>
 
 #include "DRRectangleBase.h"
 
+/*!
+ * \brief An image rendered into the rect using placement.
+ * 
+ * The underlying image is a QPixmap as it is best for presentation on a screen.
+ * The pixmap is saved as a QImage as that is best for IO.
+ * 
+ * \author pharvey (2026-11-21)
+ */
 class DRImage : public DRRectangleBase
 {
     Q_OBJECT
@@ -24,15 +32,16 @@ public:
     virtual QPixmap     getIcon() override;
     virtual QImage      getImage() override;
 
-    virtual void setImage( const QImage & );
+    virtual void setPixmap( const QPixmap & );
 
     // save/load
     virtual QDomElement doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent ) override;
     virtual bool        doLoad( QDomElement *pdomElem ) override;
 
 protected:
-    SSetting *  pSettingImage;
-    QImage      image;
+    DRSImage *          pSettingImage;
+    QPixmap             pixmap;
+    W::WImagePlacements nPlacement;
 
     virtual void doDraw( QPainter * ) override;
     virtual void doConnectSettings() override;

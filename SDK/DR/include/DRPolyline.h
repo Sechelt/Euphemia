@@ -45,8 +45,8 @@ protected:
     QPointF     pointMouse;     /*!< used when bInit to allow doDraw to draw proposed line segment  */
 
     virtual void doDraw( QPainter * ) override;
-    virtual void doCreateHandles() override;
-    virtual void doSyncHandles() override;
+    virtual void doCreateHandlesStandard() override;
+    virtual void doSyncHandlesStandard() override;
     virtual void doRemovePoint( LHandle *pHandle );
 
     virtual bool shouldRemovePoint( LHandle *pHandle );

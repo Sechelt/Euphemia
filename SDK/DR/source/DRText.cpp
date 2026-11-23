@@ -10,7 +10,6 @@
 #include "LibInfo.h"
 #include "DRText.h"
 
-#include <SSettings.h>
 #include <LGraphicsObject.h>
 #include <LGraphicsScene.h>
 #include <LGraphicsView.h>
@@ -20,7 +19,8 @@
 DRText::DRText( DRDraw *pCanvas, const QPointF &pointPos )
     : DRRectangleBase( pCanvas, pointPos )
 {
-    pSettingText = g_SSettings->getSetting( "LSText" ); Q_ASSERT(pSettingText);
+    // NOTE: This adds to DObject ie CBD::CBDText etc
+    pSettingText = (LSText*)g_SSettings->getSetting( "LSText" ); Q_ASSERT(pSettingText);
     slotRefreshText();
 }
 
@@ -34,8 +34,6 @@ QDomElement DRText::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent )
     QDomElement domElemThis = DRRectangleBase::doSave( pdomDoc, pdomElemParent );
 
     domElemThis.setAttribute( "Text", stringText );
-    domElemThis.setAttribute( "HAlign", nHAlign );
-    domElemThis.setAttribute( "VAlign", nVAlign );
 
     return domElemThis;
 }
@@ -45,8 +43,6 @@ bool DRText::doLoad( QDomElement *pdomElemThis )
     DRRectangleBase::doLoad( pdomElemThis );
 
     stringText  = pdomElemThis->attribute( "Text" ); 
-    nHAlign     = (Qt::AlignmentFlag)pdomElemThis->attribute( "HAlign", QString::number( int(Qt::AlignHCenter) ) ).toInt(); 
-    nVAlign     = (Qt::AlignmentFlag)pdomElemThis->attribute( "VAlign", QString::number( int(Qt::AlignVCenter) ) ).toInt(); 
 
     return true;
 }
@@ -69,7 +65,7 @@ void DRText::doDraw( QPainter *pPainter )
     pPainter->setFont( font.font );
 
     // draw shape
-    pPainter->drawText( r, nHAlign | nVAlign, stringText );
+    pPainter->drawText( r, font.nHAlign | font.nVAlign, stringText );
 
     // draw outline as selected
     if ( nSelectionState == SelectionStateMinimal )
@@ -87,6 +83,7 @@ void DRText::doConnectSettings()
 {
     // skip DRRectangleBase
     DRObject::doConnectSettings();
+    pSettingText->setSelected( stringText );
     connect( pSettingText, SIGNAL(signalChanged()), this, SLOT(slotRefreshText()) );
 }
 
@@ -100,8 +97,7 @@ void DRText::doDisconnectSettings()
 void DRText::slotRefreshText()
 {
     stringText  = pSettingText->property( "stringText" ).toString();
-    nHAlign     = (Qt::AlignmentFlag)pSettingText->property( "nHAlign" ).toInt();
-    nVAlign     = (Qt::AlignmentFlag)pSettingText->property( "nVAlign" ).toInt();
     if ( getGraphics() ) getGraphics()->update();
 }
+
 

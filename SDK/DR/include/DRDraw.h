@@ -56,7 +56,8 @@ public:
      */
     enum Tools
     {
-        ToolSelectRectangle,
+        // IMPORTANT: must start at 0 and order important see; getToolBox
+        ToolSelectRectangle = 0, 
         ToolSelectPolygon, 
         ToolManipulate,                 /*!< select shape(s) and then cycle through states (manipulate, transform:size, transform:rotate, transform:shear) */
         ToolDrawArc,                    /*!< shape: draw an arc                                      */ 
@@ -101,6 +102,7 @@ public:
     QWidget *           getLayerPanel( QWidget * ) override     { return nullptr; }
     QWidget *           getToolBar( QWidget * ) override;
     QWidget *           getPanel( QWidget * ) override;
+    QWidget *           getToolBox( QWidget * ) override;
     ADObject *          getObject( const QString &s, ADObject * ) override;
     QString             getToolString();
     QString             getToolStateString();

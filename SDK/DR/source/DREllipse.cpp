@@ -10,7 +10,6 @@
 #include "LibInfo.h"
 #include "DREllipse.h"
 
-#include <SSettings.h>
 #include <LGraphicsObject.h>
 #include <LGraphicsScene.h>
 #include <LGraphicsView.h>
@@ -20,8 +19,8 @@
 DREllipse::DREllipse( DRDraw *pCanvas, const QPointF &pointPos )
     : DRRectangleBase( pCanvas, pointPos )
 {
-    // we want to ignore rectangle settings - particularly bind - and use ellipse version
-    pSettingEllipse   = g_SSettings->getSetting( "LSEllipse" ); Q_ASSERT( pSettingEllipse );
+    // We could use DRRectangleBase::LSRectangle::bBind and get rid of LSEllipse. I guess LSEllipse allows us to save/restore a bind default specific to DREllipse. Will see.
+    pSettingEllipse = (LSEllipse*)g_SSettings->getSetting( "LSEllipse" ); Q_ASSERT( pSettingEllipse );
 
     slotRefreshEllipse();
 }
@@ -56,6 +55,7 @@ void DREllipse::doConnectSettings()
 {
     // skip DRRectangleBase
     DRObject::doConnectSettings();
+    pSettingEllipse->setSelected( bBind );
     connect( pSettingEllipse, SIGNAL(signalChanged()), this, SLOT(slotRefreshEllipse()) );
 }
 

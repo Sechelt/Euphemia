@@ -30,15 +30,16 @@ public:
     QPointF             getBegin()  { return pointBegin;    }
     QPointF             getEnd()    { return pointEnd;      }
 
-    virtual void        doMoveBy( const QPointF & ) override;
-    virtual void        doMove( LHandle *, const QPointF & ) override;
-    virtual void        doDrop( LHandle *, const QPointF &point = QPointF() ) override;
+    virtual void doMoveBy( const QPointF &point ) override;
+    virtual void doMove( LHandle *, const QPointF & ) override;
+    virtual void doDrop( LHandle *, const QPointF &point = QPointF() ) override;
+
     // save/load
     virtual QDomElement doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent ) override;
     virtual bool        doLoad( QDomElement *pdomElem ) override;
 
 protected:
-    SSetting *              pSettingLine;
+    LSLine *                pSettingLine;
     QPointF                 pointBegin;
     QPointF                 pointEnd;
     qreal                   nBeginSize  = 5;
@@ -47,9 +48,9 @@ protected:
     LSLine::LineEndStyles   nEndStyle   = LSLine::LineEndNone;
 
     // index of handles
-    int nIndexHandleBegin = 0;
-    int nIndexHandleMove = 1;
-    int nIndexHandleEnd = 2;
+    int nIndexHandleMove    = 0;
+    int nIndexHandleBegin   = 1;
+    int nIndexHandleEnd     = 2;
 
     virtual void doDraw( QPainter * ) override;
     virtual void doDrawLineEnds( QPainter *pPainter );
@@ -57,8 +58,11 @@ protected:
     virtual void doDrawLineEndArrow( QPainter *pPainter, const QLineF &line );
     virtual void doDrawLineEndBall( QPainter *pPainter, const QLineF &line );
 
-    virtual void doCreateHandles() override;
-    virtual void doSyncHandles() override;
+    virtual void doConnectSettings() override;
+    virtual void doDisconnectSettings() override;
+
+    virtual void doCreateHandlesStandard() override;
+    virtual void doSyncHandlesStandard() override;
 
 protected slots:
     virtual void slotRefreshLine();

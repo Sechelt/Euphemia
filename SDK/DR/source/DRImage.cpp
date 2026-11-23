@@ -20,7 +20,7 @@
 DRImage::DRImage( DRDraw *pCanvas, const QPointF &pointPos )
     : DRRectangleBase( pCanvas, pointPos )
 {
-    pSettingImage = g_SSettings->getSetting( "LSImage" ); Q_ASSERT(pSettingImage);
+    pSettingImage = (DRSImage*)g_SSettings->getSetting( "DRSImage" ); Q_ASSERT(pSettingImage);
     slotRefreshImage();
 }
 
@@ -35,12 +35,19 @@ QPixmap DRImage::getIcon()
 
 QImage DRImage::getImage()
 {
-    return image.scaled( r.width(), r.height() );
+    // ToDo need to paint the entire rect like doDraw
+
+    // QImage image( r.size() );
+    // QPainter painter( &image );
+    // 
+    // painter.drawPixmap( 0, 0, pixmap );
+
+    return pixmap.toImage();
 }
 
-void DRImage::setImage( const QImage &i )
+void DRImage::setPixmap( const QPixmap &i )
 {
-    image = i;
+    pixmap = i;
     getGraphics()->update();
 }
 
@@ -49,7 +56,7 @@ QDomElement DRImage::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent 
     QDomElement domElem = DRRectangleBase::doSave( pdomDoc, pdomElemParent );
 
     ulong nBytesCompressed = 0;
-    QString stringEncodedImage = CBDPersistUtility::getEncodedImage( image, &nBytesCompressed );
+    QString stringEncodedImage = CBDPersistUtility::getEncodedImage( pixmap.toImage(), &nBytesCompressed );
     domElem.setAttribute( "ImageSize", QString::number( nBytesCompressed ) );
     domElem.setAttribute( "ImageData", stringEncodedImage );
 
@@ -66,7 +73,7 @@ bool DRImage::doLoad( QDomElement *pdomElem )
         QString stringAttribute = pdomElem->attribute( "ImageData" );
         if ( !stringAttribute.isEmpty() )
         {
-            image = CBDPersistUtility::getDecodedImage( stringAttribute, nBytesCompressed );
+            pixmap = QPixmap::fromImage( CBDPersistUtility::getDecodedImage( stringAttribute, nBytesCompressed ) );
             return true;
         }
     }
@@ -81,7 +88,25 @@ void DRImage::doDraw( QPainter *pPainter )
     pPainter->setBrush( brush );
 
     // draw shape
-    pPainter->drawImage( r, image );
+    switch ( nPlacement )
+    {
+        case W::WImagePlacementNormal:
+            {
+                int nWidth  = qMin( r.toRect().width(), pixmap.width() );
+                int nHeight = qMin( r.toRect().height(), pixmap.height() );
+                pPainter->drawPixmap( r.topLeft(), pixmap, QRectF( 0, 0, nWidth, nHeight ) );
+            }
+            break;
+        case W::WImagePlacementTiled:
+            pPainter->drawTiledPixmap( r, pixmap );
+            break;
+        case W::WImagePlacementScaled:
+            {
+                QPixmap pixmapScaled = pixmap.scaled( r.size().toSize(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation );
+                pPainter->drawPixmap( r.left(), r.top(), pixmapScaled );
+            }
+            break;
+    }
 
     // draw outline as selected
     if ( nSelectionState == SelectionStateMinimal )
@@ -99,6 +124,7 @@ void DRImage::doConnectSettings()
 {
     // skip DRRectangleBase
     DRObject::doConnectSettings();
+    pSettingImage->setSelected( pixmap, nPlacement );
     connect( pSettingImage, SIGNAL(signalChanged()), this, SLOT(slotRefreshImage()) );
 }
 
@@ -111,9 +137,8 @@ void DRImage::doDisconnectSettings()
 
 void DRImage::slotRefreshImage()
 {
-//    stringImage  = pSettingImage->property( "stringImage" ).toString();
-//    nHAlign     = (Qt::AlignmentFlag)pSettingImage->property( "nHAlign" ).toInt();
-//    nVAlign     = (Qt::AlignmentFlag)pSettingImage->property( "nVAlign" ).toInt();
+    pixmap = pSettingImage->getPixmap();
+    nPlacement = pSettingImage->getPlacement();
     if ( getGraphics() ) getGraphics()->update();
 }
 

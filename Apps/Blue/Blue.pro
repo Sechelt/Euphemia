@@ -18,8 +18,8 @@ INCLUDEPATH += ./include
 
 # SDK LIBS - order matters!
 LIBS += -L../../SDK/lib
-LIBS += -lDR -lPA
-LIBS += -lL -lAD -lAW -lW -lS -lCBD
+LIBS += -lDR -lPA 
+LIBS += -lL -lAD -lAW -lS -lCBD -lW 
 
 !win32 {
         LIBS += -lz

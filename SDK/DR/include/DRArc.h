@@ -39,8 +39,8 @@ public:
 
 protected:
     // index of additional handles
-    int nIndexHandleStartAngle = 3;
-    int nIndexHandleSpanAngle = 4;
+    int nIndexHandleStartAngle = 0;
+    int nIndexHandleSpanAngle = 1;
 
     // keeping track of points here simplifies some operations
     QPointF pointStart;     /*!< last handle pos for nStartAngle                                            */
@@ -49,8 +49,8 @@ protected:
     int nEndAngle;          /*!< end angle in degrees. 180 = west                                           */
 
     virtual void doDraw( QPainter * ) override;
-    virtual void doCreateHandles() override;
-    virtual void doSyncHandles() override;
+    virtual void doCreateHandlesStandard() override;
+    virtual void doSyncHandlesStandard() override;
 };
 
 

@@ -187,6 +187,36 @@ QWidget *PAPaint::getPanel( QWidget *pParent )
     return nullptr;
 }
 
+QWidget *PAPaint::getToolBox( QWidget *pParent )
+{
+    QStackedWidget *p = new QStackedWidget( pParent );
+
+    // IMPORTANT: order must be same as in enum 0-n
+    p->insertWidget( ToolMagnifierSelection, new QWidget( pParent ) );
+    p->insertWidget( ToolSelectRectangle, new QWidget( pParent ) );
+    p->insertWidget( ToolSelectEllipse, new QWidget( pParent ) );
+    p->insertWidget( ToolSelectPolygon, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawArc, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawChord, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawPie, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawFreeHand, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawSpray, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawErase, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawLine, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawRectangle, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawEllipse, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawPolygon, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawPolyline, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawRectangleFilled, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawEllipseFilled, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawPolygonFilled, new QWidget( pParent ) );
+    p->insertWidget( ToolDrawText, new QWidget( pParent ) );
+    p->insertWidget( ToolFillFlood, new QWidget( pParent ) );
+    p->insertWidget( ToolFillGradient, new QWidget( pParent ) );
+
+    return p;
+}
+
 void PAPaint::doMousePressEvent( QGraphicsSceneMouseEvent *pEvent )
 {
     Q_ASSERT( pGraphics );

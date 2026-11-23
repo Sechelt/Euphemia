@@ -47,10 +47,11 @@ public:
 
     /* void setSelected( ... ); */                                                  /*!< set values, emits signalSync but NOT signalChanged, see derived classes    */
 
-    virtual QWidget *getButton( QWidget *pParent ) = 0;                             /*!< button to invoke dialog/panel for edit or nullptr                          */
-    virtual QWidget *getToolBar( QWidget *pParent ) = 0;                            /*!< edit widget suitable for a tool bar or nullptr                             */
-    virtual QWidget *getPanel( QWidget *pParent ) = 0;                              /*!< edit widget suitable for a dialog/dock or a nullptr                        */
-    virtual QWidget *getSwatch( QWidget *pParent );                                 /*!< used to show example - not always needed - default is nullptr              */
+    virtual QWidget *   getButton( QWidget *pParent ) = 0;                             /*!< button to invoke dialog/panel for edit or nullptr                          */
+    virtual QWidget *   getToolBar( QWidget *pParent ) = 0;                            /*!< edit widget suitable for a tool bar or nullptr                             */
+    virtual QWidget *   getPanel( QWidget *pParent ) = 0;                              /*!< edit widget suitable for a dialog/dock or a nullptr                        */
+    virtual QWidget *   getSwatch( QWidget *pParent );                                 /*!< used to show example - not always needed - default is nullptr              */
+    virtual QToolBox *  getToolBox( QWidget *pParent );
 
     virtual void doDialog( QWidget *pParent, bool bThis = false );                  /*!< edit dialog - default uses panel - may return nullptr                      */
     virtual void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) = 0;                                                                                        

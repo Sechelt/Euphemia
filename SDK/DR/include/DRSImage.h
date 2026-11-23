@@ -9,33 +9,48 @@
 #ifndef H_DRSImage
 #define H_DRSImage
 
+#include <W.h>
 #include <SSettings.h>
 
+/*!
+ * \brief Settings for DRImage.
+ * 
+ * \author pharvey (2026-11-21)
+ */
 class DRSImage : public SSetting 
 {
     Q_OBJECT
-    Q_PROPERTY(QImage image READ getValue WRITE setValue NOTIFY signalChanged)
+    Q_PROPERTY(QPixmap pixmap READ getPixmap WRITE setPixmap NOTIFY signalChanged)
+    Q_PROPERTY(W::WImagePlacements nPlacement READ getPlacement WRITE setPlacement NOTIFY signalChanged)
 public:
     DRSImage();
 
-    void setValue( const QImage & );
-    void setSelected( const QImage & );
+    void setPixmap( const QPixmap & );
+    void setPlacement( W::WImagePlacements );
 
-    QImage      getValue() { return image; }
+    void setSelected( const QPixmap &, W::WImagePlacements );
+
+    QPixmap             getPixmap()     { return pixmap;    }
+    W::WImagePlacements getPlacement()  { return nPlacement;}
+
     QWidget *   getButton( QWidget *pParent ) override;
     QWidget *   getToolBar( QWidget *pParent ) override;
     QWidget *   getPanel( QWidget *pParent ) override;
     QWidget *   getSwatch( QWidget *pParent ) override;
+    QToolBox *  getToolBox( QWidget *pParent ) override;
 
     void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;
     void doLoad( QDomElement *pdomElem ) override;
 
 protected:
-    QImage image;
+    QPixmap pixmap;
+    W::WImagePlacements nPlacement;
 };
 
 /*!
- * \brief A button to invoke a dialog/panel to edit.
+ * \brief A tool button to invoke a dialog/panel to edit.
+ * 
+ * Tool buttons are small so button always shows a standard image icon - not the selected pixmap (which will often be much larger). 
  * 
  * \author pharvey (9/29/25)
  */
@@ -51,8 +66,6 @@ public slots:
 protected:
     DRSImage *pSetting;
 
-    QPixmap getIcon();
-
 protected slots:
     void slotClicked();
 };
@@ -67,6 +80,17 @@ class DRSImageToolBar : public QWidget
     Q_OBJECT
 public:
     DRSImageToolBar( QWidget *pParent, bool bCompress = false );
+
+public slots:
+    void slotRefresh();
+
+protected:
+    DRSImage *          pSetting;
+    DRSImageButton *    pImageButton;
+    QComboBox *         pPlacement;
+
+protected slots:
+    void slotChangedPlacement( int nIndex );
 };
 
 /*!
@@ -100,7 +124,7 @@ public slots:
 
 protected:
     DRSImage *  pSetting;
-    QImage      image;
+    QPixmap     pixmap;
 
     void paintEvent( QPaintEvent *pEvent );
     QSize sizeHint() const;

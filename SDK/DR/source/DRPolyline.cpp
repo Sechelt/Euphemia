@@ -19,6 +19,8 @@
 DRPolyline::DRPolyline( DRDraw *pCanvas, const QPointF &pointPos )
     : DRObject( pCanvas, pointPos )
 {
+    nHandlesAlloc = -1;
+
     if ( pointPos.isNull() )
     {
         // creating object for load
@@ -178,12 +180,13 @@ void DRPolyline::doPress( const QPointF &point )
     getGraphics()->update();
 }
 
-void DRPolyline::doMoveBy( const QPointF &pointOffset )
+void DRPolyline::doMoveBy( const QPointF &pointDelta )
 {
-#ifdef CBD_TODO
-    Q_UNUSED( pointOffset );
-    printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
-#endif
+    DRObject::doMoveBy( pointDelta );
+    for ( int n = 0; n < polygon.count(); n++ )
+    {
+        polygon.replace( n, polygon.at( n ) + pointDelta );
+    }
 }
 
 void DRPolyline::doMove( const QPointF &point )
@@ -275,7 +278,7 @@ void DRPolyline::doDraw( QPainter *pPainter )
  *  
  * \author pharvey (2/1/23)
  */
-void DRPolyline::doCreateHandles()
+void DRPolyline::doCreateHandlesStandard()
 {
     Q_ASSERT( vectorHandles.count() == 0 );     // must start with no handles
     Q_ASSERT( polygon.count() );                // need at least 1 point for this call to make sense
@@ -289,7 +292,8 @@ void DRPolyline::doCreateHandles()
     LHandle *pHandle;
 
     // move handle is always vectorHandles[0]
-    pHandle = new LHandle( this, getView(), LHandle::TypeDrag, polygonView.boundingRect().center() );
+    pHandle = new LHandle( this, getView(), LHandle::FunctionMove, polygonView.boundingRect().center() );
+    pHandle->setToolTip( tr("move") );
     vectorHandles.append( pHandle );
     pHandle->show();
 
@@ -297,6 +301,7 @@ void DRPolyline::doCreateHandles()
     for ( int n = 1; n < polygonView.count(); n++ )
     {
         pHandle = new LHandle( this, getView(), LHandle::TypePointFactory, QRectF( polygonView.at( n - 1 ), polygonView.at( n ) ).center() );
+        pHandle->setToolTip( tr("factory") );
         vectorHandles.append( pHandle );
         pHandle->show();
     }
@@ -305,12 +310,15 @@ void DRPolyline::doCreateHandles()
     for ( QPointF point : polygonView )
     {
         pHandle = new LHandle( this, getView(), LHandle::TypeMovePoint, point );
+        pHandle->setToolTip( tr("point") );
         vectorHandles.append( pHandle );
         pHandle->show();
     }
+
+    nHandlesAlloc = vectorHandles.count(); // 'cart before the horse' here but set it anyway
 }
 
-void DRPolyline::doSyncHandles()
+void DRPolyline::doSyncHandlesStandard()
 {
     QPolygon polygonView = getView()->mapFromScene( polygon );
     int nHandle = 0;
@@ -330,7 +338,6 @@ void DRPolyline::doSyncHandles()
         vectorHandles[++nHandle]->setCenter( polygonView[n] );
     }
 }
-
 
 // call shouldRemovePoint() before calling here
 void DRPolyline::doRemovePoint( LHandle *pHandle )

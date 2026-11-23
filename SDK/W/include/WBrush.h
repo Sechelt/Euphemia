@@ -13,6 +13,7 @@
 #include <WBrushStyleComboBox.h>
 #include <WImageButton.h>
 
+
 /*!
  * \brief Tool bar button giving some indication of the QBrush.
  * 

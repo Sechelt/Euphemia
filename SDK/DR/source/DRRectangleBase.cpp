@@ -10,7 +10,6 @@
 #include "LibInfo.h"
 #include "DRRectangleBase.h"
 
-#include <SSettings.h>
 #include <LGraphicsObject.h>
 #include <LGraphicsScene.h>
 #include <LGraphicsView.h>
@@ -21,8 +20,9 @@ DRRectangleBase::DRRectangleBase( DRDraw *pCanvas, const QPointF &pointPos )
     : DRObject( pCanvas, pointPos )
 {
     r = QRectF( pointPos.isNull() ? QPointF( 0, 0 ) : pointPos, QSize( 1, 1 ) );
+    nHandlesAlloc = 3;
 
-    pSettingRectangle   = g_SSettings->getSetting( "LSRectangle" ); Q_ASSERT( pSettingRectangle );
+    pSettingRectangle   = (LSRectangle*)g_SSettings->getSetting( "LSRectangle" ); Q_ASSERT( pSettingRectangle );
     slotRefreshRectangle();
 }
 
@@ -73,7 +73,7 @@ LHandle *DRRectangleBase::getGrab( const QPointF &pointPos, bool bSizing )
     if ( bSizing ) 
     {
         if ( nSelectionState != SelectionStateStandard ) return nullptr;
-        return vectorHandles.at( nIndexHandleEnd );
+        return vectorHandles.at( nIndexHandleBottomRight );
     }
 
     return DRObject::getGrab( pointPos ); 
@@ -200,9 +200,55 @@ bool DRRectangleBase::doLoad( QDomElement *pdomElemThis )
     return true;
 }
 
+/*!
+ * \brief Create handles for a rectangle. This may not be good enough for all shapes in SelectionStateStandard but probably rest is ok with this default. 
+ * 
+ * \author pharvey (10/20/25)
+ */
+void DRRectangleBase::doCreateHandlesStandard()
+{
+    Q_ASSERT( nSelectionState == SelectionStateStandard );
+    Q_ASSERT( vectorHandles.count() == 0 );
+    LGraphicsView *pView = getView();
+    Q_ASSERT( pView );
+
+    // default is per rect
+    QRectF r = boundingRect();
+
+    // their parent will be the viewport so...
+    QRect rectView = pView->mapFromScene( r ).boundingRect();
+
+    // Order matters when handles share a position. Last handle will be found first.
+    vectorHandles.resize( nHandlesAlloc );
+    vectorHandles[nIndexHandleMove]        = new LHandle( this, pView, LHandle::FunctionMove, rectView.center() );
+    vectorHandles[nIndexHandleTopLeft]     = new LHandle( this, pView, LHandle::TypeSizeTopLeft, rectView.topLeft() );
+    vectorHandles[nIndexHandleBottomRight] = new LHandle( this, pView, LHandle::TypeSizeBottomRight, rectView.bottomRight() );
+
+    vectorHandles[nIndexHandleMove]->setToolTip( tr("move") );
+    vectorHandles[nIndexHandleTopLeft]->setToolTip( tr("top-left") );
+    vectorHandles[nIndexHandleBottomRight]->setToolTip( tr("bottom-right") );
+
+    vectorHandles[nIndexHandleMove]->show();
+    vectorHandles[nIndexHandleTopLeft]->show();
+    vectorHandles[nIndexHandleBottomRight]->show();
+}
+
+void DRRectangleBase::doSyncHandlesStandard()
+{
+    Q_ASSERT( nSelectionState == SelectionStateStandard );
+    Q_ASSERT( vectorHandles.count() > 0 );
+
+    QRect rectView = getView()->mapFromScene( boundingRect() ).boundingRect();
+
+    vectorHandles[nIndexHandleMove]->setCenter( rectView.center() );
+    vectorHandles[nIndexHandleTopLeft]->setCenter( rectView.topLeft() );
+    vectorHandles[nIndexHandleBottomRight]->setCenter( rectView.bottomRight() );
+}
+
 void DRRectangleBase::doConnectSettings()
 {
     DRObject::doConnectSettings();
+    pSettingRectangle->setSelected( bBind );
     connect( pSettingRectangle, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
 }
 
@@ -214,6 +260,7 @@ void DRRectangleBase::doDisconnectSettings()
 
 void DRRectangleBase::slotRefreshRectangle()
 {
+    // we only care about the bind property in this class
     bBind = pSettingRectangle->property( "bBind" ).toInt();
 }
 

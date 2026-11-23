@@ -10,7 +10,7 @@
 #ifndef H_DRRectangleBase
 #define H_DRRectangleBase
 
-#include <SSetting.h>
+#include <LSRectangle.h>
 
 #include "DRObject.h"
 
@@ -38,15 +38,18 @@ public:
     virtual bool        doLoad( QDomElement *pdomElem ) override;
 
 protected:
-    SSetting *      pSettingRectangle;
+    LSRectangle *   pSettingRectangle;
     bool            bBind       = false;    /*!< bind x and y (ensure we have a square)     */
 
     QRectF r;
 
     // index of handles
-    int nIndexHandleMove    = 0;
-    int nIndexHandleBegin   = 1;
-    int nIndexHandleEnd     = 2;
+    int nIndexHandleMove        = 0;
+    int nIndexHandleTopLeft     = 1;
+    int nIndexHandleBottomRight = 2;
+
+    virtual void doCreateHandlesStandard();
+    virtual void doSyncHandlesStandard();
 
     virtual void doConnectSettings() override;
     virtual void doDisconnectSettings() override;

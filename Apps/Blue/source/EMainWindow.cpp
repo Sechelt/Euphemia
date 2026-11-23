@@ -602,6 +602,7 @@ void EMainWindow::doInitStatusBar()
 void EMainWindow::doInitDockWindows()
 {
     doInitDockTools();
+    doInitDockToolBox();
     doInitDockLayers(); 
     doInitDockScratch(); 
     doInitDockColors();
@@ -622,6 +623,21 @@ void EMainWindow::doInitDockTools()
     addDockWidget( Qt::LeftDockWidgetArea, pDockTools );
 
     pMenuDocks->addAction( pDockTools->toggleViewAction() );
+}
+
+void EMainWindow::doInitDockToolBox()
+{
+    // tools
+    pDockToolBox = new QDockWidget( tr("Tool Box"), this );
+    pDockToolBox->setObjectName( "DockToolBox" );
+    pDockToolBox->setAllowedAreas( Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea );
+
+    pToolBoxWidget = new QStackedWidget( pDockToolBox );
+
+    pDockToolBox->setWidget( pToolBoxWidget );
+    addDockWidget( Qt::LeftDockWidgetArea, pDockToolBox );
+
+    pMenuDocks->addAction( pDockToolBox->toggleViewAction() );
 }
 
 void EMainWindow::doInitDockLayers()
@@ -958,6 +974,18 @@ void EMainWindow::doConnectLayer()
     pLayer      = pLayers->getLayerCurrent();
     Q_ASSERT( pLayer );
 
+    // add toolbox if layer is new to us (these will linger until the app exits)
+    {
+        QString stringClass = pLayer->metaObject()->className();
+        if ( !mapToolBoxs.contains( stringClass ) ) 
+        {
+            QWidget *pWidget = pLayer->getToolBox( pToolBoxWidget );
+            mapToolBoxs.insert( stringClass, pWidget );
+            pToolBoxWidget->addWidget( pWidget );
+        }
+        pToolBoxWidget->setCurrentWidget( mapToolBoxs.value( stringClass ) );
+    }
+
     pActionCut->setEnabled( pLayer->canCut() ); 
     pActionCopy->setEnabled( pLayer->canCopy() ); 
     pActionPaste->setEnabled( pLayer->canPaste() ); 
@@ -1019,6 +1047,22 @@ void EMainWindow::doConnectTool()
     pToolConfigWidget = pLayer->getToolBar( pToolBarHolder );         
     // not all tools have a config widget
     if ( pToolConfigWidget ) pToolBarHolder->addWidget( pToolConfigWidget );     
+
+    // show appropriate toolbox for the given tool
+    {
+        QString stringClass = pLayer->metaObject()->className();
+        QWidget *pLayerWidget = mapToolBoxs.value( stringClass );
+        Q_ASSERT( pLayerWidget );
+        pToolBoxWidget->setCurrentWidget( pLayerWidget );
+        if ( pLayerWidget->inherits( "QStackedWidget" ) )
+        {
+            ((QStackedWidget*)pLayerWidget)->setCurrentIndex( pLayer->getTool() );
+        }
+        else if ( pLayerWidget->inherits( "QToolBox" ) )
+        {
+            ((QToolBox*)pLayerWidget)->setCurrentIndex( pLayer->getTool() );
+        }
+    }
 }
 
 void EMainWindow::doDisconnectTool()

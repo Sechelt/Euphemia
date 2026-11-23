@@ -10,6 +10,8 @@
 #ifndef H_DREllipse
 #define H_DREllipse
 
+#include <LSEllipse.h>
+
 #include "DRRectangleBase.h"
 
 class DREllipse : public DRRectangleBase
@@ -21,7 +23,7 @@ public:
     virtual QPixmap getIcon() override;
 
 protected:
-    SSetting *pSettingEllipse;
+    LSEllipse *pSettingEllipse;
 
     virtual void doDraw( QPainter * ) override;
     virtual void doConnectSettings() override;

@@ -28,7 +28,7 @@ DRObject::DRObject( DRDraw *pLayer, const QPointF &pointPos, const QString &stri
 
     pSettingPen = (SPen*)g_SSettings->getSetting( "SPen" ); Q_ASSERT( pSettingPen );
     pSettingBrush = (SBrush*)g_SSettings->getSetting( "SBrush" ); Q_ASSERT( pSettingBrush );
-    pSettingFont = (SFont*)g_SSettings->getSetting( "SFont" ); Q_ASSERT( pSettingFont );
+    pSettingFont = (SText*)g_SSettings->getSetting( "SText" ); Q_ASSERT( pSettingFont );
     pSettingGeneral = (LSGeneral*)g_SSettings->getSetting( "LSGeneral" ); Q_ASSERT( pSettingGeneral );
     slotRefreshPen();
     slotRefreshBrush();
@@ -108,6 +108,7 @@ void DRObject::setSelected( bool b )
  */
 void DRObject::setSelected( SelectionStates n )
 {
+// qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Current: " << getSelectionStateString( nSelectionState ) << " Requested: " << getSelectionStateString( n );
     if ( n == nSelectionState ) return;
 
     // sanity check
@@ -189,8 +190,6 @@ QString DRObject::getSelectionStateString( SelectionStates n )
             return "SelectionStateNone";
         case SelectionStateMinimal:
             return "SelectionStateMinimal";
-        case SelectionStateMove:
-            return "SelectionStateMove";
         case SelectionStateStandard:
             return "SelectionStateStandard";
         case SelectionStateScale:
@@ -205,6 +204,16 @@ QString DRObject::getSelectionStateString( SelectionStates n )
     return "unknown";
 }
 
+void DRObject::doMoveBy( const QPointF & )
+{
+    getGraphics()->doPrepareGeometryChange();
+}
+
+void DRObject::doMove( LHandle *, const QPointF & )
+{
+    getGraphics()->doPrepareGeometryChange();
+}
+
 void DRObject::doSelectionStateCycle()
 {
     switch ( nSelectionState )
@@ -212,8 +221,8 @@ void DRObject::doSelectionStateCycle()
         case SelectionStateNone:
             setSelected( SelectionStateStandard );
             break;
-        case SelectionStateMove:
-            setSelected( SelectionStateMove );
+//        case SelectionStateMove:
+//            setSelected( SelectionStateMove );
             break;
         case SelectionStateStandard:
             setSelected( SelectionStateScale );
@@ -381,33 +390,117 @@ void DRObject::doCreateHandles()
     switch ( nSelectionState )
     {
         case SelectionStateStandard:
-            {
-                Q_ASSERT( vectorHandles.count() == 0 );
-                LGraphicsView *pView = getView();
-                Q_ASSERT( getView() );
-
-                // default is per rect
-                QRectF r = boundingRect();
-
-                // their parent will be the viewport so...
-                QRect rectView = pView->mapFromScene( r ).boundingRect();
-
-                // Order matters when handles share a position. Last handle will be found first.
-                LHandle *pHandle;
-
-                pHandle = new LHandle( this, pView, LHandle::FunctionMove, rectView.center() );
-                vectorHandles.append( pHandle );
-                pHandle->show();
-
-                pHandle = new LHandle( this, pView, LHandle::TypeSizeTopLeft, rectView.topLeft() );
-                vectorHandles.append( pHandle );
-                pHandle->show();
-
-                pHandle = new LHandle( this, pView, LHandle::TypeSizeBottomRight, rectView.bottomRight() );
-                vectorHandles.append( pHandle );
-                pHandle->show();
-            }
+            doCreateHandlesStandard();
             break;
+        case SelectionStateScale:
+        case SelectionStateShear:
+        case SelectionStateRotate:
+            doCreateHandlesTransform();
+            break;
+        case SelectionStateGradient:
+            printf( "[PAH][%s][%s][%d] SelectionStateGradient not implemented.\n", __FILE__, __FUNCTION__, __LINE__ );
+            break;
+        case SelectionStateNone:
+        case SelectionStateMinimal:
+            qFatal( "[PAH][%s][%s][%d] Invalid call.\n", __FILE__, __FUNCTION__, __LINE__ );
+            break;
+    }
+}
+
+void DRObject::doDeleteHandles()
+{
+    //
+    pHandle = nullptr;
+    for ( int n = 0; n < vectorHandles.count(); n++ )
+    {
+        delete vectorHandles.at( n );
+    }
+    vectorHandles.clear();
+}
+
+void DRObject::doSyncHandles()
+{
+    switch ( nSelectionState )
+    {
+        case SelectionStateStandard:
+            doSyncHandlesStandard();
+            break;
+        case SelectionStateScale:
+        case SelectionStateShear:
+        case SelectionStateRotate:
+            doSyncHandlesTransform();
+            break;
+        case SelectionStateNone:
+        case SelectionStateMinimal:
+        case SelectionStateGradient:
+            qFatal( "[PAH][%s][%s][%d] Invalid call.\n", __FILE__, __FUNCTION__, __LINE__ );
+            break;
+    }
+}
+
+/*!
+ * \brief Alter handle types if rectangle flipped (horiz/vert or both).
+ * 
+ * \author pharvey (2/28/23)
+ */
+void DRObject::doSyncHandleTypes()
+{
+#ifdef CBD_TODO
+printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
+#endif
+/*
+    QRect rectView = getView()->mapFromScene( r ).boundingRect();
+
+    if ( vectorHandles[DRRectangleBaseBegin]->geometry().contains( rectView.topLeft() ) ) vectorHandles[DRRectangleBaseBegin]->setType( LHandle::TypeSizeTopLeft );             
+    else if ( vectorHandles[DRRectangleBaseBegin]->geometry().contains( rectView.topRight() ) ) vectorHandles[DRRectangleBaseBegin]->setType( LHandle::TypeSizeTopRight );      
+    else if ( vectorHandles[DRRectangleBaseBegin]->geometry().contains( rectView.bottomLeft() ) ) vectorHandles[DRRectangleBaseBegin]->setType( LHandle::TypeSizeBottomLeft );  
+    else if ( vectorHandles[DRRectangleBaseBegin]->geometry().contains( rectView.bottomRight() ) ) vectorHandles[DRRectangleBaseBegin]->setType( LHandle::TypeSizeBottomRight );
+                                                                                                                                                                       
+    if ( vectorHandles[DRRectangleBaseEnd]->geometry().contains( rectView.topLeft() ) ) vectorHandles[DRRectangleBaseEnd]->setType( LHandle::TypeSizeTopLeft );                 
+    else if ( vectorHandles[DRRectangleBaseEnd]->geometry().contains( rectView.topRight() ) ) vectorHandles[DRRectangleBaseEnd]->setType( LHandle::TypeSizeTopRight );          
+    else if ( vectorHandles[DRRectangleBaseEnd]->geometry().contains( rectView.bottomLeft() ) ) vectorHandles[DRRectangleBaseEnd]->setType( LHandle::TypeSizeBottomLeft );      
+    else if ( vectorHandles[DRRectangleBaseEnd]->geometry().contains( rectView.bottomRight() ) ) vectorHandles[DRRectangleBaseEnd]->setType( LHandle::TypeSizeBottomRight );    
+*/
+}
+
+void DRObject::doShowHandles( bool b )
+{
+    for ( LHandle *p : vectorHandles )
+    {
+        p->setVisible( b );
+    }
+}
+
+void DRObject::doConnectSettings()
+{
+    pSettingPen->setSelected( pen );
+    pSettingBrush->setSelected( brush );
+    pSettingFont->setSelected( font );
+    connect( pSettingPen, SIGNAL(signalChanged()), this, SLOT(slotRefreshPen()) );
+    connect( pSettingBrush, SIGNAL(signalChanged()), this, SLOT(slotRefreshBrush()) );
+    connect( pSettingFont, SIGNAL(signalChanged()), this, SLOT(slotRefreshFont()) );
+    connect( pSettingGeneral, SIGNAL(signalChanged()), this, SLOT(slotRefreshGeneral()) );
+}
+
+void DRObject::doDisconnectSettings()
+{
+    disconnect( pSettingPen, SIGNAL(signalChanged()), this, SLOT(slotRefreshPen()) );
+    disconnect( pSettingBrush, SIGNAL(signalChanged()), this, SLOT(slotRefreshBrush()) );
+    disconnect( pSettingFont, SIGNAL(signalChanged()), this, SLOT(slotRefreshFont()) );
+    disconnect( pSettingGeneral, SIGNAL(signalChanged()), this, SLOT(slotRefreshGeneral()) );
+}
+
+/*!
+ * \brief Create handles when selected for transform.
+ * 
+ * This should be good for all derived classes.
+ * 
+ * \author pharvey (2026-11-17)
+ */
+void DRObject::doCreateHandlesTransform()
+{
+    switch ( nSelectionState )
+    {
         case SelectionStateScale:
             {
                 Q_ASSERT( vectorHandles.count() == 0 );
@@ -485,57 +578,19 @@ void DRObject::doCreateHandles()
                 pHandle->show();
             }
             break;
-        case SelectionStateMove:
-            {
-                Q_ASSERT( vectorHandles.count() == 0 );
-                LGraphicsView *pView = getView();
-                Q_ASSERT( getView() );
-
-                QRectF r = boundingRect();
-
-                // their parent will be the viewport so...
-                QRect rectView = pView->mapFromScene( r ).boundingRect();
-
-                // Order matters when handles share a position. Last handle will be found first.
-                // Also; DRRectangleBase assumes a particular order.
-                LHandle *pHandle;
-
-                pHandle = new LHandle( this, pView, LHandle::TypeDrag, rectView.center() );
-                vectorHandles.append( pHandle );
-                pHandle->show();
-            }
-            break;
         case SelectionStateNone:
         case SelectionStateMinimal:
+        case SelectionStateStandard:
         case SelectionStateGradient:
+            qFatal( "[PAH][%s][%s][%d] Invalid call.\n", __FILE__, __FUNCTION__, __LINE__ );
             break;
     }
 }
 
-void DRObject::doDeleteHandles()
-{
-    //
-    pHandle = nullptr;
-    for ( int n = 0; n < vectorHandles.count(); n++ )
-    {
-        delete vectorHandles.at( n );
-    }
-    vectorHandles.clear();
-}
-
-void DRObject::doSyncHandles()
+void DRObject::doSyncHandlesTransform()
 {
     switch ( nSelectionState )
     {
-        case SelectionStateStandard:
-            {
-                QRect rectView = getView()->mapFromScene( boundingRect() ).boundingRect();
-
-                vectorHandles[0]->setCenter( rectView.center() );
-                vectorHandles[1]->setCenter( rectView.topLeft() );
-                vectorHandles[2]->setCenter( rectView.bottomRight() );
-            }
-            break;
         case SelectionStateScale:
             {
                 QRect rectView = getView()->mapFromScene( boundingRect() ).boundingRect();
@@ -558,69 +613,13 @@ void DRObject::doSyncHandles()
                 vectorHandles[1]->setCenter( pointIndicator );
         }
             break;
-        case SelectionStateMove:
-            {
-                QRect rectView = getView()->mapFromScene( boundingRect() ).boundingRect();
-                vectorHandles[0]->setCenter( rectView.center() );
-            }
-            break;
         case SelectionStateNone:
         case SelectionStateMinimal:
+        case SelectionStateStandard:
         case SelectionStateGradient:
+            qFatal( "[PAH][%s][%s][%d] Invalid call.\n", __FILE__, __FUNCTION__, __LINE__ );
             break;
     }
-}
-
-/*!
- * \brief Alter handle types if rectangle flipped (horiz/vert or both).
- * 
- * \author pharvey (2/28/23)
- */
-void DRObject::doSyncHandleTypes()
-{
-#ifdef CBD_TODO
-printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
-#endif
-/*
-    QRect rectView = getView()->mapFromScene( r ).boundingRect();
-
-    if ( vectorHandles[DRRectangleBaseBegin]->geometry().contains( rectView.topLeft() ) ) vectorHandles[DRRectangleBaseBegin]->setType( LHandle::TypeSizeTopLeft );             
-    else if ( vectorHandles[DRRectangleBaseBegin]->geometry().contains( rectView.topRight() ) ) vectorHandles[DRRectangleBaseBegin]->setType( LHandle::TypeSizeTopRight );      
-    else if ( vectorHandles[DRRectangleBaseBegin]->geometry().contains( rectView.bottomLeft() ) ) vectorHandles[DRRectangleBaseBegin]->setType( LHandle::TypeSizeBottomLeft );  
-    else if ( vectorHandles[DRRectangleBaseBegin]->geometry().contains( rectView.bottomRight() ) ) vectorHandles[DRRectangleBaseBegin]->setType( LHandle::TypeSizeBottomRight );
-                                                                                                                                                                       
-    if ( vectorHandles[DRRectangleBaseEnd]->geometry().contains( rectView.topLeft() ) ) vectorHandles[DRRectangleBaseEnd]->setType( LHandle::TypeSizeTopLeft );                 
-    else if ( vectorHandles[DRRectangleBaseEnd]->geometry().contains( rectView.topRight() ) ) vectorHandles[DRRectangleBaseEnd]->setType( LHandle::TypeSizeTopRight );          
-    else if ( vectorHandles[DRRectangleBaseEnd]->geometry().contains( rectView.bottomLeft() ) ) vectorHandles[DRRectangleBaseEnd]->setType( LHandle::TypeSizeBottomLeft );      
-    else if ( vectorHandles[DRRectangleBaseEnd]->geometry().contains( rectView.bottomRight() ) ) vectorHandles[DRRectangleBaseEnd]->setType( LHandle::TypeSizeBottomRight );    
-*/
-}
-
-void DRObject::doShowHandles( bool b )
-{
-    for ( LHandle *p : vectorHandles )
-    {
-        p->setVisible( b );
-    }
-}
-
-void DRObject::doConnectSettings()
-{
-    pSettingPen->setSelected( pen );
-    pSettingBrush->setSelected( brush );
-    pSettingFont->setSelected( font.font );
-    connect( pSettingPen, SIGNAL(signalChanged()), this, SLOT(slotRefreshPen()) );
-    connect( pSettingBrush, SIGNAL(signalChanged()), this, SLOT(slotRefreshBrush()) );
-    connect( pSettingFont, SIGNAL(signalChanged()), this, SLOT(slotRefreshFont()) );
-    connect( pSettingGeneral, SIGNAL(signalChanged()), this, SLOT(slotRefreshGeneral()) );
-}
-
-void DRObject::doDisconnectSettings()
-{
-    disconnect( pSettingPen, SIGNAL(signalChanged()), this, SLOT(slotRefreshPen()) );
-    disconnect( pSettingBrush, SIGNAL(signalChanged()), this, SLOT(slotRefreshBrush()) );
-    disconnect( pSettingFont, SIGNAL(signalChanged()), this, SLOT(slotRefreshFont()) );
-    disconnect( pSettingGeneral, SIGNAL(signalChanged()), this, SLOT(slotRefreshGeneral()) );
 }
 
 void DRObject::slotRefreshPen()

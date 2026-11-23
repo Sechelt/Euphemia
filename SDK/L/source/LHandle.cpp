@@ -462,6 +462,8 @@ void LHandle::doInit()
     // set cursor
     switch ( nType )
     {
+        case TypeHRound:
+        case TypeVRound:
         case TypeMovePoint:
         case TypeGradientIntermediate:
         case TypeGradientRadius:

@@ -34,6 +34,7 @@ protected:
 
     QSplitter *         pSplitter               = nullptr;
 
+    bool                bPanelArea              = false;
     QScrollArea *       pScrollAreaTools        = nullptr;
     QWidget *           pScrollableWidgetTools  = nullptr;
     QActionGroup *      pActionGroup            = nullptr;

@@ -18,6 +18,8 @@
 /*!
  * \brief Setting for a SFont.
  * 
+ * NOTE: Use SText instead?
+ * 
  * \author pharvey (3/14/23)
  */
 class SFont : public SSetting 

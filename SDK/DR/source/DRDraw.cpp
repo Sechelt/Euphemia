@@ -157,7 +157,9 @@ QWidget* DRDraw::getToolBar( QWidget *pParent )
         case ToolManipulate:
         case ToolDrawArc:
         case ToolDrawChord:
+            break;
         case ToolDrawImage:
+            return g_SSettings->getSetting( "DRSImage" )->getToolBar( pParent );
         case ToolDrawPie:
             break;
         case ToolDrawLine:
@@ -171,7 +173,7 @@ QWidget* DRDraw::getToolBar( QWidget *pParent )
         case ToolDrawPolyline:
             break;
         case ToolDrawText:
-            return g_SSettings->getSetting( "LSText" )->getToolBar( pParent );
+            return g_SSettings->getSetting( "SText" )->getToolBar( pParent );
     }
     return nullptr;
 }
@@ -190,20 +192,24 @@ QWidget* DRDraw::getPanel( QWidget *pParent )
                 {
                     QString s = p->metaObject()->className();
                     // we know these objects have panels...
-                    if ( s == "DRLine" )
+                    if ( s == "DRImage" )
+                        return g_SSettings->getSetting( "DRSImage" )->getPanel( pParent );
+                    else if ( s == "DRLine" )
                         return g_SSettings->getSetting( "LSLine" )->getPanel( pParent );
                     else if ( s == "DRRectangle" )
                         return g_SSettings->getSetting( "LSRectangle" )->getPanel( pParent );
                     else if ( s == "DREllipse" )
                         return g_SSettings->getSetting( "LSEllipse" )->getPanel( pParent );
                     else if ( s == "DRText" )
-                        return g_SSettings->getSetting( "LSText" )->getPanel( pParent );
+                        return g_SSettings->getSetting( "SText" )->getPanel( pParent );
                 }
             }
             break;
         case ToolDrawArc:
         case ToolDrawChord:
+            break;
         case ToolDrawImage:
+            return g_SSettings->getSetting( "DRSImage" )->getPanel( pParent );
         case ToolDrawPie:
             break;
         case ToolDrawLine:
@@ -217,9 +223,30 @@ QWidget* DRDraw::getPanel( QWidget *pParent )
         case ToolDrawPolyline:
             break;
         case ToolDrawText:
-            return g_SSettings->getSetting( "LSText" )->getPanel( pParent );
+            return g_SSettings->getSetting( "SText" )->getPanel( pParent );
     }
     return nullptr;
+}
+
+QWidget *DRDraw::getToolBox( QWidget *pParent )
+{
+    QStackedWidget *pWidget = new QStackedWidget( pParent );
+
+    // IMPORTANT: order must be same as in enum 0-n
+    pWidget->insertWidget( ToolSelectRectangle, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolSelectPolygon, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolManipulate, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolDrawArc, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolDrawChord, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolDrawImage, ( g_SSettings->getSetting( "DRSImage" ) ? g_SSettings->getSetting( "DRSImage" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawPie, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolDrawLine, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolDrawRectangle, ( g_SSettings->getSetting( "LSRectangle" ) ? g_SSettings->getSetting( "LSRectangle" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawEllipse, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolDrawPolygon, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolDrawPolyline, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolDrawText, new QWidget( pParent ) );
+    return pWidget;
 }
 
 ADObject* DRDraw::getObject( const QString &s, ADObject * )
@@ -563,6 +590,7 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
             {
                 pSelectionManager->doSelectNone();
                 pObjectDrawing = getObject( nTool, pointPress );
+                pSelectionManager->setSelected( pObjectDrawing );
                 pObjectDrawing->setSelected( DRObject::SelectionStateStandard ); // needed as selectors are !isSelectable()
                 pHandleMoving = pObjectDrawing->getGrab( pointPress, true ); // get the sizing handle
                 Q_ASSERT( pHandleMoving );
@@ -1550,6 +1578,7 @@ void DRDraw::setSelected( QList<DRObject *> listObjects, bool b )
 {
     for ( DRObject *p : listObjects )
     {
+
         setSelected( p, b );
     }
 }

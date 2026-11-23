@@ -100,6 +100,7 @@ void DRSelectRectangle::doDraw( QPainter *pPainter )
 
 void DRSelectRectangle::doConnectSettings()
 {
+printf( "[PAH][%s][%s][%d]\n", __FILE__, __FUNCTION__, __LINE__ );
     // bypass DRRectangleBase to avoid changing bBind
     DRObject::doConnectSettings();
 }

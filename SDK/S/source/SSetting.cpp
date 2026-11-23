@@ -23,6 +23,11 @@ QWidget *SSetting::getSwatch( QWidget *pParent )
     return nullptr;
 }
 
+QToolBox *SSetting::getToolBox( QWidget *pParent )
+{
+    return new QToolBox( pParent ); // default is an empty one
+}
+
 void SSetting::doDialog( QWidget *pParent, bool bThis )
 {
     // NOTE: Default is to use the className as the key and as the window title.

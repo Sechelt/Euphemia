@@ -40,9 +40,14 @@ void LSText::setVAlign( Qt::AlignmentFlag t )
     emit signalChanged();
 }
 
-void LSText::setSelected( const QString &stringText, Qt::AlignmentFlag nHAlign, Qt::AlignmentFlag nVAlign )
+void LSText::setSelected( const QString &stringText )
 {
     this->stringText    = stringText;
+    emit signalSync();
+}
+
+void LSText::setSelected( Qt::AlignmentFlag nHAlign, Qt::AlignmentFlag nVAlign )
+{
     this->nHAlign       = nHAlign;
     this->nVAlign       = nVAlign;
     emit signalSync();

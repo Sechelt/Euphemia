@@ -28,7 +28,7 @@ PATool::PATool( PAPaint *pLayer )
 
     pSettingPen     = g_SSettings->getSetting( "SPen" ); Q_ASSERT( pSettingPen );
     pSettingBrush   = g_SSettings->getSetting( "SBrush" ); Q_ASSERT( pSettingBrush );
-    pSettingFont    = g_SSettings->getSetting( "SFont" ); Q_ASSERT( pSettingFont );
+    pSettingFont    = g_SSettings->getSetting( "SText" ); Q_ASSERT( pSettingFont );
     pSettingGeneral = g_SSettings->getSetting( "LSGeneral" ); Q_ASSERT( pSettingGeneral );
     pSettingRender  = g_SSettings->getSetting( "LSRender" ); Q_ASSERT( pSettingRender );
 

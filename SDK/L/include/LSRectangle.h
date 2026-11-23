@@ -30,16 +30,18 @@ public:
     void setSizeMode( Qt::SizeMode );     
     void setXRadius( qreal );      
     void setYRadius( qreal );      
-    void setSelected( bool, Qt::SizeMode, qreal, qreal );
+    void setSelected( bool );
+    void setSelected( Qt::SizeMode, qreal, qreal );
 
     bool            getBind()       { return bBind;     }
     Qt::SizeMode    getSizeMode()   { return nSizeMode; }   
     qreal           getXRadius()    { return nXRadius;  }   
     qreal           getYRadius()    { return nYRadius;  }   
 
-    QWidget *getButton( QWidget * /* pParent */ ) { return nullptr; }
-    QWidget *getToolBar( QWidget *pParent ) override;
-    QWidget *getPanel( QWidget *pParent ) override;
+    QWidget *   getButton( QWidget * /* pParent */ ) { return nullptr; }
+    QWidget *   getToolBar( QWidget *pParent ) override;
+    QWidget *   getPanel( QWidget *pParent ) override;
+    QToolBox *  getToolBox( QWidget *pParent ) override;
 
     void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;
     void doLoad( QDomElement *pdomElem ) override;

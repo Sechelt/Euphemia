@@ -70,6 +70,10 @@ private:
     QDockWidget *           pDockTools;
     LToolsWidget *          pToolsWidget;
 
+    QDockWidget *           pDockToolBox;
+    QStackedWidget *        pToolBoxWidget;
+    QMap<QString,QWidget*>  mapToolBoxs;       /*!< layer-class,toolbox                */
+
     QDockWidget *           pDockScratch;
     LScratchWidget *        pScratchWidget;
 
@@ -207,6 +211,7 @@ private:
     void doInitStatusBar();
     void doInitDockWindows();
     void doInitDockTools();
+    void doInitDockToolBox();
     void doInitDockLayers();
     void doInitDockScratch();
     void doInitDockColors();

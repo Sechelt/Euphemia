@@ -20,10 +20,15 @@
 DRRectangle::DRRectangle( DRDraw *pCanvas, const QPointF &pointPos )
     : DRRectangleBase( pCanvas, pointPos )
 {
-    // override order
-    // nIndexHandleMove    = 1;
-    // nIndexHandleBegin   = 0;
-    // nIndexHandleEnd     = 2;
+    // juggle around handles
+    nHandlesAlloc           = 5;
+    nIndexHandleHRound      = 0;
+    nIndexHandleVRound      = 1;
+    nIndexHandleMove        = 2;
+    nIndexHandleTopLeft     = 3;
+    nIndexHandleBottomRight = 4;
+
+    // we share LSRectangle with DRRectangleBase
     slotRefreshRectangle();
 }
 
@@ -226,32 +231,51 @@ void DRRectangle::doDraw( QPainter *pPainter )
     }
 }
 
-void DRRectangle::doCreateHandles()
+void DRRectangle::doCreateHandlesStandard()
 {
+    Q_ASSERT( nSelectionState == SelectionStateStandard );
     Q_ASSERT( vectorHandles.count() == 0 );
 
-    DRRectangleBase::doCreateHandles();
+    DRRectangleBase::doCreateHandlesStandard();
 
-    if ( nSelectionState != SelectionStateStandard ) return;
+    vectorHandles[nIndexHandleHRound] = new LHandle( this, getView(), LHandle::TypeHRound, getView()->mapFromScene( getXRadiusPoint( nXRadius ) ) );
+    vectorHandles[nIndexHandleVRound] = new LHandle( this, getView(), LHandle::TypeVRound, getView()->mapFromScene( getYRadiusPoint( nYRadius ) ) );
 
-    pHandle = new LHandle( this, getView(), LHandle::TypeHRound, getView()->mapFromScene( getXRadiusPoint( nXRadius ) ) );
-    vectorHandles.append( pHandle );
-    pHandle->show();
+    // make z-order the same order as vectorHandles
+    for ( int n = 0; n < vectorHandles.count(); n++ )
+    {
+        vectorHandles[n]->raise();
+    }
 
-    pHandle = new LHandle( this, getView(), LHandle::TypeVRound, getView()->mapFromScene( getYRadiusPoint( nYRadius ) ) );
-    vectorHandles.append( pHandle );
-    pHandle->show();
+    vectorHandles[nIndexHandleHRound]->setToolTip( tr("horizontal round") );
+    vectorHandles[nIndexHandleVRound]->setToolTip( tr("vertical round") );
+
+    vectorHandles[nIndexHandleHRound]->show();
+    vectorHandles[nIndexHandleVRound]->show();
 }
 
-void DRRectangle::doSyncHandles()
+void DRRectangle::doSyncHandlesStandard()
 {
-    DRRectangleBase::doSyncHandles();
+    Q_ASSERT( nSelectionState == SelectionStateStandard );
+    Q_ASSERT( vectorHandles.count() > 0 );
 
-    if ( nSelectionState == SelectionStateStandard )
-    {
-        vectorHandles[nIndexHandleHRound]->setCenter( getView()->mapFromScene( getXRadiusPoint( nXRadius ) ) );
-        vectorHandles[nIndexHandleVRound]->setCenter( getView()->mapFromScene( getYRadiusPoint( nYRadius ) ) );
-    }
+    DRRectangleBase::doSyncHandlesStandard();
+
+    vectorHandles[nIndexHandleHRound]->setCenter( getView()->mapFromScene( getXRadiusPoint( nXRadius ) ) );
+    vectorHandles[nIndexHandleVRound]->setCenter( getView()->mapFromScene( getYRadiusPoint( nYRadius ) ) );
+}
+
+void DRRectangle::doConnectSettings()
+{
+    DRRectangleBase::doConnectSettings();
+    pSettingRectangle->setSelected( nSizeMode, nXRadius, nYRadius );
+    connect( pSettingRectangle, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
+}
+
+void DRRectangle::doDisconnectSettings()
+{
+    DRRectangleBase::doDisconnectSettings();
+    disconnect( pSettingRectangle, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
 }
 
 void DRRectangle::slotRefreshRectangle()

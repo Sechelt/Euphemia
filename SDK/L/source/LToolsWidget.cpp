@@ -29,6 +29,7 @@ LToolsWidget::LToolsWidget( QWidget *pParent )
     }
 
     // bottom area is the settings panel (if any) for the currently selected tool
+    if ( bPanelArea )
     {
         pScrollAreaPanel = new QScrollArea( this );
         pScrollAreaPanel->setToolTip( tr("settings panel for active tool (if available)") );
@@ -74,7 +75,7 @@ void LToolsWidget::doConnectLayer( LLayer *p )
 
     doInitActions( pLayer->getTools() );
     doInitButtons();
-    doInitPanel();
+    if ( bPanelArea ) doInitPanel();
 
     // catch tool change
     // - activate the button
@@ -98,7 +99,7 @@ void LToolsWidget::doDisconnectLayer()
     }
     bSelectionToolConfig = false;
 
-    doFiniPanel();
+    if ( bPanelArea ) doFiniPanel();
     doFiniButtons();
     doFiniActions();
 
@@ -131,7 +132,7 @@ void LToolsWidget::doConnectTool( int n )
     }
 
     // set panel (if available)
-    doInitPanel();
+    if ( bPanelArea ) doInitPanel();
 }
 
 void LToolsWidget::doDisconnectTool()
@@ -158,7 +159,7 @@ void LToolsWidget::doDisconnectTool()
     }
 
     // get rid of panel (if there is one)
-    doFiniPanel();
+    if ( bPanelArea ) doFiniPanel();
 }
 
 void LToolsWidget::doInitActions( QVector<LTool> vectorTools )

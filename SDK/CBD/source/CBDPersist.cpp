@@ -23,6 +23,10 @@
 QDomElement CBDPersistNative::doSaveText( const CBD::CBDText &font, QDomDocument *pdomDoc, const QString &stringName )
 {
     QDomElement domElem = pdomDoc->createElement( stringName.isEmpty() ? "Font" : stringName );
+
+    domElem.setAttribute( "HAlign", font.nHAlign );
+    domElem.setAttribute( "VAlign", font.nVAlign );
+
     domElem.appendChild( doSaveFont( font.font, pdomDoc ) );
     domElem.appendChild( doSaveColor( font.color, pdomDoc ) );
     domElem.appendChild( doSaveBrush( font.brush, pdomDoc ) );
@@ -144,6 +148,9 @@ QDomElement CBDPersistNative::doSaveImage( const QImage &image, QDomDocument *pd
 CBD::CBDText CBDPersistNative::doLoadText( QDomElement *pdomElem )
 {
     CBD::CBDText font;
+
+    font.nHAlign     = (Qt::AlignmentFlag)pdomElem->attribute( "HAlign", QString::number( int(Qt::AlignHCenter) ) ).toInt(); 
+    font.nVAlign     = (Qt::AlignmentFlag)pdomElem->attribute( "VAlign", QString::number( int(Qt::AlignVCenter) ) ).toInt(); 
 
     // load additional nodes...
     QDomNode domNode = pdomElem->firstChild();

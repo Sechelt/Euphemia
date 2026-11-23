@@ -47,9 +47,14 @@ void LSRectangle::setYRadius( qreal t )
     emit signalChanged();
 }
 
-void LSRectangle::setSelected( bool bBind, Qt::SizeMode nSizeMode, qreal nXRadius, qreal nYRadius )
+void LSRectangle::setSelected( bool bBind )
 {
     this->bBind     = bBind;
+    emit signalSync();
+}
+
+void LSRectangle::setSelected( Qt::SizeMode nSizeMode, qreal nXRadius, qreal nYRadius )
+{
     this->nSizeMode = nSizeMode;
     this->nXRadius  = nXRadius;
     this->nYRadius  = nYRadius;
@@ -64,6 +69,24 @@ QWidget *LSRectangle::getToolBar( QWidget *pParent )
 QWidget *LSRectangle::getPanel( QWidget *pParent )
 {
     return new LSRectanglePanel( pParent );
+}
+
+QToolBox *LSRectangle::getToolBox( QWidget *pParent )
+{
+    QToolBox *pToolBox = SSetting::getToolBox( pParent );
+
+    SSetting *pSettingPen       = g_SSettings->getSetting( "SPen" ); Q_ASSERT( pSettingPen );
+    SSetting *pSettingBrush     = g_SSettings->getSetting( "SBrush" ); Q_ASSERT( pSettingBrush );
+    SSetting *pSettingFont      = g_SSettings->getSetting( "SText" ); Q_ASSERT( pSettingFont );
+    SSetting *pSettingGeneral   = g_SSettings->getSetting( "LSGeneral" ); Q_ASSERT( pSettingGeneral );
+
+    pToolBox->insertItem( -1, getPanel( pToolBox ), QIcon(), "Rectangle" );
+    pToolBox->insertItem( -1, pSettingPen->getPanel( pToolBox ), QIcon(), "Pen" );
+    pToolBox->insertItem( -1, pSettingBrush->getPanel( pToolBox ), QIcon(), "Brush" );
+    pToolBox->insertItem( -1, pSettingFont->getPanel( pToolBox ), QIcon(), "Font" );
+    pToolBox->insertItem( -1, pSettingGeneral->getPanel( pToolBox ), QIcon(), "General" );
+
+    return pToolBox;
 }
 
 void LSRectangle::doSave( QDomDocument *pdomDoc, QDomElement *pdomElem )

@@ -18,6 +18,8 @@
 /*!
  * \brief 
  * 
+ * NOTE: Use SText for alignment?
+ * 
  * \author pharvey (3/15/23)
  */
 class LSText : public SSetting 
@@ -32,7 +34,8 @@ public:
     void setText( const QString & );
     void setHAlign( Qt::AlignmentFlag );
     void setVAlign( Qt::AlignmentFlag );
-    void setSelected( const QString &, Qt::AlignmentFlag, Qt::AlignmentFlag );
+    void setSelected( const QString & );
+    void setSelected( Qt::AlignmentFlag, Qt::AlignmentFlag );
 
     QString             getText()       { return stringText;    }
     Qt::AlignmentFlag   getHAlign()     { return nHAlign;       }

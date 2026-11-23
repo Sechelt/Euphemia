@@ -36,8 +36,8 @@ protected:
     qreal           nYRadius    = 0;
 
     // index of additional handles
-    int nIndexHandleHRound = 3;
-    int nIndexHandleVRound = 4;
+    int nIndexHandleHRound = 0;
+    int nIndexHandleVRound = 1;
 
     qreal   getXRadius( const QPointF &point );
     qreal   getYRadius( const QPointF &point );
@@ -48,9 +48,11 @@ protected:
 
     virtual void doDraw( QPainter * ) override;
 
-    virtual void doCreateHandles() override;
-    virtual void doSyncHandles() override;
+    virtual void doCreateHandlesStandard() override;
+    virtual void doSyncHandlesStandard() override;
 
+    virtual void doConnectSettings() override;
+    virtual void doDisconnectSettings() override;
 
 protected slots:
     virtual void slotRefreshRectangle() override;

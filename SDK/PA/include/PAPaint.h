@@ -69,7 +69,8 @@ class PAPaint : public LLayer
 public:
     enum Tools
     {
-        ToolMagnifierSelection,         /*!< shape: select rectangle, can move but size set elsewhere*/ 
+        // IMPORTANT: must start at 0 and order important see; getToolBox
+        ToolMagnifierSelection = 0,     /*!< shape: select rectangle, can move but size set elsewhere*/ 
         ToolSelectRectangle,            /*!< shape: select using a rectangle                         */ 
         ToolSelectEllipse,              /*!< shape: select using an ellipse                          */ 
         ToolSelectPolygon,              /*!< shape: select using a polygon                           */ 
@@ -109,6 +110,7 @@ public:
     QWidget *           getLayerPanel( QWidget * ) override     { return nullptr; }
     QWidget *           getToolBar( QWidget * ) override;
     QWidget *           getPanel( QWidget * ) override;
+    QWidget *           getToolBox( QWidget * ) override;
 
     void doMousePressEvent( QGraphicsSceneMouseEvent *pEvent ) override;
     void doMouseMoveEvent( QGraphicsSceneMouseEvent *pEvent ) override;

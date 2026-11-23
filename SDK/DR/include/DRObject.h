@@ -15,7 +15,7 @@
 #include <CBDPersist.h>
 #include <SPen.h>
 #include <SBrush.h>
-#include <SFont.h>
+#include <SText.h>
 #include <LSGeneral.h>
 #include <LObject.h>
 #include <LHandle.h>
@@ -31,7 +31,6 @@ public:
     {
         SelectionStateNone,         /*!< not selected                                               */
         SelectionStateMinimal,      /*!< multi-object selection: - no DRObject handles              */
-        SelectionStateMove,         /*!< move only                                                  */
         SelectionStateStandard,     /*!< manipulation: size, move, plus class dependent             */
         SelectionStateScale,        /*!< transform: scale                                           */
         SelectionStateShear,        /*!< transform: shear                                           */
@@ -61,8 +60,8 @@ public:
     virtual LHandle *       getHandle( const QPointF &pointPos );
     virtual QString         getSelectionStateString( SelectionStates n );
 
-    virtual void doMoveBy( const QPointF & ) = 0;
-    virtual void doMove( LHandle *, const QPointF & ) = 0;
+    virtual void doMoveBy( const QPointF & );
+    virtual void doMove( LHandle *, const QPointF & );
     virtual void doDrop( LHandle *, const QPointF &point = QPointF() ) = 0;
     virtual void doSelectionStateCycle();
     virtual void doCut() {}
@@ -88,7 +87,7 @@ protected:
     // some common settings
     SPen *      pSettingPen;
     SBrush *    pSettingBrush;
-    SFont *     pSettingFont;
+    SText *     pSettingFont;
     LSGeneral * pSettingGeneral;
     QPen            pen;        // line (incl. color)
     QBrush          brush;      // fill (incl. color)
@@ -100,6 +99,7 @@ protected:
     DRDraw *            pLayer;                                 /*!< layer we are drawing on (which is a QGraphicsObject)                                       */
     QVector<LHandle*>   vectorHandles;                          /*!< Handles are children of canvas widget and are shown on top of shape due to z-order.        */
     LHandle *           pHandle = nullptr;                      /*!< Handle being moved.                                                                        */
+    int                 nHandlesAlloc = 0;                      /*!< number of handles when SelectionStateStandard                              */
 
     // transform handle positions relative to center
     // - they need to be realtive so we can restore even if the rect has moved or changed size
@@ -123,8 +123,14 @@ protected:
     virtual void doSyncHandles();                   /*!< usually called after view zoom/scale change    */
     virtual void doSyncHandleTypes();
     virtual void doShowHandles( bool b = true );
+
     virtual void doConnectSettings();
     virtual void doDisconnectSettings();
+
+    virtual void doCreateHandlesStandard() = 0;
+    virtual void doCreateHandlesTransform();
+    virtual void doSyncHandlesStandard() = 0;
+    virtual void doSyncHandlesTransform();
 
 protected slots:
     virtual void slotRefreshPen();

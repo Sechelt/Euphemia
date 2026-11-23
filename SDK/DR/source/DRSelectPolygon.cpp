@@ -19,7 +19,6 @@
 DRSelectPolygon::DRSelectPolygon( DRDraw *pCanvas, const QPointF &pointPos )
     : DRPolygon( pCanvas, pointPos )
 {
-printf( "[PAH][%s][%s][%d] DRPolygon: ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
     bSelectable = false;
 }
 

@@ -63,12 +63,15 @@ void DRObject::paint( QPainter *pPainter, const QStyleOptionGraphicsItem *nOptio
 QRectF DRObject::boundingRect() const
 {
     // add padding for line width and any handles
-    int nPadding;
+    int nPadding = qMax( 16, pen.width() + 2 );
 
+    /*
+    // do not use vectorHandles here - we may have count but may not set yet
     if ( vectorHandles.count() )
         nPadding = vectorHandles.at( 0 )->width() + 2;
     else
         nPadding = pen.width() + 2; // better a little extra than too little
+    */
 
     QRectF r = getRect();
     r.moveTo( r.topLeft() - QPointF( nPadding / 2 , nPadding / 2 ) );
@@ -90,7 +93,7 @@ QRectF DRObject::boundingRect() const
  */
 void DRObject::setSelected( bool b )
 {
-// qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Current: " << isSelected() << " Requested: " << b;
+// qInfo() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Current: " << isSelected() << " Requested: " << b;
     AWObject::setSelected( b ); 
     if ( isSelected() ) setSelected( SelectionStateStandard );
     else setSelected( SelectionStateNone );
@@ -108,7 +111,7 @@ void DRObject::setSelected( bool b )
  */
 void DRObject::setSelected( SelectionStates n )
 {
-// qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Current: " << getSelectionStateString( nSelectionState ) << " Requested: " << getSelectionStateString( n );
+// qInfo() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Current: " << getSelectionStateString( nSelectionState ) << " Requested: " << getSelectionStateString( n );
     if ( n == nSelectionState ) return;
 
     // sanity check
@@ -131,6 +134,14 @@ void DRObject::setSelected( SelectionStates n )
 
     if ( pGraphics ) pGraphics->update();
     emit signalChanged();
+}
+
+void DRObject::setTransparentHandles( bool b )
+{
+    for ( LHandle *p : vectorHandles )
+    {
+        p->setTransparent( b );
+    }
 }
 
 void DRObject::setPen( const QPen &t )
@@ -387,9 +398,13 @@ LHandle *DRObject::getHandlePrev( LHandle *pHandle, LHandle::Type nType )
  */
 void DRObject::doCreateHandles()
 {
+    // sanity checks
+    Q_ASSERT( vectorHandles.count() == 0 );
+
     switch ( nSelectionState )
     {
         case SelectionStateStandard:
+            vectorHandles.resize( nHandlesAlloc );
             doCreateHandlesStandard();
             break;
         case SelectionStateScale:
@@ -463,6 +478,15 @@ printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 */
 }
 
+/*!
+ * \brief Change visibility.
+ * 
+ * NOTE: Changing visibility changes the flow of mouse events. If this is a concern try setTransparentHandles.
+ * 
+ * \author pharvey (2026-11-22)
+ * 
+ * \param b      
+ */
 void DRObject::doShowHandles( bool b )
 {
     for ( LHandle *p : vectorHandles )

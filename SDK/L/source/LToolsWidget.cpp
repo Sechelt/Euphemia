@@ -266,6 +266,7 @@ void LToolsWidget::slotChangedTool()
 
 void LToolsWidget::slotSelectionChanged()
 {
+    if ( !bPanelArea ) return;
     doFiniPanel();
     doInitPanel();
 }

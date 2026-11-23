@@ -528,6 +528,8 @@ void DRDraw::doMouseReleaseEvent( QGraphicsSceneMouseEvent *pEvent )
 
 void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
 {
+    // printf( "[PAH][%s][%s][%d] %d %s\n", __FILE__, __FUNCTION__, __LINE__, nTool, getToolString().toLatin1().constData() );
+
     // we may have a selection but the following makes us idle (no need to commit/cancel)
     Q_ASSERT( !pObjectDrawing );
     Q_ASSERT( !pHandleMoving );
@@ -552,6 +554,7 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
                 if ( pHandlePress ) 
                 {
                     pHandleMoving = pHandlePress;
+                    pObjectPress->setTransparentHandles();
                     setToolState( ToolStateManipulate );
                     return;
                 }
@@ -609,6 +612,7 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
                 // we could defer create until move but for now keep it simple and create here
                 pSelectionManager->doSelectNone();
                 pObjectDrawing = getObject( nTool, pointPress );
+                Q_ASSERT( pObjectDrawing );
                 pSelectionManager->setSelected( pObjectDrawing );
                 pHandleMoving = pObjectDrawing->getGrab( pointPress, true ); // get the sizing handle
                 Q_ASSERT( pHandleMoving );
@@ -854,6 +858,7 @@ void DRDraw::doMouseReleaseEventManipulate( QGraphicsSceneMouseEvent *pEvent )
 
     DRObject *p = (DRObject*)pHandleMoving->getLayerObject();
     p->doDrop( pHandleMoving, pointCurrent );
+    pObjectPress->setTransparentHandles( false );
     setModified();
     pHandleMoving = nullptr;
     setToolState( ToolStateIdle );
@@ -1213,10 +1218,10 @@ void DRDraw::doCrop()
 
 void DRDraw::doScale( qreal nX, qreal nY, Qt::AspectRatioMode n )
 {
-#ifdef CBD_TODO
     Q_UNUSED( nX );
     Q_UNUSED( nY );
     Q_UNUSED( n );
+#ifdef CBD_TODO
     printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
 /*
@@ -1273,8 +1278,8 @@ void DRDraw::doFlipY()
 
 void DRDraw::doRotate( int nDegrees )
 {
-#ifdef CBD_TODO
     Q_UNUSED( nDegrees );
+#ifdef CBD_TODO
     printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
 /*
@@ -1383,19 +1388,19 @@ void DRDraw::doPushUndo()
 
 void DRDraw::doZoomChanged( int nZoom )
 {
+    Q_UNUSED( nZoom );
     // if ( pObjectDrawing ) pObjectDrawing->doZoomChanged( nZoom );
 #ifdef CBD_TODO
-    Q_UNUSED( nZoom );
     printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
 }
 
 void DRDraw::doScrollChanged( int nX, int nY )
 {
-    // if ( pObjectDrawing ) pObjectDrawing->doScrollChanged( nX, nY );
-#ifdef CBD_TODO
     Q_UNUSED( nX );
     Q_UNUSED( nY );
+    // if ( pObjectDrawing ) pObjectDrawing->doScrollChanged( nX, nY );
+#ifdef CBD_TODO
     printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
 }

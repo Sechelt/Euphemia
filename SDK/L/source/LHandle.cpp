@@ -49,6 +49,8 @@ void LHandle::paintEvent( QPaintEvent *pEvent )
 {
     Q_UNUSED( pEvent );
 
+    if ( bTransparent ) return;
+
     QPainter painter( this );
     painter.setRenderHint( QPainter::Antialiasing );
     painter.setRenderHint( QPainter::SmoothPixmapTransform );
@@ -445,6 +447,12 @@ void LHandle::setCenter( const QPointF &pointCenter )
 {
     QPointF pointTopLeft( pointCenter.x() - rect().width() / 2, pointCenter.y() - rect().height() / 2 );
     move( pointTopLeft.toPoint() );
+}
+
+void LHandle::setTransparent( bool b )
+{
+    bTransparent = b;
+    update();
 }
 
 void LHandle::doMoveBy( qreal nDeltaX, qreal nDeltaY )

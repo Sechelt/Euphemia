@@ -208,7 +208,7 @@ bool DRRectangleBase::doLoad( QDomElement *pdomElemThis )
 void DRRectangleBase::doCreateHandlesStandard()
 {
     Q_ASSERT( nSelectionState == SelectionStateStandard );
-    Q_ASSERT( vectorHandles.count() == 0 );
+    Q_ASSERT( vectorHandles.count() >= 3 );
     LGraphicsView *pView = getView();
     Q_ASSERT( pView );
 

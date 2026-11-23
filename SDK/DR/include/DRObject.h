@@ -46,6 +46,7 @@ public:
 
     virtual void setSelected( bool b = true ) override;
     virtual void setSelected( SelectionStates );
+    virtual void setTransparentHandles( bool b = true );
     virtual void setPen( const QPen &pen );
     virtual void setBrush( const QBrush &brush );
     virtual void setFont( const CBD::CBDText &font );

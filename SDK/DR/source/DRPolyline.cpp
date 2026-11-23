@@ -320,6 +320,9 @@ void DRPolyline::doCreateHandlesStandard()
 
 void DRPolyline::doSyncHandlesStandard()
 {
+    // sanity checks
+    // Q_ASSERT( vectorHandles.count() * 2 - 1 = polygon.count() );
+
     QPolygon polygonView = getView()->mapFromScene( polygon );
     int nHandle = 0;
 

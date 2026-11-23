@@ -231,8 +231,9 @@ void DRPie::doDraw( QPainter *pPainter )
 
 void DRPie::doCreateHandlesStandard()
 {
+    // sanity checks
     Q_ASSERT( nSelectionState == SelectionStateStandard );
-    Q_ASSERT( vectorHandles.count() == 0 );
+    Q_ASSERT( vectorHandles.count() >= 5 );
 
     DRRectangleBase::doCreateHandlesStandard();
 
@@ -254,8 +255,9 @@ void DRPie::doCreateHandlesStandard()
 
 void DRPie::doSyncHandlesStandard()
 {
+    // sanity checks
     Q_ASSERT( nSelectionState == SelectionStateStandard );
-    Q_ASSERT( vectorHandles.count() > 0 );
+    Q_ASSERT( vectorHandles.count() >= 5 );
 
     DRRectangleBase::doSyncHandlesStandard();
 

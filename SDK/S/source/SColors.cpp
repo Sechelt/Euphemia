@@ -263,8 +263,10 @@ bool SColors::doLoad( const QString &s )
 
     // read file into XML document...
     QDomDocument domDoc( metaObject()->className() );
-    if ( !domDoc.setContent( &file ) )
+    QDomDocument::ParseResult parseResult = domDoc.setContent( &file );
+    if ( !parseResult ) // has a bool operator - nice!
     {
+        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "][ERROR] Message: " << parseResult.errorMessage << "Line: " << parseResult.errorLine << "Column: " << parseResult.errorColumn;
         QMessageBox::information( qApp->activeWindow(), tr("Open Color Palette"), tr("Invalid file format.\nCould not create an XML document from file.\n\n") + file.fileName() );
         file.close();
         return false;

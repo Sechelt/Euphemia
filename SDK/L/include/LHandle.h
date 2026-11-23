@@ -110,6 +110,7 @@ public:
     void setConnected( bool b = true )      { bConnected = b;       }
     void setConnectType( ConnectTypes n );
     void setPixmap( const QPixmap &pixmap );
+    void setTransparent( bool b = true );
 
     Type                getType()           { return nType;         }
     QPointF             getCenter()         { return geometry().center();   }
@@ -125,6 +126,7 @@ public:
 
 protected:
     QGraphicsView *     pView;                      /*!< view - we are child of its viewport                                    */
+    bool                bTransparent = false;       /*!< changing visibility can mess up mouse events so we have this instead   */
     Type                nType = TypeMovePoint;
     QPointF             pointDelta;                 /*!< delta from a reference point (not used if isNull())                    */
     bool                bConnected;                 /*!< affects appearance                                                     */

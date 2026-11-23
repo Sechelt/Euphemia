@@ -26,15 +26,27 @@ void ADObjectSelectionManager::setSelected( ADObject *p, bool bSelect )
 
     if ( bSelect )
     {
-        if ( !p->isSelectable() ) return;
-        if ( listSelected.contains( p ) ) return;
+        if ( !p->isSelectable() ) 
+        {
+            qInfo() << p->metaObject()->className() << "is not selectable.";
+            return;
+        }
+        if ( listSelected.contains( p ) ) 
+        {
+            qInfo() << p->metaObject()->className() << "is already selected.";
+            return;
+        }
         p->setSelected();
         listSelected.append( p );
         connect( p, SIGNAL(destroyed(QObject*)), this, SLOT(slotRemove(QObject*)) );
     }
     else
     {
-        if ( !listSelected.contains( p ) ) return;
+        if ( !listSelected.contains( p ) ) 
+        {
+            qInfo() << p->metaObject()->className() << "is not selected.";
+            return;
+        }
         p->setSelected( false );
         listSelected.removeAll( (ADObject*)p );
         disconnect( p, SIGNAL(destroyed(QObject*)), this, SLOT(slotRemove(QObject*)) );

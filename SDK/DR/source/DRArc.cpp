@@ -208,8 +208,9 @@ void DRArc::doDraw( QPainter *pPainter )
 
 void DRArc::doCreateHandlesStandard()
 {
+    // sanity checks
     Q_ASSERT( nSelectionState == SelectionStateStandard );
-    Q_ASSERT( vectorHandles.count() == 0 );
+    Q_ASSERT( vectorHandles.count() >= 5 );
 
     DRRectangleBase::doCreateHandlesStandard();
 
@@ -231,8 +232,9 @@ void DRArc::doCreateHandlesStandard()
 
 void DRArc::doSyncHandlesStandard()
 {
+    // sanity checks
     Q_ASSERT( nSelectionState == SelectionStateStandard );
-    Q_ASSERT( vectorHandles.count() > 0 );
+    Q_ASSERT( vectorHandles.count() >= 5 );
 
     DRRectangleBase::doSyncHandlesStandard();
 

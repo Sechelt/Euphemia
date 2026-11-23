@@ -619,11 +619,11 @@ bool AWContainer::doRead( const QString &stringFileName )
 
     // read file into XML document...
     QDomDocument domDoc( metaObject()->className() );
-    QDomDocument::ParseResult result = domDoc.setContent( &file );
-    if ( !result )
+    QDomDocument::ParseResult parseResult = domDoc.setContent( &file );
+    if ( !parseResult ) // has a bool operator - nice!
     {
-        doMessageBox( "ERROR", LIB_NAME, tr("Invalid file format.\nCould not create an XML document from file.\n\n") + file.fileName() );
-        doMessage( "ERROR", QString( "%1 Line: %2 Column: %3" ).arg( result.errorMessage ).arg( result.errorLine ).arg( result.errorColumn ) );
+        doMessage( "ERROR", QString( "%1 Line: %2 Column: %3" ).arg( parseResult.errorMessage ).arg( parseResult.errorLine ).arg( parseResult.errorColumn ) );
+        doMessageBox( "ERROR", APP_NAME, tr("Invalid file format.\nCould not create an XML document from file.\n\n") + file.fileName() );
         file.close();
         return false;
     }

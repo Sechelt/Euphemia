@@ -307,8 +307,9 @@ void DRLine::doDisconnectSettings()
 
 void DRLine::doCreateHandlesStandard()
 {
+    // sanity checks
     Q_ASSERT( nSelectionState == SelectionStateStandard );
-    Q_ASSERT( vectorHandles.count() == 0 );
+    Q_ASSERT( vectorHandles.count() >= 3 );
     LGraphicsView *pView = getView();
     Q_ASSERT( pView );
 
@@ -333,6 +334,9 @@ void DRLine::doCreateHandlesStandard()
 
 void DRLine::doSyncHandlesStandard()
 {
+    // sanity checks
+    Q_ASSERT( vectorHandles.count() >= 3 );
+
     LGraphicsView *pView = getView();
     QPointF pointViewMove   = pView->mapFromScene( boundingRect().center() );
     QPointF pointViewBegin  = pView->mapFromScene( pointBegin );

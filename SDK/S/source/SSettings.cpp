@@ -127,8 +127,10 @@ void SSettings::doLoad()
 
     // read file into XML document...
     QDomDocument domDoc( SSETTINGS_DOC_CLASS );
-    if ( !domDoc.setContent( &file ) )
+    QDomDocument::ParseResult parseResult = domDoc.setContent( &file );
+    if ( !parseResult ) // has a bool operator - nice!
     {
+        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "][ERROR] Message: " << parseResult.errorMessage << "Line: " << parseResult.errorLine << "Column: " << parseResult.errorColumn;
         QMessageBox::information( qApp->activeWindow(), tr("Open Default Context"), tr("Invalid file format.\nCould not create an XML document from file.\n\n") + file.fileName() );
         file.close();
         return;

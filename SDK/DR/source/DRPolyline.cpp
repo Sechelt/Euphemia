@@ -19,7 +19,9 @@
 DRPolyline::DRPolyline( DRDraw *pCanvas, const QPointF &pointPos )
     : DRObject( pCanvas, pointPos )
 {
-    nHandlesAlloc = -1;
+    // leave this value <=0 to avoid DRObject alloc vectorHandles
+    // as we add handles with append and do not have fixed index except 0=move
+    nHandlesAlloc = -1;                 
 
     if ( pointPos.isNull() )
     {
@@ -48,6 +50,34 @@ QPainterPath DRPolyline::shape() const
     stroker.setWidth( pen.width() + 10 );
     // return the, now slightly fatter, line
     return stroker.createStroke( path );
+}
+
+void DRPolyline::setTransparentHandles( bool b, LHandle *pHandleGrabbed )
+{
+    // sanity checks
+    Q_ASSERT( vectorHandles.count() );
+
+    // do default
+    DRObject::setTransparentHandles( b );
+    if ( !b ) DRObject::setTransparentHandles( b );
+    // no special processing without a handle
+    if ( !pHandleGrabbed ) return;
+    // too few points to allow deleting a point - make all transparent  
+    if ( b && polygon.count() <= 2 ) return;
+
+    // keep the adjacent point handles visible as they are where pHandleGrabbed can be dropped to remove its point 
+    // remember;    vectorHandles[0] is move handle - we always hide that
+    //              a factory handle is between each point handle
+    int nIndexGrabbed   = vectorHandles.indexOf( pHandleGrabbed );
+    int nIndexLeft  = 0;
+    int nIndexRight = 0;
+
+    // look left
+    if ( nIndexGrabbed >= 3 ) nIndexLeft = nIndexGrabbed - 1;
+    if ( nIndexGrabbed <= vectorHandles.count() - 2 ) nIndexRight = nIndexGrabbed + 1;
+
+    if ( vectorHandles[nIndexLeft] ) vectorHandles[nIndexLeft]->setTransparent( false );
+    if ( vectorHandles[nIndexRight] ) vectorHandles[nIndexRight]->setTransparent( false );
 }
 
 QPixmap DRPolyline::getIcon()
@@ -142,7 +172,7 @@ void DRPolyline::doMove( LHandle *pHandle, const QPointF &pointPos )
     int nFirstMovePointHandle = polygon.count(); // would be count() - 1 except we also have the DragHandle at index 0
 
     // move handle?
-    if ( pHandle->getType() == LHandle::TypeDrag )
+    if ( pHandle->getType() == LHandle::FunctionMove )
     {
         QPointF pointDelta = pointPos - getView()->mapToScene( pHandle->getCenter().toPoint() );
         // move points
@@ -204,7 +234,11 @@ void DRPolyline::doDoubleClick( const QPointF &point /* could be null */ )
 
     getGraphics()->setAcceptHoverEvents( false );
     bInit = false;
-    if ( nSelectionState != SelectionStateNone && nSelectionState != SelectionStateMinimal ) doCreateHandles();
+
+    // we will add handles to vector using append (not index) so no need to have DRObject alloc
+    // nHandlesAlloc = polygon.count();        // for each point
+    // nHandlesAlloc += polygon.count() - 1;   // for each intermediate point
+    // nHandlesAlloc += 1;                     // for move handle
 }
 
 QDomElement DRPolyline::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent )
@@ -280,10 +314,10 @@ void DRPolyline::doDraw( QPainter *pPainter )
  */
 void DRPolyline::doCreateHandlesStandard()
 {
+    if ( bInit ) return; // defer until after we are initialized see; doDoubleClick()
+
     Q_ASSERT( vectorHandles.count() == 0 );     // must start with no handles
     Q_ASSERT( polygon.count() );                // need at least 1 point for this call to make sense
-
-    if ( bInit ) return; // defer until after we are initialized see; doDoubleClick()
 
     // their parent will be the viewport so...
     QPolygonF polygonView = getView()->mapFromScene( polygon );
@@ -314,14 +348,12 @@ void DRPolyline::doCreateHandlesStandard()
         vectorHandles.append( pHandle );
         pHandle->show();
     }
-
-    nHandlesAlloc = vectorHandles.count(); // 'cart before the horse' here but set it anyway
 }
 
 void DRPolyline::doSyncHandlesStandard()
 {
     // sanity checks
-    // Q_ASSERT( vectorHandles.count() * 2 - 1 = polygon.count() );
+    Q_ASSERT( vectorHandles.count() > 0 );
 
     QPolygon polygonView = getView()->mapFromScene( polygon );
     int nHandle = 0;

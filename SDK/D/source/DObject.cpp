@@ -538,7 +538,10 @@ void DObject::setVisible( bool b )
  */
 void DObject::setSelected( bool b )
 {
-   if ( b == isSelected() ) return;
+   if ( b == isSelected() ) 
+   {
+       return;
+   }
 
    if ( b )
    {

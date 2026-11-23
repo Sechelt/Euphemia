@@ -46,7 +46,7 @@ public:
 
     virtual void setSelected( bool b = true ) override;
     virtual void setSelected( SelectionStates );
-    virtual void setTransparentHandles( bool b = true );
+    virtual void setTransparentHandles( bool b = true, LHandle *pHandleGrabbed = nullptr );
     virtual void setPen( const QPen &pen );
     virtual void setBrush( const QBrush &brush );
     virtual void setFont( const CBD::CBDText &font );
@@ -64,6 +64,7 @@ public:
     virtual void doMoveBy( const QPointF & );
     virtual void doMove( LHandle *, const QPointF & );
     virtual void doDrop( LHandle *, const QPointF &point = QPointF() ) = 0;
+
     virtual void doSelectionStateCycle();
     virtual void doCut() {}
     virtual void doCopy();
@@ -123,7 +124,6 @@ protected:
     virtual void doDeleteHandles();
     virtual void doSyncHandles();                   /*!< usually called after view zoom/scale change    */
     virtual void doSyncHandleTypes();
-    virtual void doShowHandles( bool b = true );
 
     virtual void doConnectSettings();
     virtual void doDisconnectSettings();

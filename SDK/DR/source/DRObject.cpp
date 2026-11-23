@@ -112,7 +112,11 @@ void DRObject::setSelected( bool b )
 void DRObject::setSelected( SelectionStates n )
 {
 // qInfo() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Current: " << getSelectionStateString( nSelectionState ) << " Requested: " << getSelectionStateString( n );
-    if ( n == nSelectionState ) return;
+    if ( n == nSelectionState )
+    {
+        qInfo() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] SelectionState already is " << getSelectionStateString( nSelectionState );
+        return;
+    }
 
     // sanity check
     if ( !isSelector() )
@@ -136,8 +140,15 @@ void DRObject::setSelected( SelectionStates n )
     emit signalChanged();
 }
 
-void DRObject::setTransparentHandles( bool b )
+void DRObject::setTransparentHandles( bool b, LHandle *pHandleGrabbed )
 {
+    // some objects may only process some handles depending upon the grabbed handle
+    // default is all handles are processed
+    Q_UNUSED( pHandleGrabbed ); 
+
+    // sanity checks
+    Q_ASSERT( vectorHandles.count() );
+
     for ( LHandle *p : vectorHandles )
     {
         p->setTransparent( b );
@@ -231,9 +242,6 @@ void DRObject::doSelectionStateCycle()
     {
         case SelectionStateNone:
             setSelected( SelectionStateStandard );
-            break;
-//        case SelectionStateMove:
-//            setSelected( SelectionStateMove );
             break;
         case SelectionStateStandard:
             setSelected( SelectionStateScale );
@@ -404,7 +412,8 @@ void DRObject::doCreateHandles()
     switch ( nSelectionState )
     {
         case SelectionStateStandard:
-            vectorHandles.resize( nHandlesAlloc );
+            // alloc handles for objects that add handles via index and leave alone for those just append (polyline/polygon)
+            if ( nHandlesAlloc > 0 ) vectorHandles.resize( nHandlesAlloc );
             doCreateHandlesStandard();
             break;
         case SelectionStateScale:
@@ -476,23 +485,6 @@ printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
     else if ( vectorHandles[DRRectangleBaseEnd]->geometry().contains( rectView.bottomLeft() ) ) vectorHandles[DRRectangleBaseEnd]->setType( LHandle::TypeSizeBottomLeft );      
     else if ( vectorHandles[DRRectangleBaseEnd]->geometry().contains( rectView.bottomRight() ) ) vectorHandles[DRRectangleBaseEnd]->setType( LHandle::TypeSizeBottomRight );    
 */
-}
-
-/*!
- * \brief Change visibility.
- * 
- * NOTE: Changing visibility changes the flow of mouse events. If this is a concern try setTransparentHandles.
- * 
- * \author pharvey (2026-11-22)
- * 
- * \param b      
- */
-void DRObject::doShowHandles( bool b )
-{
-    for ( LHandle *p : vectorHandles )
-    {
-        p->setVisible( b );
-    }
 }
 
 void DRObject::doConnectSettings()

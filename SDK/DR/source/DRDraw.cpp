@@ -539,12 +539,13 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
     // what did we press on (if anything)?
     pointPress      = pEvent->scenePos();
     pointCurrent    = pointPress;
-    pObjectPress    = nullptr;
-    pHandlePress    = getHandle( pointPress );
-    if ( pHandlePress ) 
-        pObjectPress = (DRObject*)pHandlePress->getLayerObject();
-    else
-        pObjectPress = getObject( pointPress ); // no handle as object is not selected
+
+    pHandlePress = nullptr;
+    pObjectPress = getObject( pointPress );
+    if ( pObjectPress )
+    {
+        pHandlePress = pObjectPress->getGrab( pointPress );  // need to call getGrab (NOT getHandle) so object can preprocess ie DRPolyline
+    }
 
     // each tool type is handled a bit differently 
     switch ( nTool )
@@ -554,7 +555,7 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
                 if ( pHandlePress ) 
                 {
                     pHandleMoving = pHandlePress;
-                    pObjectPress->setTransparentHandles();
+                    pObjectPress->setTransparentHandles( true, pHandleMoving );
                     setToolState( ToolStateManipulate );
                     return;
                 }
@@ -616,6 +617,7 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
                 pSelectionManager->setSelected( pObjectDrawing );
                 pHandleMoving = pObjectDrawing->getGrab( pointPress, true ); // get the sizing handle
                 Q_ASSERT( pHandleMoving );
+                pObjectDrawing->setTransparentHandles();
                 setToolState( ToolStateDraw );
             }
             return;
@@ -727,6 +729,7 @@ void DRDraw::doMouseReleaseEventDraw( QGraphicsSceneMouseEvent *pEvent )
         case ToolDrawEllipse:
         case ToolDrawText:
             pObjectDrawing->doDrop( pHandleMoving, pointCurrent );
+            pObjectDrawing->setTransparentHandles( false );
             pHandleMoving = nullptr;
             if ( bAutoCommit )
                 doCommit( false );
@@ -748,12 +751,12 @@ void DRDraw::doMousePressEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
     pointPress      = pEvent->scenePos();
     pointCurrent    = pointPress;
 
-    pObjectPress    = nullptr;
-    pHandlePress    = getHandle( pointPress );
-    if ( pHandlePress ) 
-        pObjectPress = (DRObject*)pHandlePress->getLayerObject();
-    else
-        pObjectPress = getObject( pointPress ); // no handle as object is not selected
+    pHandlePress = nullptr;
+    pObjectPress = getObject( pointPress );
+    if ( pObjectPress )
+    {
+        pHandlePress = pObjectPress->getGrab( pointPress ); // need to call getGrab (NOT getHandle) so object can preprocess ie DRPolyline
+    }
 
     // do we need to commit/cancel current?
     if ( pObjectPress != pObjectDrawing || !pHandlePress )
@@ -769,7 +772,7 @@ void DRDraw::doMousePressEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
     }
 
     pHandleMoving = pHandlePress;
-    if ( pHandleMoving && pHandleMoving->getType() == LHandle::FunctionMove ) pHandleMoving->setCursor( QCursor() );
+    if ( pHandleMoving ) pObjectDrawing->setTransparentHandles( true, pHandleMoving );
 }
 
 void DRDraw::doMouseMoveEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
@@ -824,6 +827,7 @@ void DRDraw::doMouseReleaseEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent
             if ( !pHandleMoving ) return; // could be here after a double click
             if ( pHandleMoving->getType() == LHandle::FunctionMove ) pHandleMoving->setCursor( QCursor( Qt::OpenHandCursor ) );
             pObjectDrawing->doDrop( pHandleMoving, pointCurrent ); // move a handle
+            pObjectDrawing->setTransparentHandles( false );
             pHandleMoving = nullptr;
             break;
     }

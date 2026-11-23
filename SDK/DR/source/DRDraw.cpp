@@ -1341,16 +1341,11 @@ void DRDraw::doCommit( bool bSelectNone )
 
     pHandleMoving = nullptr;
 
-    if ( bSelectNone ) 
-    {
-        pSelectionManager->doSelectNone();
-        pObjectDrawing = nullptr;
-        setToolState( ToolStateIdle );
-        setModified();
-        emit signalChanged();
-    }
-    else
-        setToolState( ToolStateDrawManipulate ); // manipulate without changing the tool
+    if ( bSelectNone ) pSelectionManager->doSelectNone();
+    pObjectDrawing = nullptr;
+    setToolState( ToolStateIdle );
+    setModified();
+    emit signalChanged();
 }
 
 /*!

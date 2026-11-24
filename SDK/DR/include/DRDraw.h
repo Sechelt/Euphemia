@@ -104,8 +104,8 @@ public:
     QWidget *           getPanel( QWidget * ) override;
     QWidget *           getToolBox( QWidget * ) override;
     ADObject *          getObject( const QString &s, ADObject * ) override;
-    QString             getToolString();
-    QString             getToolStateString();
+    QString             getToolString( Tools n );
+    QString             getToolStateString( ToolStates n );
     QVector<DRObject*>  getSelected();
     QRectF              getSelectedBoundingRect();
 

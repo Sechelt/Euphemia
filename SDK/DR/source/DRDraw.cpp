@@ -320,9 +320,9 @@ ADObject* DRDraw::getObject( const QString &s, ADObject * )
     return pObject;
 }
 
-QString DRDraw::getToolString()
+QString DRDraw::getToolString( Tools n )
 {
-    switch ( nTool ) 
+    switch ( n ) 
     {
         case ToolSelectRectangle:
             return "ToolSelectRectangle";
@@ -354,9 +354,9 @@ QString DRDraw::getToolString()
     return "unknown";
 }
 
-QString DRDraw::getToolStateString()
+QString DRDraw::getToolStateString( ToolStates n )
 {
-    switch ( nToolState ) 
+    switch ( n ) 
     {
         case ToolStateIdle:
             return "ToolStateIdle";
@@ -501,6 +501,7 @@ void DRDraw::doMouseMoveEvent( QGraphicsSceneMouseEvent *pEvent )
  */
 void DRDraw::doMouseReleaseEvent( QGraphicsSceneMouseEvent *pEvent )
 {
+    // sanity checks
     Q_ASSERT( pGraphics );
 
     /****************************************** 
@@ -530,8 +531,10 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
 {
     // printf( "[PAH][%s][%s][%d] %d %s\n", __FILE__, __FUNCTION__, __LINE__, nTool, getToolString().toLatin1().constData() );
 
-    // we may have a selection but the following makes us idle (no need to commit/cancel)
+    // sanity checks
     Q_ASSERT( !pObjectDrawing );
+    Q_ASSERT( !pObjectPress );
+    Q_ASSERT( !pHandlePress );
     Q_ASSERT( !pHandleMoving );
 
     if ( pEvent->buttons() != Qt::LeftButton ) return;
@@ -540,38 +543,55 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
     pointPress      = pEvent->scenePos();
     pointCurrent    = pointPress;
 
-    pHandlePress = nullptr;
-    pObjectPress = getObject( pointPress );
-    if ( pObjectPress )
+    // calling getHandle is more precise than getObject followed by object::getHandle 
+    // because getObject will fail if click on part of handle outside of object 
+    // unfortunately we still need to call object::getGrab
+    pHandlePress = getHandle( pointPress );
+    if ( pHandlePress )
     {
-        pHandlePress = pObjectPress->getGrab( pointPress );  // need to call getGrab (NOT getHandle) so object can preprocess ie DRPolyline
+        pObjectPress = (DRObject*)(pHandlePress->getLayerObject());
+        pHandlePress = pObjectPress->getGrab( pointPress );  // need to call getGrab so object can preprocess ie DRPolyline
+    }
+    else
+        pObjectPress = getObject( pointPress );
+
+    // grabbing a handle means manipulate regardless of the tool
+    if ( pHandlePress ) 
+    {
+        pHandleMoving = pHandlePress;
+        pObjectPress->setTransparentHandles( true, pHandleMoving );
+        setToolState( ToolStateManipulate );
+        return;
     }
 
     // each tool type is handled a bit differently 
     switch ( nTool )
     {
         case ToolManipulate:
+            if ( pObjectPress )
             {
-                if ( pHandlePress ) 
+                if ( pObjectPress->isSelected() )
                 {
-                    pHandleMoving = pHandlePress;
-                    pObjectPress->setTransparentHandles( true, pHandleMoving );
-                    setToolState( ToolStateManipulate );
-                    return;
-                }
-                if ( pObjectPress )
-                {
-                    if ( pObjectPress->isSelected() )
-                        pObjectPress->doSelectionStateCycle();
-                    else
-                    {
-                        pSelectionManager->doSelectNone();
-                        pSelectionManager->setSelected( pObjectPress );
-                    }
+                    pObjectPress->doSelectionStateCycle();
+                    setToolState( ToolStateIdle ); // reset
                     return;
                 }
                 pSelectionManager->doSelectNone();
+                pSelectionManager->setSelected( pObjectPress );
+                setToolState( ToolStateIdle ); // reset
                 return;
+            }
+            // we fall through here on purpose
+            [[fallthrough]];
+        case ToolSelectRectangle:
+            {
+                pSelectionManager->doSelectNone();
+                pObjectDrawing = getObject( ToolSelectRectangle, pointPress );
+                pSelectionManager->setSelected( pObjectDrawing );
+                pObjectDrawing->setSelected( DRObject::SelectionStateStandard ); // needed as selectors are !isSelectable()
+                pHandleMoving = pObjectDrawing->getGrab( pointPress, true ); // get the sizing handle
+                Q_ASSERT( pHandleMoving );
+                setToolState( ToolStateDraw );
             }
             return;
         case ToolSelectPolygon:
@@ -587,17 +607,6 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
             {
                 pObjectDrawing = getObject( nTool, pointPress );       // first point
                 // select when doubleclick because that is when we know what handles to create
-                setToolState( ToolStateDraw );
-            }
-            return;
-        case ToolSelectRectangle:
-            {
-                pSelectionManager->doSelectNone();
-                pObjectDrawing = getObject( nTool, pointPress );
-                pSelectionManager->setSelected( pObjectDrawing );
-                pObjectDrawing->setSelected( DRObject::SelectionStateStandard ); // needed as selectors are !isSelectable()
-                pHandleMoving = pObjectDrawing->getGrab( pointPress, true ); // get the sizing handle
-                Q_ASSERT( pHandleMoving );
                 setToolState( ToolStateDraw );
             }
             return;
@@ -699,17 +708,16 @@ void DRDraw::doMouseReleaseEventDraw( QGraphicsSceneMouseEvent *pEvent )
     Q_UNUSED( pEvent );
     switch ( nTool )
     {
+        case ToolManipulate:
         case ToolSelectRectangle:
             {
                 Q_ASSERT( pObjectDrawing );
                 Q_ASSERT( pHandleMoving );
                 DRSelectRectangle *p = (DRSelectRectangle*)pObjectDrawing;
                 p->doDrop( pHandleMoving, pointCurrent );
-                pHandleMoving = nullptr;
                 doSelectAll( p->getRect() );    
                 slotDelete( pObjectDrawing );
-                pObjectDrawing = nullptr;
-                setTool( ToolManipulate, false );
+                setToolState( ToolStateIdle ); // same tool but back to idle
                 emit signalChanged();
             }
             break;
@@ -717,8 +725,6 @@ void DRDraw::doMouseReleaseEventDraw( QGraphicsSceneMouseEvent *pEvent )
         case ToolDrawPolygon:
         case ToolDrawPolyline:
             // these end with a double click
-            break;
-        case ToolManipulate:
             break;
         case ToolDrawArc:
         case ToolDrawChord:
@@ -743,7 +749,10 @@ void DRDraw::doMousePressEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
 {
     if ( pEvent->buttons() != Qt::LeftButton ) return;
 
+    // sanity checks
     Q_ASSERT( pObjectDrawing );
+    Q_ASSERT( !pObjectPress );
+    Q_ASSERT( !pHandlePress );
     Q_ASSERT( !pHandleMoving );
     Q_ASSERT( isToolDraw() );
 
@@ -751,12 +760,17 @@ void DRDraw::doMousePressEventDrawManipulate( QGraphicsSceneMouseEvent *pEvent )
     pointPress      = pEvent->scenePos();
     pointCurrent    = pointPress;
 
-    pHandlePress = nullptr;
-    pObjectPress = getObject( pointPress );
-    if ( pObjectPress )
+    // calling getHandle is more precise than getObject followed by object::getHandle 
+    // because getObject will fail if click on part of handle outside of object 
+    // unfortunately we still need to call object::getGrab
+    pHandlePress = getHandle( pointPress );
+    if ( pHandlePress )
     {
-        pHandlePress = pObjectPress->getGrab( pointPress ); // need to call getGrab (NOT getHandle) so object can preprocess ie DRPolyline
+        pObjectPress = (DRObject*)(pHandlePress->getLayerObject());
+        pHandlePress = pObjectPress->getGrab( pointPress );  // need to call getGrab so object can preprocess ie DRPolyline
     }
+    else
+        pObjectPress = getObject( pointPress );
 
     // do we need to commit/cancel current?
     if ( pObjectPress != pObjectDrawing || !pHandlePress )
@@ -847,49 +861,49 @@ void DRDraw::doMouseMoveEventManipulate( QGraphicsSceneMouseEvent *pEvent )
 {
     if ( pEvent->buttons() != Qt::LeftButton ) return;
 
-    Q_ASSERT( nTool == ToolManipulate );
+    // sanity checks
     Q_ASSERT( pHandleMoving );
 
-    DRObject *p = (DRObject*)pHandleMoving->getLayerObject();
+    DRObject *p = (DRObject*)(pHandleMoving->getLayerObject());
     p->doMove( pHandleMoving, pointCurrent );
 }
 
 void DRDraw::doMouseReleaseEventManipulate( QGraphicsSceneMouseEvent *pEvent )
 {
     Q_UNUSED( pEvent );
-    Q_ASSERT( nTool == ToolManipulate );
+    // sanity checks
     Q_ASSERT( pHandleMoving );
 
-    DRObject *p = (DRObject*)pHandleMoving->getLayerObject();
+    DRObject *p = (DRObject*)(pHandleMoving->getLayerObject());
     p->doDrop( pHandleMoving, pointCurrent );
-    pObjectPress->setTransparentHandles( false );
+    p->setTransparentHandles( false );
     setModified();
-    pHandleMoving = nullptr;
     setToolState( ToolStateIdle );
 }
 
 void DRDraw::doDragEnterEvent( QGraphicsSceneDragDropEvent * )
 {
+    // sanity checks
     Q_ASSERT( pGraphics );
     Q_ASSERT( hasSelection() );
 }
 
 void DRDraw::doDragMoveEvent( QGraphicsSceneDragDropEvent * )
 {
+    // sanity checks
     Q_ASSERT( pGraphics );
-
 }
 
 void DRDraw::doDropEvent( QGraphicsSceneDragDropEvent * )
 {
+    // sanity checks
     Q_ASSERT( pGraphics );
-
 }
 
 void DRDraw::doContextMenuEvent( QGraphicsSceneContextMenuEvent * )
 {
+    // sanity checks
     Q_ASSERT( pGraphics );
-
 }
 
 /*!
@@ -1565,8 +1579,32 @@ void DRDraw::slotCommitted()
 
 void DRDraw::setToolState( ToolStates n )
 {
-    if ( n == nToolState ) return;
-    nToolState = n;
+// qInfo() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Current: " << getToolStateString( nToolState ) << "Requested: " << getToolStateString( n );
+    // we can be called when in same state (only ToolStateIdle) just to get vars reset
+    if ( n == nToolState &&  n != ToolStateIdle ) return;
+
+    switch ( n )
+    {
+        case ToolStateIdle:
+            nToolState = n;
+            pointPress = pointCurrent = QPointF();   
+            pHandlePress = pHandleMoving = nullptr;
+            pObjectPress = pObjectDrawing = nullptr;
+            break;
+        case ToolStateDraw:
+            Q_ASSERT( nToolState == ToolStateIdle );
+            nToolState = n;
+            break;
+        case ToolStateDrawManipulate:
+            Q_ASSERT( nToolState == ToolStateDraw );
+            nToolState = n;
+            break;
+        case ToolStateManipulate:
+            Q_ASSERT( nToolState == ToolStateIdle );
+            nToolState = n;
+            break;
+    }
+
     emit signalChangedToolState();
 }
 

@@ -64,6 +64,8 @@ void DRPolyline::setTransparentHandles( bool b, LHandle *pHandleGrabbed )
     if ( !pHandleGrabbed ) return;
     // too few points to allow deleting a point - make all transparent  
     if ( b && polygon.count() <= 2 ) return;
+    // default is fine when move object
+    if ( pHandleGrabbed->getType() == LHandle::FunctionMove ) return;
 
     // keep the adjacent point handles visible as they are where pHandleGrabbed can be dropped to remove its point 
     // remember;    vectorHandles[0] is move handle - we always hide that

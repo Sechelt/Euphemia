@@ -106,11 +106,12 @@ public:
     QImage *            getImageRef() override      { return &image;                }
     QImage              getCopyImage() override;
     QDomDocument        getCopyXML() override       { return QDomDocument();        }
-    int                 getTool() override          { return nTool;                 }
+    int                 getTool( bool ) override    { return nTool;                 }
     QWidget *           getLayerPanel( QWidget * ) override     { return nullptr; }
     QWidget *           getToolBar( QWidget * ) override;
     QWidget *           getPanel( QWidget * ) override;
     QWidget *           getToolBox( QWidget * ) override;
+    QWidget *           getToolBoxStack( QWidget * ) override;
 
     void doMousePressEvent( QGraphicsSceneMouseEvent *pEvent ) override;
     void doMouseMoveEvent( QGraphicsSceneMouseEvent *pEvent ) override;

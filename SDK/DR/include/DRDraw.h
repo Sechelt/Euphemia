@@ -98,11 +98,12 @@ public:
     QImage *            getImageRef() override      { return &image;                }
     QImage              getCopyImage() override;
     QDomDocument        getCopyXML() override;
-    int                 getTool() override          { return nTool;                 }
+    int                 getTool( bool ) override;
     QWidget *           getLayerPanel( QWidget * ) override     { return nullptr; }
     QWidget *           getToolBar( QWidget * ) override;
     QWidget *           getPanel( QWidget * ) override;
     QWidget *           getToolBox( QWidget * ) override;
+    QWidget *           getToolBoxStack( QWidget * ) override;
     ADObject *          getObject( const QString &s, ADObject * ) override;
     QString             getToolString( Tools n );
     QString             getToolStateString( ToolStates n );
@@ -229,6 +230,10 @@ protected:
     DRObject *  getObject( const QImage & );
     QList<DRObject*>getObjects( const QRectF & );
     LHandle *   getHandle( const QPointF & );
+    QWidget *   getToolBar( QWidget *, Tools );
+    QWidget *   getPanel( QWidget *, Tools );
+    QWidget *   getToolBox( QWidget *, Tools );
+    Tools       getPreferredSelectedObjectTool();
 
     void doSelectAll( const QRectF & );
     void doSelectAll( const QPolygonF & );

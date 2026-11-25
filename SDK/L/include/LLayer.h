@@ -123,12 +123,13 @@ public:
     virtual QImage *            getImageRef() { return nullptr; }
     virtual QImage              getCopyImage() = 0; // for scratch
     virtual QDomDocument        getCopyXML() = 0;   // for scratch
-    virtual int                 getTool() = 0;
+    virtual int                 getTool( bool b = false ) = 0;                      /*!< returns current tool IF b THEN first looks for tool associated with any selected object    */
     virtual QColor              getBackground() { return colorBackground; }
     virtual QWidget *           getLayerPanel( QWidget *pParent ) = 0;              /*!< return layers panel widget (could be nullptr)              */
     virtual QWidget *           getToolBar( QWidget *pParent ) = 0;                 /*!< IF tool THEN return its tool bar widget (could be nullptr) */
     virtual QWidget *           getPanel( QWidget *pParent ) = 0;                   /*!< IF tool THEN return its panel widget (could be nullptr)    */
-    virtual QWidget *           getToolBox( QWidget *pParent ) = 0;                 /*!< FOR all tools return its panel widgets (must not be null ) */
+    virtual QWidget *           getToolBox( QWidget *pParent ) = 0;                 /*!< IF tool THEN return its tool box widget (could be nullptr) */
+    virtual QWidget *           getToolBoxStack( QWidget *pParent ) = 0;            /*!< FOR all tools return its panel widgets (must not be null ) */
 
     virtual void doCut() = 0;
     virtual void doCopy() = 0;

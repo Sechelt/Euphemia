@@ -148,6 +148,13 @@ QImage DRDraw::getCopyImage()
     return pObjectDrawing->getImage();
 }
 
+int DRDraw::getTool( bool b )
+{
+    if ( !b ) return nTool;
+    if ( !hasSelection() ) return nTool;
+    return getPreferredSelectedObjectTool();
+}
+
 QWidget* DRDraw::getToolBar( QWidget *pParent )
 {
     switch ( nTool )
@@ -155,25 +162,23 @@ QWidget* DRDraw::getToolBar( QWidget *pParent )
         case ToolSelectRectangle:
         case ToolSelectPolygon:
         case ToolManipulate:
+            {
+                Tools n = (Tools)getTool( true );
+                if ( n == nTool ) return nullptr;
+                return getToolBar( pParent, n );
+            }
+            break;
         case ToolDrawArc:
         case ToolDrawChord:
-            break;
         case ToolDrawImage:
-            return g_SSettings->getSetting( "DRSImage" )->getToolBar( pParent );
         case ToolDrawPie:
-            break;
         case ToolDrawLine:
-            return g_SSettings->getSetting( "DRSLine" )->getToolBar( pParent );
         case ToolDrawRectangle:
-            return g_SSettings->getSetting( "DRSRectangleBase" )->getToolBar( pParent );
         case ToolDrawEllipse:
-            return g_SSettings->getSetting( "LSEllipse" )->getToolBar( pParent );
         case ToolDrawPolygon:
-            break;
         case ToolDrawPolyline:
-            break;
         case ToolDrawText:
-            return g_SSettings->getSetting( "DRSText" )->getToolBar( pParent );
+            return getToolBar( pParent, nTool );
     }
     return nullptr;
 }
@@ -186,49 +191,55 @@ QWidget* DRDraw::getPanel( QWidget *pParent )
         case ToolSelectPolygon:
         case ToolManipulate:
             {
-                // scan selected until we find an object that has a panel...
-                QList<ADObject*> l = pSelectionManager->getSelected();
-                for ( ADObject *p : l )
-                {
-                    QString s = p->metaObject()->className();
-                    // we know these objects have panels...
-                    if ( s == "DRImage" )
-                        return g_SSettings->getSetting( "DRSImage" )->getPanel( pParent );
-                    else if ( s == "DRLine" )
-                        return g_SSettings->getSetting( "DRSLine" )->getPanel( pParent );
-                    else if ( s == "DRRectangle" )
-                        return g_SSettings->getSetting( "DRSRectangleBase" )->getPanel( pParent );
-                    else if ( s == "DREllipse" )
-                        return g_SSettings->getSetting( "LSEllipse" )->getPanel( pParent );
-                    else if ( s == "DRText" )
-                        return g_SSettings->getSetting( "DRSText" )->getPanel( pParent );
-                }
+                Tools n = (Tools)getTool( true );
+                if ( n == nTool ) return nullptr;
+                return getPanel( pParent, n );
             }
             break;
         case ToolDrawArc:
         case ToolDrawChord:
-            break;
         case ToolDrawImage:
-            return g_SSettings->getSetting( "DRSImage" )->getPanel( pParent );
         case ToolDrawPie:
-            break;
         case ToolDrawLine:
-            return g_SSettings->getSetting( "DRSLine" )->getPanel( pParent );
         case ToolDrawRectangle:
-            return g_SSettings->getSetting( "DRSRectangleBase" )->getPanel( pParent );
         case ToolDrawEllipse:
-            return g_SSettings->getSetting( "LSEllipse" )->getPanel( pParent );
         case ToolDrawPolygon:
-            break;
         case ToolDrawPolyline:
-            break;
         case ToolDrawText:
-            return g_SSettings->getSetting( "DRSText" )->getPanel( pParent );
+            return getPanel( pParent, nTool );
     }
     return nullptr;
 }
 
 QWidget *DRDraw::getToolBox( QWidget *pParent )
+{
+    switch ( nTool )
+    {
+        case ToolSelectRectangle:
+        case ToolSelectPolygon:
+        case ToolManipulate:
+            {
+                Tools n = (Tools)getTool( true );
+                if ( n == nTool ) return nullptr;
+                return getToolBox( pParent, n );
+            }
+            break;
+        case ToolDrawArc:
+        case ToolDrawChord:
+        case ToolDrawImage:
+        case ToolDrawPie:
+        case ToolDrawLine:
+        case ToolDrawRectangle:
+        case ToolDrawEllipse:
+        case ToolDrawPolygon:
+        case ToolDrawPolyline:
+        case ToolDrawText:
+            return getToolBox( pParent, nTool );
+    }
+    return nullptr;
+}
+
+QWidget *DRDraw::getToolBoxStack( QWidget *pParent )
 {
     QStackedWidget *pWidget = new QStackedWidget( pParent );
 
@@ -1813,6 +1824,138 @@ LHandle* DRDraw::getHandle( const QPointF &point )
     }
 
     return nullptr;
+}
+
+QWidget *DRDraw::getToolBar( QWidget *p, Tools n )
+{
+    switch ( n )
+    {
+        case ToolSelectRectangle:
+        case ToolSelectPolygon:
+        case ToolManipulate:
+            qFatal() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Tool:" << getToolString( n ) << "does not provide a tool bar.";
+            break;
+        case ToolDrawArc:
+        case ToolDrawChord:
+            break;
+        case ToolDrawImage:
+            return g_SSettings->getSetting( "DRSImage" )->getToolBar( p );
+        case ToolDrawPie:
+            break;
+        case ToolDrawLine:
+            return g_SSettings->getSetting( "DRSLine" )->getToolBar( p );
+        case ToolDrawRectangle:
+            return g_SSettings->getSetting( "DRSRectangleBase" )->getToolBar( p );
+        case ToolDrawEllipse:
+            return g_SSettings->getSetting( "LSEllipse" )->getToolBar( p );
+        case ToolDrawPolygon:
+            break;
+        case ToolDrawPolyline:
+            break;
+        case ToolDrawText:
+            return g_SSettings->getSetting( "DRSText" )->getToolBar( p );
+    }
+    return nullptr;
+}
+
+QWidget *DRDraw::getPanel( QWidget *p, Tools n )
+{
+    switch ( n )
+    {
+        case ToolSelectRectangle:
+        case ToolSelectPolygon:
+        case ToolManipulate:
+            qFatal() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Tool:" << getToolString( n ) << "does not provide a panel.";
+            break;
+        case ToolDrawArc:
+        case ToolDrawChord:
+            break;
+        case ToolDrawImage:
+            return g_SSettings->getSetting( "DRSImage" )->getPanel( p );
+        case ToolDrawPie:
+            break;
+        case ToolDrawLine:
+            return g_SSettings->getSetting( "DRSLine" )->getPanel( p );
+        case ToolDrawRectangle:
+            return g_SSettings->getSetting( "DRSRectangleBase" )->getPanel( p );
+        case ToolDrawEllipse:
+            return g_SSettings->getSetting( "LSEllipse" )->getPanel( p );
+        case ToolDrawPolygon:
+            break;
+        case ToolDrawPolyline:
+            break;
+        case ToolDrawText:
+            return g_SSettings->getSetting( "DRSText" )->getPanel( p );
+    }
+    return nullptr;
+}
+
+QWidget *DRDraw::getToolBox( QWidget *p, Tools n )
+{
+    switch ( n )
+    {
+        case ToolSelectRectangle:
+        case ToolSelectPolygon:
+        case ToolManipulate:
+            qFatal() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Tool:" << getToolString( n ) << "does not provide a tool box.";
+            break;
+        case ToolDrawArc:
+        case ToolDrawChord:
+            break;
+        case ToolDrawImage:
+            return g_SSettings->getSetting( "DRSImage" )->getToolBox( p );
+        case ToolDrawPie:
+            break;
+        case ToolDrawLine:
+            return g_SSettings->getSetting( "DRSLine" )->getToolBox( p );
+        case ToolDrawRectangle:
+            return g_SSettings->getSetting( "DRSRectangleBase" )->getToolBox( p );
+        case ToolDrawEllipse:
+            return g_SSettings->getSetting( "LSEllipse" )->getToolBox( p );
+        case ToolDrawPolygon:
+            break;
+        case ToolDrawPolyline:
+            break;
+        case ToolDrawText:
+            return g_SSettings->getSetting( "DRSText" )->getToolBox( p );
+    }
+    return nullptr;
+}
+
+DRDraw::Tools DRDraw::getPreferredSelectedObjectTool()
+{
+    // scan selected until we find an object that has a setting
+    QList<ADObject*> l = pSelectionManager->getSelected();
+    for ( ADObject *p : l )
+    {
+        QString s = p->metaObject()->className();
+        // xref class to tool
+        if ( s == "DRArc" )
+            return ToolDrawArc;
+        else if ( s == "DRChord" )
+            return ToolDrawChord;
+        else if ( s == "DRImage" )
+            return ToolDrawImage;
+        else if ( s == "DRPie" )
+            return ToolDrawPie;
+        else if ( s == "DRLine" )
+            return ToolDrawLine;
+        else if ( s == "DRRectangle" )
+            return ToolDrawRectangle;
+        else if ( s == "DREllipse" )
+            return ToolDrawEllipse;
+        else if ( s == "DRPolygon" )
+            return ToolDrawPolygon;
+        else if ( s == "DRPolyline" )
+            return ToolDrawPolyline;
+        else if ( s == "DRText" )
+            return ToolDrawText;
+        else
+        {
+            qFatal() << "[PAH][" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Class:" << s << "unexpected.";
+        }
+    }
+    return nTool;
 }
 
 void DRDraw::doSelectAll( const QRectF &rect )

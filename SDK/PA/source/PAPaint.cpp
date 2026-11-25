@@ -189,6 +189,56 @@ QWidget *PAPaint::getPanel( QWidget *pParent )
 
 QWidget *PAPaint::getToolBox( QWidget *pParent )
 {
+    switch ( nTool )
+    {
+        case ToolSelectRectangle:    
+            break;
+        case ToolSelectEllipse:      
+            break;
+        case ToolSelectPolygon:      
+            break;
+        case ToolDrawArc:      
+            break;
+        case ToolDrawChord:      
+            break;
+        case ToolDrawPie:      
+            break;
+        case ToolDrawFreeHand:               
+            return g_SSettings->getSetting( "PASFreeHand" )->getToolBox( pParent );
+        case ToolDrawSpray:               
+            return g_SSettings->getSetting( "PASSpray" )->getToolBox( pParent );
+        case ToolDrawErase:               
+            break;
+        case ToolDrawLine:
+            return g_SSettings->getSetting( "LSLine" )->getToolBox( pParent );
+        case ToolDrawRectangle:      
+            return g_SSettings->getSetting( "LSRectangle" )->getToolBox( pParent );
+        case ToolDrawEllipse:        
+            return g_SSettings->getSetting( "LSEllipse" )->getToolBox( pParent );
+        case ToolDrawPolygon:        
+            break;
+        case ToolDrawPolyline:        
+            break;
+        case ToolDrawRectangleFilled:
+            return g_SSettings->getSetting( "LSRectangle" )->getToolBox( pParent );
+        case ToolDrawEllipseFilled:  
+            return g_SSettings->getSetting( "LSEllipse" )->getToolBox( pParent );
+        case ToolDrawPolygonFilled:  
+            return g_SSettings->getSetting( "PASPolygonFilled" )->getToolBox( pParent );
+        case ToolDrawText:
+            return g_SSettings->getSetting( "LSText" )->getToolBox( pParent );
+        case ToolFillFlood:
+            break;
+        case ToolFillGradient:       
+            return g_SSettings->getSetting( "PASGradient" )->getToolBox( pParent );
+        case ToolMagnifierSelection:
+            break;
+    }
+    return nullptr;
+}
+
+QWidget *PAPaint::getToolBoxStack( QWidget *pParent )
+{
     QStackedWidget *p = new QStackedWidget( pParent );
 
     // IMPORTANT: order must be same as in enum 0-n

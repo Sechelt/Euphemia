@@ -200,6 +200,7 @@ private:
     QAction *pActionHelpMenu;
 
     // setters
+    void setCurrentIndexToolBox( bool bPreferredSelectedObject = false );
 
     // getters
 
@@ -241,6 +242,9 @@ private:
 
     void doUpdateWindowTitle();
     void doUpdateTabText();
+
+    void doInitToolConfigWidget();
+    void doFiniToolConfigWidget();
 
     // get view from tab widget
     LGraphicsView *getView( int n );
@@ -321,6 +325,7 @@ private slots:
 
     // from pLayer
     void slotChangedLayer();                        // <<- pLayer->signalModified()
+    void slotChangedSelection();                    // <<- pLayer->signalSelectionChanged()
     void slotChangedTool();                         // so we can adjust tool config toolbar
     void slotChangedLayerToolState();               // so we can enable/disable commit/cancel etc
 

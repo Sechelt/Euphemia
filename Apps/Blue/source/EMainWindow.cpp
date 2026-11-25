@@ -121,6 +121,22 @@ void EMainWindow::closeEvent( QCloseEvent *pEvent )
     pEvent->accept();
 }
 
+void EMainWindow::setCurrentIndexToolBox( bool bPreferredSelectedObject )
+{
+    QString stringClass = pLayer->metaObject()->className();
+    QWidget *pLayerWidget = mapToolBoxs.value( stringClass );
+    Q_ASSERT( pLayerWidget );
+    pToolBoxWidget->setCurrentWidget( pLayerWidget );
+    if ( pLayerWidget->inherits( "QStackedWidget" ) )
+    {
+        ((QStackedWidget*)pLayerWidget)->setCurrentIndex( pLayer->getTool( bPreferredSelectedObject ) );
+    }
+    else if ( pLayerWidget->inherits( "QToolBox" ) )
+    {
+        ((QToolBox*)pLayerWidget)->setCurrentIndex( pLayer->getTool( bPreferredSelectedObject ) );
+    }
+}
+
 void EMainWindow::doInitActions()
 {
     // FILE
@@ -970,16 +986,16 @@ void EMainWindow::doDisconnectEditor()
 
 void EMainWindow::doConnectLayer()
 {
-//    Q_ASSERT( !pLayer );
+    Q_ASSERT( !pLayer );
     pLayer      = pLayers->getLayerCurrent();
     Q_ASSERT( pLayer );
 
-    // add toolbox if layer is new to us (these will linger until the app exits)
+    // add tool box stack if layer is new to us (these will linger until the app exits)
     {
         QString stringClass = pLayer->metaObject()->className();
         if ( !mapToolBoxs.contains( stringClass ) ) 
         {
-            QWidget *pWidget = pLayer->getToolBox( pToolBoxWidget );
+            QWidget *pWidget = pLayer->getToolBoxStack( pToolBoxWidget );
             mapToolBoxs.insert( stringClass, pWidget );
             pToolBoxWidget->addWidget( pWidget );
         }
@@ -1002,10 +1018,10 @@ void EMainWindow::doConnectLayer()
 
     connect( pLayer, SIGNAL(signalModified()), this, SLOT(slotChangedLayer()) );
     connect( pLayer, SIGNAL(signalChanged()), this, SLOT(slotChangedLayer()) );
+    connect( pLayer, SIGNAL(signalSelectionChanged()), this, SLOT(slotChangedSelection()) );
     connect( pLayer, SIGNAL(signalChangedToolState()), this, SLOT(slotChangedLayerToolState()) );
     connect( pLayer, SIGNAL(signalChangedTool()), this, SLOT(slotChangedTool()) );
 
-    connect( pLayer, SIGNAL(signalSelectionChanged()), this, SLOT(slotChangedLayer()) );
 }
 
 void EMainWindow::doDisconnectLayer()
@@ -1029,6 +1045,7 @@ void EMainWindow::doDisconnectLayer()
 
     disconnect( pLayer, SIGNAL(signalModified()), this, SLOT(slotChangedLayer()) );
     disconnect( pLayer, SIGNAL(signalChanged()), this, SLOT(slotChangedLayer()) );
+    disconnect( pLayer, SIGNAL(signalSelectionChanged()), this, SLOT(slotChangedSelection()) );
     disconnect( pLayer, SIGNAL(signalChangedToolState()), this, SLOT(slotChangedLayerToolState()) );
     disconnect( pLayer, SIGNAL(signalChangedTool()), this, SLOT(slotChangedTool()) );
     
@@ -1044,36 +1061,15 @@ void EMainWindow::doConnectTool()
     Q_ASSERT( pLayer );
     Q_ASSERT( !pToolConfigWidget );
 
-    pToolConfigWidget = pLayer->getToolBar( pToolBarHolder );         
-    // not all tools have a config widget
-    if ( pToolConfigWidget ) pToolBarHolder->addWidget( pToolConfigWidget );     
-
-    // show appropriate toolbox for the given tool
-    {
-        QString stringClass = pLayer->metaObject()->className();
-        QWidget *pLayerWidget = mapToolBoxs.value( stringClass );
-        Q_ASSERT( pLayerWidget );
-        pToolBoxWidget->setCurrentWidget( pLayerWidget );
-        if ( pLayerWidget->inherits( "QStackedWidget" ) )
-        {
-            ((QStackedWidget*)pLayerWidget)->setCurrentIndex( pLayer->getTool() );
-        }
-        else if ( pLayerWidget->inherits( "QToolBox" ) )
-        {
-            ((QToolBox*)pLayerWidget)->setCurrentIndex( pLayer->getTool() );
-        }
-    }
+    doInitToolConfigWidget();
+    setCurrentIndexToolBox();
 }
 
 void EMainWindow::doDisconnectTool()
 {
     Q_ASSERT( pLayer );
 
-    // not all tools have a config widget
-    if ( !pToolConfigWidget ) return;
-
-    delete pToolConfigWidget;                                                    
-    pToolConfigWidget = nullptr;                                                 
+    doFiniToolConfigWidget();
 }
 
 void EMainWindow::doUpdateWindowTitle()
@@ -1112,6 +1108,23 @@ void EMainWindow::doUpdateTabText()
     if ( pFile->isModified() ) stringTabText = stringTabText + " *";
     pCentralWidget->setTabText( nIndex, stringTabText );
     pCentralWidget->setTabToolTip( nIndex, getFilePath( stringFileName ) );
+}
+
+void EMainWindow::doInitToolConfigWidget()
+{
+    Q_ASSERT( !pToolConfigWidget );
+    // the layer will account for selected object vs current tool 
+    pToolConfigWidget = pLayer->getToolBar( pToolBarHolder );         
+    // not all tools have a config widget
+    if ( pToolConfigWidget ) pToolBarHolder->addWidget( pToolConfigWidget );     
+}
+
+void EMainWindow::doFiniToolConfigWidget()
+{
+    // not all tools have a config widget and that is ok - do not assert over it
+    if ( !pToolConfigWidget ) return;
+    delete pToolConfigWidget;                                                    
+    pToolConfigWidget = nullptr;                                                 
 }
 
 LGraphicsView *EMainWindow::getView( int n )
@@ -1858,6 +1871,18 @@ void EMainWindow::slotChangedLayer() // layer modified state
 
     // region
     pActionRegionCrop->setEnabled( pLayer->canCrop() ); 
+}
+
+void EMainWindow::slotChangedSelection()
+{
+    Q_ASSERT( pLayer );
+
+    doFiniToolConfigWidget();
+    doInitToolConfigWidget();
+
+    slotChangedLayer();
+
+    setCurrentIndexToolBox( true );
 }
 
 void EMainWindow::slotChangedCurrentLayer()

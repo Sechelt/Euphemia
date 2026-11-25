@@ -101,8 +101,7 @@ void EMainWindow::closeEvent( QCloseEvent *pEvent )
     // reset state of current layer
     if ( pLayer )
     {
-        if ( pLayer->canCancel() ) pLayer->doCancel();
-        else if ( pLayer->canCommit() ) pLayer->doCommit();
+        pLayer->doSelectNone();
     }
 
     // save/discard/cancel

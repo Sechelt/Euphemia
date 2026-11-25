@@ -54,7 +54,6 @@ HEADERS = \
         include/DRRectangleBase.h \
         include/DRSelectPolygon.h \
         include/DRSelectRectangle.h \
-        include/DRSImage.h \
         include/DRText.h \
         include/DRObject.h
 
@@ -74,7 +73,6 @@ SOURCES = \
         source/DRRectangleBase.cpp \
         source/DRSelectPolygon.cpp \
         source/DRSelectRectangle.cpp \
-        source/DRSImage.cpp \
         source/DRText.cpp \
         source/DRObject.cpp
 

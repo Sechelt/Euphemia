@@ -43,9 +43,9 @@
 #include <PASSpray.h>     
 
 // Settings created for DR tools (may combine the others)
-#include <DRSImage.h>     
 #include <DRObject.h>           // DRSObject
 #include <DRRectangleBase.h>    // DRSRectangleBase
+#include <DRImage.h>            // DRSImage
 #include <DRText.h>             // DRSText
 #include <DRLine.h>             // DRSLine    
 

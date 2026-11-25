@@ -146,7 +146,6 @@
             <F N="source/DRRectangleBase.cpp"/>
             <F N="source/DRSelectPolygon.cpp"/>
             <F N="source/DRSelectRectangle.cpp"/>
-            <F N="source/DRSImage.cpp"/>
             <F N="source/DRText.cpp"/>
             <F N="source/LibInfo.h"/>
         </Folder>
@@ -170,7 +169,6 @@
             <F N="include/DRRectangleBase.h"/>
             <F N="include/DRSelectPolygon.h"/>
             <F N="include/DRSelectRectangle.h"/>
-            <F N="include/DRSImage.h"/>
             <F N="include/DRText.h"/>
         </Folder>
         <Folder

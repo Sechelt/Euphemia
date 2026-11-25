@@ -14,6 +14,8 @@
 
 #include <LSLine.h>
 
+class DRSLine;
+
 class DRLine : public DRObject
 {
     Q_OBJECT
@@ -39,7 +41,7 @@ public:
     virtual bool        doLoad( QDomElement *pdomElem ) override;
 
 protected:
-    LSLine *                pSettingLine;
+    DRSLine *               pSettingLine;
     QPointF                 pointBegin;
     QPointF                 pointEnd;
     qreal                   nBeginSize  = 5;
@@ -66,6 +68,32 @@ protected:
 
 protected slots:
     virtual void slotRefreshLine();
+};
+
+/*!
+ * \brief Settings for DRLine.
+ * 
+ * This does not contain its own settings - just brings in some useful settings from elsewhere.
+ * 
+ * \author pharvey (2026-11-24)
+ */
+class DRSLine : public DRSObject 
+{
+    Q_OBJECT
+public:
+    DRSLine();
+
+    LSLine *pLine;
+
+    QWidget *   getButton( QWidget *pParent ) override;
+    QWidget *   getToolBar( QWidget *pParent ) override;
+    QWidget *   getPanel( QWidget *pParent ) override;
+    QWidget *   getSwatch( QWidget *pParent ) override;
+    QToolBox *  getToolBox( QWidget *pParent ) override;    // return valid QToolBox
+
+    void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;   // does nothing
+    void doLoad( QDomElement *pdomElem ) override;                          // does nothing
+
 };
 
 #endif

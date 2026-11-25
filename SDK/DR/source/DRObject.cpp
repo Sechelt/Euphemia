@@ -26,14 +26,11 @@ DRObject::DRObject( DRDraw *pLayer, const QPointF &pointPos, const QString &stri
     // setPos( pointPos );
     this->pLayer = pLayer;
 
-    pSettingPen = (SPen*)g_SSettings->getSetting( "SPen" ); Q_ASSERT( pSettingPen );
-    pSettingBrush = (SBrush*)g_SSettings->getSetting( "SBrush" ); Q_ASSERT( pSettingBrush );
-    pSettingFont = (SText*)g_SSettings->getSetting( "SText" ); Q_ASSERT( pSettingFont );
-    pSettingGeneral = (LSGeneral*)g_SSettings->getSetting( "LSGeneral" ); Q_ASSERT( pSettingGeneral );
+    // settings...
+    pSettingObject = (DRSObject*)g_SSettings->getSetting( "DRSObject" ); Q_ASSERT( pSettingObject );
     slotRefreshPen();
     slotRefreshBrush();
     slotRefreshFont();
-    slotRefreshGeneral();
 }
 
 DRObject::~DRObject()
@@ -489,21 +486,19 @@ printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 
 void DRObject::doConnectSettings()
 {
-    pSettingPen->setSelected( pen );
-    pSettingBrush->setSelected( brush );
-    pSettingFont->setSelected( font );
-    connect( pSettingPen, SIGNAL(signalChanged()), this, SLOT(slotRefreshPen()) );
-    connect( pSettingBrush, SIGNAL(signalChanged()), this, SLOT(slotRefreshBrush()) );
-    connect( pSettingFont, SIGNAL(signalChanged()), this, SLOT(slotRefreshFont()) );
-    connect( pSettingGeneral, SIGNAL(signalChanged()), this, SLOT(slotRefreshGeneral()) );
+    pSettingObject->pPen->setSelected( pen );
+    pSettingObject->pBrush->setSelected( brush );
+    pSettingObject->pFont->setSelected( font );
+    connect( pSettingObject->pPen, SIGNAL(signalChanged()), this, SLOT(slotRefreshPen()) );
+    connect( pSettingObject->pBrush, SIGNAL(signalChanged()), this, SLOT(slotRefreshBrush()) );
+    connect( pSettingObject->pFont, SIGNAL(signalChanged()), this, SLOT(slotRefreshFont()) );
 }
 
 void DRObject::doDisconnectSettings()
 {
-    disconnect( pSettingPen, SIGNAL(signalChanged()), this, SLOT(slotRefreshPen()) );
-    disconnect( pSettingBrush, SIGNAL(signalChanged()), this, SLOT(slotRefreshBrush()) );
-    disconnect( pSettingFont, SIGNAL(signalChanged()), this, SLOT(slotRefreshFont()) );
-    disconnect( pSettingGeneral, SIGNAL(signalChanged()), this, SLOT(slotRefreshGeneral()) );
+    disconnect( pSettingObject->pPen, SIGNAL(signalChanged()), this, SLOT(slotRefreshPen()) );
+    disconnect( pSettingObject->pBrush, SIGNAL(signalChanged()), this, SLOT(slotRefreshBrush()) );
+    disconnect( pSettingObject->pFont, SIGNAL(signalChanged()), this, SLOT(slotRefreshFont()) );
 }
 
 /*!
@@ -640,25 +635,20 @@ void DRObject::doSyncHandlesTransform()
 
 void DRObject::slotRefreshPen()
 {
-    pen = pSettingPen->property( "pen" ).value<QPen>();
+    pen = pSettingObject->pPen->property( "pen" ).value<QPen>();
     if ( pGraphics ) pGraphics->update();
 }
 
 void DRObject::slotRefreshBrush()
 {
-    brush = pSettingBrush->property( "brush" ).value<QBrush>();
+    brush = pSettingObject->pBrush->property( "brush" ).value<QBrush>();
     if ( pGraphics ) pGraphics->update();
 }
 
 void DRObject::slotRefreshFont()
 {
-    font.font = pSettingFont->property( "font" ).value<QFont>();
+    font = pSettingObject->pFont->getValue();
     if ( pGraphics ) pGraphics->update();
-}
-
-void DRObject::slotRefreshGeneral()
-{
-    bAutoCommit = pSettingGeneral->property( "bAutoCommit" ).toInt();
 }
 
 /*
@@ -695,3 +685,56 @@ void DRObject::doFiniTransform()
     bInitTransform = false;
 }
 */
+
+
+DRSObject::DRSObject()
+{
+    pPen         = (SPen*)g_SSettings->getSetting( "SPen" ); Q_ASSERT( pPen );
+    pBrush       = (SBrush*)g_SSettings->getSetting( "SBrush" ); Q_ASSERT( pBrush );
+    pFont        = (SText*)g_SSettings->getSetting( "SText" ); Q_ASSERT( pFont );
+}
+
+QWidget *DRSObject::getButton( QWidget *pParent )
+{
+    Q_UNUSED( pParent );
+    return nullptr;
+}
+
+QWidget *DRSObject::getToolBar( QWidget *pParent )
+{
+    Q_UNUSED( pParent );
+    return nullptr;
+}
+
+QWidget *DRSObject::getPanel( QWidget *pParent )
+{
+    Q_UNUSED( pParent );
+    return nullptr;
+}
+
+QWidget *DRSObject::getSwatch( QWidget *pParent )
+{
+    Q_UNUSED( pParent );
+    return nullptr;
+}
+
+QToolBox *DRSObject::getToolBox( QWidget *pParent )
+{
+    QToolBox *p = SSetting::getToolBox( pParent );
+    p->addItem( pPen->getPanel( p ), QIcon(), "Pen" );
+    p->addItem( pBrush->getPanel( p ), QIcon(), "Brush" );
+    return p;
+}
+
+void DRSObject::doSave( QDomDocument *pdomDoc, QDomElement *pdomElem )
+{
+    Q_UNUSED( pdomDoc );
+    Q_UNUSED( pdomElem );
+}
+
+void DRSObject::doLoad( QDomElement *pdomElem )
+{
+    Q_UNUSED( pdomElem );
+}
+
+

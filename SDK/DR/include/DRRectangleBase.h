@@ -14,6 +14,8 @@
 
 #include "DRObject.h"
 
+class DRSRectangleBase;
+
 class DRRectangleBase : public DRObject
 {
     Q_OBJECT
@@ -38,8 +40,8 @@ public:
     virtual bool        doLoad( QDomElement *pdomElem ) override;
 
 protected:
-    LSRectangle *   pSettingRectangle;
-    bool            bBind       = false;    /*!< bind x and y (ensure we have a square)     */
+    DRSRectangleBase *pSettingRectangleBase;
+    bool bBind = false;    /*!< bind x and y (ensure we have a square)     */
 
     QRectF r;
 
@@ -57,5 +59,32 @@ protected:
 protected slots:
     virtual void slotRefreshRectangle();
 };
+
+/*!
+ * \brief Settings for DRRectangleBase.
+ * 
+ * This does not contain its own settings - just brings in some useful settings from elsewhere.
+ * 
+ * \author pharvey (2026-11-23)
+ */
+class DRSRectangleBase : public DRSObject 
+{
+    Q_OBJECT
+public:
+    DRSRectangleBase();
+
+    LSRectangle *pRectangle;
+
+    QWidget *   getButton( QWidget *pParent ) override;
+    QWidget *   getToolBar( QWidget *pParent ) override;
+    QWidget *   getPanel( QWidget *pParent ) override;
+    QWidget *   getSwatch( QWidget *pParent ) override;
+    QToolBox *  getToolBox( QWidget *pParent ) override;    // return valid QToolBox
+
+    void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;   // does nothing
+    void doLoad( QDomElement *pdomElem ) override;                          // does nothing
+
+};
+
 
 #endif

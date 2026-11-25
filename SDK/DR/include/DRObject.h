@@ -16,11 +16,11 @@
 #include <SPen.h>
 #include <SBrush.h>
 #include <SText.h>
-#include <LSGeneral.h>
 #include <LObject.h>
 #include <LHandle.h>
 
 class DRDraw;
+class DRSObject;
 
 class DRObject : public LObject
 {
@@ -86,15 +86,12 @@ signals:
    void signalCommitted();                      /*!< so DRDraw can update modified status                   */
 
 protected:
-    // some common settings
-    SPen *      pSettingPen;
-    SBrush *    pSettingBrush;
-    SText *     pSettingFont;
-    LSGeneral * pSettingGeneral;
+    // settings
+    DRSObject * pSettingObject;
+    // local setting values
     QPen            pen;        // line (incl. color)
     QBrush          brush;      // fill (incl. color)
     CBD::CBDText    font;       // font
-    bool            bAutoCommit;                /*!< mouse release automatically unselects  */
 
     //
     SelectionStates     nSelectionState = SelectionStateNone;   /*!< this is independent of ADObject::bSelected but SelectionStateNone should be eq to false    */
@@ -137,7 +134,35 @@ protected slots:
     virtual void slotRefreshPen();
     virtual void slotRefreshBrush();
     virtual void slotRefreshFont();
-    virtual void slotRefreshGeneral();
+};
+
+/*!
+ * \brief Common settings from all based upon DRObject.
+ * 
+ * This does not contain its own settings - just brings in some useful settings from elsewhere.
+ * Another notable thing this provides is a QToolBox with the widgets for the settings used - pre-loaded.
+ * 
+ * \author pharvey (2026-11-23)
+ */
+class DRSObject : public SSetting 
+{
+    Q_OBJECT
+public:
+    DRSObject();
+
+    SPen *      pPen;
+    SBrush *    pBrush;
+    SText *     pFont;
+
+    QWidget *   getButton( QWidget *pParent ) override;     // return nullptr
+    QWidget *   getToolBar( QWidget *pParent ) override;    // return nullptr
+    QWidget *   getPanel( QWidget *pParent ) override;      // return nullptr
+    QWidget *   getSwatch( QWidget *pParent ) override;     // return nullptr
+    QToolBox *  getToolBox( QWidget *pParent ) override;    // return valid QToolBox
+
+    void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;   // does nothing
+    void doLoad( QDomElement *pdomElem ) override;                          // does nothing
+
 };
 
 #endif

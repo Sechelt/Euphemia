@@ -42,7 +42,12 @@
 #include <PASPolygonFilled.h>
 #include <PASSpray.h>     
 
+// Settings created for DR tools (may combine the others)
 #include <DRSImage.h>     
+#include <DRObject.h>           // DRSObject
+#include <DRRectangleBase.h>    // DRSRectangleBase
+#include <DRText.h>             // DRSText
+#include <DRLine.h>             // DRSLine    
 
 int main( int argc, char *argv[] )
 {
@@ -181,7 +186,11 @@ int main( int argc, char *argv[] )
     g_SSettings->doInsert( "PASFreeHand", new PASFreeHand() );  
     g_SSettings->doInsert( "PASGradient", new PASGradient() );  
 
+    g_SSettings->doInsert( "DRSObject", new DRSObject() );
+    g_SSettings->doInsert( "DRSRectangleBase", new DRSRectangleBase() );
+    g_SSettings->doInsert( "DRSText", new DRSText() );
     g_SSettings->doInsert( "DRSImage", new DRSImage() );
+    g_SSettings->doInsert( "DRSLine", new DRSLine() );
 
     g_SSettings->doLoad();
 

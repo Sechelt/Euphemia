@@ -34,7 +34,7 @@ protected:
 
     QSplitter *         pSplitter               = nullptr;
 
-    bool                bPanelArea              = false;
+    bool                bPanelArea              = false;        /*!< true to show the panel for the selected tool                                       */
     QScrollArea *       pScrollAreaTools        = nullptr;
     QWidget *           pScrollableWidgetTools  = nullptr;
     QActionGroup *      pActionGroup            = nullptr;
@@ -60,7 +60,11 @@ protected:
     void doInitPanel();
     void doFiniPanel();
 
+    void doNewPanelArea();
+    void doDeletePanelArea();
+
 protected slots:
+    void slotShowPanel( bool );
     void slotTriggered( QAction * );
     void slotChangedCurrent();
     void slotChangedTool();

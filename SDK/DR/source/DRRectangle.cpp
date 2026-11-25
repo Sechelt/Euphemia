@@ -70,12 +70,12 @@ void DRRectangle::doMove( LHandle *pHandle, const QPointF &pointPos )
     {
         if ( pHandle->getType() == LHandle::TypeHRound )
         {
-            pSettingRectangle->setProperty( "nXRadius", getXRadiusValidated( getXRadius( pointPos ) ) );
+            pSettingRectangleBase->pRectangle->setProperty( "nXRadius", getXRadiusValidated( getXRadius( pointPos ) ) );
             return;
         }
         else if ( pHandle->getType() == LHandle::TypeVRound )
         {
-            pSettingRectangle->setProperty( "nYRadius", getYRadiusValidated( getYRadius( pointPos ) ) );
+            pSettingRectangleBase->pRectangle->setProperty( "nYRadius", getYRadiusValidated( getYRadius( pointPos ) ) );
             return;
         }
     }
@@ -270,14 +270,14 @@ void DRRectangle::doSyncHandlesStandard()
 void DRRectangle::doConnectSettings()
 {
     DRRectangleBase::doConnectSettings();
-    pSettingRectangle->setSelected( nSizeMode, nXRadius, nYRadius );
-    connect( pSettingRectangle, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
+    pSettingRectangleBase->pRectangle->setSelected( nSizeMode, nXRadius, nYRadius );
+    connect( pSettingRectangleBase->pRectangle, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
 }
 
 void DRRectangle::doDisconnectSettings()
 {
     DRRectangleBase::doDisconnectSettings();
-    disconnect( pSettingRectangle, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
+    disconnect( pSettingRectangleBase->pRectangle, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
 }
 
 void DRRectangle::slotRefreshRectangle()
@@ -285,9 +285,9 @@ void DRRectangle::slotRefreshRectangle()
     DRRectangleBase::slotRefreshRectangle();
 
     // accept
-    nSizeMode   = (Qt::SizeMode)pSettingRectangle->property( "nSizeMode" ).toInt();
-    nXRadius    = getXRadiusValidated( pSettingRectangle->property( "nXRadius" ).toDouble() );
-    nYRadius    = getYRadiusValidated( pSettingRectangle->property( "nYRadius" ).toDouble() );
+    nSizeMode   = (Qt::SizeMode)pSettingRectangleBase->pRectangle->property( "nSizeMode" ).toInt();
+    nXRadius    = getXRadiusValidated( pSettingRectangleBase->pRectangle->property( "nXRadius" ).toDouble() );
+    nYRadius    = getYRadiusValidated( pSettingRectangleBase->pRectangle->property( "nYRadius" ).toDouble() );
 
     if ( !vectorHandles.count() ) return;
 

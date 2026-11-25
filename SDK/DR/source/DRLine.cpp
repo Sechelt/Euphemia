@@ -25,7 +25,7 @@ DRLine::DRLine( DRDraw *pCanvas, const QPointF &pointPos )
     else
         pointBegin = pointEnd = pointPos;
 
-    pSettingLine = (LSLine*)g_SSettings->getSetting( "LSLine" ); Q_ASSERT( pSettingLine );
+    pSettingLine = (DRSLine*)g_SSettings->getSetting( "DRSLine" ); Q_ASSERT( pSettingLine );
     slotRefreshLine();
 }
 
@@ -295,7 +295,7 @@ void DRLine::doDrawLineEndBall( QPainter *pPainter, const QLineF &line )
 void DRLine::doConnectSettings()
 {
     DRObject::doConnectSettings();
-    pSettingLine->setSelected( nBeginStyle, nEndStyle, nBeginSize, nEndSize );
+    pSettingLine->pLine->setSelected( nBeginStyle, nEndStyle, nBeginSize, nEndSize );
     connect( pSettingLine, SIGNAL(signalChanged()), this, SLOT(slotRefreshLine()) );
 }
 
@@ -349,12 +349,59 @@ void DRLine::doSyncHandlesStandard()
 
 void DRLine::slotRefreshLine()
 {
-    nBeginStyle = LSLine::LineEndStyles(pSettingLine->property( "nBegin" ).toInt());
-    nBeginSize  = pSettingLine->property( "nBeginSize" ).toReal();
+    nBeginStyle = LSLine::LineEndStyles(pSettingLine->pLine->property( "nBegin" ).toInt());
+    nBeginSize  = pSettingLine->pLine->property( "nBeginSize" ).toReal();
 
-    nEndStyle = LSLine::LineEndStyles(pSettingLine->property( "nEnd" ).toInt());
-    nEndSize  = pSettingLine->property( "nEndSize" ).toReal();
+    nEndStyle = LSLine::LineEndStyles(pSettingLine->pLine->property( "nEnd" ).toInt());
+    nEndSize  = pSettingLine->pLine->property( "nEndSize" ).toReal();
 
     if ( pGraphics ) pGraphics->update();
 }
+
+DRSLine::DRSLine()
+{
+    pLine = (LSLine*)g_SSettings->getSetting( "LSLine" ); Q_ASSERT( pLine );
+    connect( pLine, SIGNAL(signalChanged()), SIGNAL(signalChanged()) );
+}
+
+QWidget *DRSLine::getButton( QWidget *pParent )
+{
+    return pLine->getButton( pParent );
+}
+
+QWidget *DRSLine::getToolBar( QWidget *pParent )
+{
+    return pLine->getToolBar( pParent );
+}
+
+QWidget *DRSLine::getPanel( QWidget *pParent )
+{
+    return pLine->getPanel( pParent );
+}
+
+QWidget *DRSLine::getSwatch( QWidget *pParent )
+{
+    return pLine->getSwatch( pParent );
+}
+
+QToolBox *DRSLine::getToolBox( QWidget *pParent )
+{
+    QToolBox *p = DRSObject::getToolBox( pParent );
+    p->insertItem( 0, pLine->getPanel( p ), QIcon(), "Line" );
+    return p;
+}
+
+void DRSLine::doSave( QDomDocument *pdomDoc, QDomElement *pdomElem )
+{
+    Q_UNUSED( pdomDoc );
+    Q_UNUSED( pdomElem );
+}
+
+void DRSLine::doLoad( QDomElement *pdomElem )
+{
+    Q_UNUSED( pdomElem );
+}
+
+
+
 

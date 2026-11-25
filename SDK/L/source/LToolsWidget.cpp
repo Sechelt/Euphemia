@@ -29,13 +29,7 @@ LToolsWidget::LToolsWidget( QWidget *pParent )
     }
 
     // bottom area is the settings panel (if any) for the currently selected tool
-    if ( bPanelArea )
-    {
-        pScrollAreaPanel = new QScrollArea( this );
-        pScrollAreaPanel->setToolTip( tr("settings panel for active tool (if available)") );
-        pScrollAreaPanel->setWidgetResizable( true );
-        addWidget( pScrollAreaPanel );
-    }
+    if ( bPanelArea ) doNewPanelArea();
 }
 
 void LToolsWidget::setLayers( LFile *p )
@@ -209,6 +203,15 @@ void LToolsWidget::doInitButtons()
     // create widget to scroll
     pScrollableWidgetTools = new QWidget( this );
     WIconLayout *pIconLayout = new WIconLayout( pScrollableWidgetTools );
+    // first button is to enable/disable showing tool panel
+    QToolButton *pButton = new QToolButton( this );
+    pButton->setToolTip( tr("show/hide tool panel") );
+    pButton->setCheckable( true );
+    pButton->setText( ":" );
+    pButton->setChecked( bPanelArea );
+    pIconLayout->addWidget( pButton );
+    connect( pButton, SIGNAL(toggled(bool)), SLOT(slotShowPanel(bool)) );
+
     foreach( QAction *pAction, vectorActions )
     {
         QToolButton *pButton = new QToolButton( this );
@@ -242,10 +245,40 @@ void LToolsWidget::doFiniPanel()
     pScrollableWidgetPanel = nullptr;
 }
 
+void LToolsWidget::doNewPanelArea()
+{
+    pScrollAreaPanel = new QScrollArea( this );
+    pScrollAreaPanel->setToolTip( tr("settings panel for active tool (if available)") );
+    pScrollAreaPanel->setWidgetResizable( true );
+    addWidget( pScrollAreaPanel );
+}
+
+void LToolsWidget::doDeletePanelArea()
+{
+    delete pScrollAreaPanel;
+    pScrollAreaPanel = nullptr;
+}
+
 void LToolsWidget::slotTriggered( QAction *p )
 {
     nTool = p->property( "Tool" ).toInt();
     pLayer->setTool( nTool ); // this is a request if accepted we will get slotChangedTool
+}
+
+void LToolsWidget::slotShowPanel( bool b )
+{
+    if ( b == bPanelArea ) return;
+    bPanelArea = b;
+    if ( bPanelArea && pLayer )
+    {
+        doNewPanelArea();
+        doInitPanel();
+    }
+    else
+    {
+        doFiniPanel();
+        doDeletePanelArea();
+    }
 }
 
 void LToolsWidget::slotChangedCurrent()

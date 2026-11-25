@@ -163,9 +163,9 @@ QWidget* DRDraw::getToolBar( QWidget *pParent )
         case ToolDrawPie:
             break;
         case ToolDrawLine:
-            return g_SSettings->getSetting( "LSLine" )->getToolBar( pParent );
+            return g_SSettings->getSetting( "DRSLine" )->getToolBar( pParent );
         case ToolDrawRectangle:
-            return g_SSettings->getSetting( "LSRectangle" )->getToolBar( pParent );
+            return g_SSettings->getSetting( "DRSRectangleBase" )->getToolBar( pParent );
         case ToolDrawEllipse:
             return g_SSettings->getSetting( "LSEllipse" )->getToolBar( pParent );
         case ToolDrawPolygon:
@@ -173,7 +173,7 @@ QWidget* DRDraw::getToolBar( QWidget *pParent )
         case ToolDrawPolyline:
             break;
         case ToolDrawText:
-            return g_SSettings->getSetting( "SText" )->getToolBar( pParent );
+            return g_SSettings->getSetting( "DRSText" )->getToolBar( pParent );
     }
     return nullptr;
 }
@@ -195,13 +195,13 @@ QWidget* DRDraw::getPanel( QWidget *pParent )
                     if ( s == "DRImage" )
                         return g_SSettings->getSetting( "DRSImage" )->getPanel( pParent );
                     else if ( s == "DRLine" )
-                        return g_SSettings->getSetting( "LSLine" )->getPanel( pParent );
+                        return g_SSettings->getSetting( "DRSLine" )->getPanel( pParent );
                     else if ( s == "DRRectangle" )
-                        return g_SSettings->getSetting( "LSRectangle" )->getPanel( pParent );
+                        return g_SSettings->getSetting( "DRSRectangleBase" )->getPanel( pParent );
                     else if ( s == "DREllipse" )
                         return g_SSettings->getSetting( "LSEllipse" )->getPanel( pParent );
                     else if ( s == "DRText" )
-                        return g_SSettings->getSetting( "SText" )->getPanel( pParent );
+                        return g_SSettings->getSetting( "DRSText" )->getPanel( pParent );
                 }
             }
             break;
@@ -213,9 +213,9 @@ QWidget* DRDraw::getPanel( QWidget *pParent )
         case ToolDrawPie:
             break;
         case ToolDrawLine:
-            return g_SSettings->getSetting( "LSLine" )->getPanel( pParent );
+            return g_SSettings->getSetting( "DRSLine" )->getPanel( pParent );
         case ToolDrawRectangle:
-            return g_SSettings->getSetting( "LSRectangle" )->getPanel( pParent );
+            return g_SSettings->getSetting( "DRSRectangleBase" )->getPanel( pParent );
         case ToolDrawEllipse:
             return g_SSettings->getSetting( "LSEllipse" )->getPanel( pParent );
         case ToolDrawPolygon:
@@ -223,7 +223,7 @@ QWidget* DRDraw::getPanel( QWidget *pParent )
         case ToolDrawPolyline:
             break;
         case ToolDrawText:
-            return g_SSettings->getSetting( "SText" )->getPanel( pParent );
+            return g_SSettings->getSetting( "DRSText" )->getPanel( pParent );
     }
     return nullptr;
 }
@@ -240,12 +240,12 @@ QWidget *DRDraw::getToolBox( QWidget *pParent )
     pWidget->insertWidget( ToolDrawChord, new QWidget( pParent ) );
     pWidget->insertWidget( ToolDrawImage, ( g_SSettings->getSetting( "DRSImage" ) ? g_SSettings->getSetting( "DRSImage" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
     pWidget->insertWidget( ToolDrawPie, new QWidget( pParent ) );
-    pWidget->insertWidget( ToolDrawLine, new QWidget( pParent ) );
-    pWidget->insertWidget( ToolDrawRectangle, ( g_SSettings->getSetting( "LSRectangle" ) ? g_SSettings->getSetting( "LSRectangle" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawLine, ( g_SSettings->getSetting( "DRSLine" ) ? g_SSettings->getSetting( "DRSLine" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawRectangle, ( g_SSettings->getSetting( "DRSRectangleBase" ) ? g_SSettings->getSetting( "DRSRectangleBase" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
     pWidget->insertWidget( ToolDrawEllipse, new QWidget( pParent ) );
     pWidget->insertWidget( ToolDrawPolygon, new QWidget( pParent ) );
     pWidget->insertWidget( ToolDrawPolyline, new QWidget( pParent ) );
-    pWidget->insertWidget( ToolDrawText, new QWidget( pParent ) );
+    pWidget->insertWidget( ToolDrawText, ( g_SSettings->getSetting( "DRSText" ) ? g_SSettings->getSetting( "DRSText" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
     return pWidget;
 }
 
@@ -581,7 +581,7 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
                 setToolState( ToolStateIdle ); // reset
                 return;
             }
-            // we fall through here on purpose
+            // we fall through here on purpose - suppress compile warning
             [[fallthrough]];
         case ToolSelectRectangle:
             {

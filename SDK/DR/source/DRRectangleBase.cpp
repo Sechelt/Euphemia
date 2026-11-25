@@ -22,7 +22,7 @@ DRRectangleBase::DRRectangleBase( DRDraw *pCanvas, const QPointF &pointPos )
     r = QRectF( pointPos.isNull() ? QPointF( 0, 0 ) : pointPos, QSize( 1, 1 ) );
     nHandlesAlloc = 3;
 
-    pSettingRectangle   = (LSRectangle*)g_SSettings->getSetting( "LSRectangle" ); Q_ASSERT( pSettingRectangle );
+    pSettingRectangleBase = (DRSRectangleBase*)g_SSettings->getSetting( "DRSRectangleBase" ); Q_ASSERT( pSettingRectangleBase );
     slotRefreshRectangle();
 }
 
@@ -248,19 +248,64 @@ void DRRectangleBase::doSyncHandlesStandard()
 void DRRectangleBase::doConnectSettings()
 {
     DRObject::doConnectSettings();
-    pSettingRectangle->setSelected( bBind );
-    connect( pSettingRectangle, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
+    pSettingRectangleBase->pRectangle->setSelected( bBind );
+    connect( pSettingRectangleBase, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
 }
 
 void DRRectangleBase::doDisconnectSettings()
 {
     DRObject::doDisconnectSettings();
-    disconnect( pSettingRectangle, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
+    disconnect( pSettingRectangleBase, SIGNAL(signalChanged()), this, SLOT(slotRefreshRectangle()) );
 }
 
 void DRRectangleBase::slotRefreshRectangle()
 {
     // we only care about the bind property in this class
-    bBind = pSettingRectangle->property( "bBind" ).toInt();
+    bBind = pSettingRectangleBase->pRectangle->property( "bBind" ).toInt();
 }
+
+DRSRectangleBase::DRSRectangleBase()
+{
+    pRectangle = (LSRectangle*)g_SSettings->getSetting( "LSRectangle" ); Q_ASSERT( pRectangle );
+    connect( pRectangle, SIGNAL(signalChanged()), SIGNAL(signalChanged()) );
+}
+
+QWidget *DRSRectangleBase::getButton( QWidget *pParent )
+{
+    return pRectangle->getButton( pParent );
+}
+
+QWidget *DRSRectangleBase::getToolBar( QWidget *pParent )
+{
+    return pRectangle->getToolBar( pParent );
+}
+
+QWidget *DRSRectangleBase::getPanel( QWidget *pParent )
+{
+    return pRectangle->getPanel( pParent );
+}
+
+QWidget *DRSRectangleBase::getSwatch( QWidget *pParent )
+{
+    return pRectangle->getSwatch( pParent );
+}
+
+QToolBox *DRSRectangleBase::getToolBox( QWidget *pParent )
+{
+    QToolBox *p = DRSObject::getToolBox( pParent );
+    p->insertItem( 0, pRectangle->getPanel( p ), QIcon(), "Rectangle" );
+    return p;
+}
+
+void DRSRectangleBase::doSave( QDomDocument *pdomDoc, QDomElement *pdomElem )
+{
+    Q_UNUSED( pdomDoc );
+    Q_UNUSED( pdomElem );
+}
+
+void DRSRectangleBase::doLoad( QDomElement *pdomElem )
+{
+    Q_UNUSED( pdomElem );
+}
+
 

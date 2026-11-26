@@ -49,7 +49,8 @@ public:
     {
         TypeDrag,
         TypeMovePoint,
-        TypePointFactory,
+        TypePointFactoryNew,
+        TypePointFactoryDelete,
         TypeSizeLeft,
         TypeSizeRight,
         TypeSizeTop,

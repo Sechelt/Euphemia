@@ -263,7 +263,7 @@ void PAPolyline::doCreateHandles()
     // add a handle between each point (moving it will create a new point)
     for ( int n = 1; n < polygonView.count(); n++ )
     {
-        pHandle = new LHandle( this, pLayerView, LHandle::TypePointFactory, QRect( polygonView.at( n - 1 ), polygonView.at( n ) ).center() );
+        pHandle = new LHandle( this, pLayerView, LHandle::TypePointFactoryNew, QRect( polygonView.at( n - 1 ), polygonView.at( n ) ).center() );
         vectorHandles.append( pHandle );
         pHandle->show();
     }
@@ -336,7 +336,7 @@ void PAPolyline::doMoveHandle( const QPoint &pointPos )
         // just a single point handle
         polygon.replace( vectorHandles.indexOf( pHandle ) - nFirstMovePointHandle, pointPos );
     }
-    else if ( pHandle->getType() == LHandle::TypePointFactory )
+    else if ( pHandle->getType() == LHandle::TypePointFactoryNew )
     {
         QPoint point            = pLayerView->mapToScene( pHandle->getCenter().toPoint() ).toPoint();
         int nHandleNewPoint     = vectorHandles.indexOf( pHandle );
@@ -348,7 +348,7 @@ void PAPolyline::doMoveHandle( const QPoint &pointPos )
         polygon.insert( nPointNext, pLayerView->mapToScene( pHandle->getCenter().toPoint() ).toPoint() );
 
         // insert another new point handle
-        pHandle = new LHandle( this, pLayerView, LHandle::TypePointFactory, point );
+        pHandle = new LHandle( this, pLayerView, LHandle::TypePointFactoryNew, point );
         vectorHandles.insert( nHandleNewPointNext, pHandle );
         pHandle->show();
         nHandlePointNext++; // we just shoved everything over by one

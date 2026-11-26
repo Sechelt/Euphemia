@@ -47,6 +47,8 @@ protected:
     bool        bInit = false;  /*!< indicates that we are using doPress for appending points       */
     QPointF     pointMouse;     /*!< used when bInit to allow doDraw to draw proposed line segment  */
 
+    int nIndexHandleMove = 0;   /*!< first handle is a move handle */
+
     virtual void doDraw( QPainter * ) override;
     virtual void doCreateHandlesStandard() override;
     virtual void doSyncHandlesStandard() override;

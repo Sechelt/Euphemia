@@ -90,13 +90,33 @@ void LHandle::paintEvent( QPaintEvent *pEvent )
                 painter.drawEllipse( rect() );
             }
             break;
-        case TypePointFactory:
+        case TypePointFactoryNew:
             {
-                painter.setPen( QPen( Qt::black ) );
-                painter.setBrush( Qt::white );
-                painter.drawRect( rect() );
-                painter.setBrush( Qt::green );
-                painter.drawEllipse( rect().x() + 2, rect().y() + 2, rect().width() - 4, rect().height() - 4 );
+                QRect r = rect();
+                // +
+                QPen pen( Qt::black );
+                painter.setPen( pen );
+                painter.setBrush( QBrush( Qt::black ) );
+                painter.drawEllipse( r );
+                pen.setColor( Qt::green );
+                pen.setWidth( 2 );
+                painter.setPen( pen );
+                painter.drawLine( r.width() / 2, 0, r.width() / 2, r.height() );
+                painter.drawLine( 0, r.height() / 2, r.width(), r.height() / 2 );
+            }
+            break;
+        case TypePointFactoryDelete:
+            {
+                QRect r = rect();
+                // -
+                QPen pen( Qt::black );
+                painter.setPen( pen );
+                painter.setBrush( QBrush( Qt::black ) );
+                painter.drawEllipse( r );
+                pen.setColor( Qt::green );
+                pen.setWidth( 2 );
+                painter.setPen( pen );
+                painter.drawLine( 0, r.height() / 2, r.width(), r.height() / 2 );
             }
             break;
         case TypeDrag:
@@ -497,7 +517,8 @@ void LHandle::doInit()
         case TypeGradientStop:
             setCursor( QCursor( Qt::PointingHandCursor ) );
             break;
-        case TypePointFactory:
+        case TypePointFactoryNew:
+        case TypePointFactoryDelete:
             setCursor( QCursor( Qt::CrossCursor ) );
             break;
         case TypeDrag:

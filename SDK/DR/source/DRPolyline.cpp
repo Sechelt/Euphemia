@@ -52,34 +52,64 @@ QPainterPath DRPolyline::shape() const
     return stroker.createStroke( path );
 }
 
+/*!
+ * \brief Set handles transparent as a way to hide them - they just do not paint themselves.
+ * 
+ * The default is do this to all handles but here we make an exception.
+ * 
+ * IF pHandleGrabbed IS TypeMovePoint THEN TypeMovePoint on either side is temp switched to a TypePointFactoryDelete and is visible.
+ * 
+ * \author pharvey (2026-11-26)
+ * 
+ * \param b              
+ * \param pHandleGrabbed 
+ */
 void DRPolyline::setTransparentHandles( bool b, LHandle *pHandleGrabbed )
 {
     // sanity checks
     Q_ASSERT( vectorHandles.count() );
 
+    // show them all
+    if ( !b ) 
+    {
+        for ( LHandle *p : vectorHandles )
+        {
+            p->setTransparent( false );
+            if ( p->getType() == LHandle::TypePointFactoryDelete ) p->setType( LHandle::TypePointFactoryNew );
+        }
+        return;
+    }
+
     // do default
-    DRObject::setTransparentHandles( b );
-    if ( !b ) DRObject::setTransparentHandles( b );
+    if ( b ) DRObject::setTransparentHandles( b );
+
     // no special processing without a handle
     if ( !pHandleGrabbed ) return;
     // too few points to allow deleting a point - make all transparent  
     if ( b && polygon.count() <= 2 ) return;
     // default is fine when move object
-    if ( pHandleGrabbed->getType() == LHandle::FunctionMove ) return;
+    if ( pHandleGrabbed->getType() != LHandle::TypeMovePoint ) return;
 
-    // keep the adjacent point handles visible as they are where pHandleGrabbed can be dropped to remove its point 
-    // remember;    vectorHandles[0] is move handle - we always hide that
-    //              a factory handle is between each point handle
+    // Temp switch adjacent TypeMovePoint handles to TypePointFactoryDelete and make visible
+    //
+    // Remember: [0]        is TypeFunctionMove
+    //           [1-n]      are TypePointFactoryNew        
+    //           [n+1-nn]   are TypeMovePoint
+
     int nIndexGrabbed   = vectorHandles.indexOf( pHandleGrabbed );
-    int nIndexLeft  = 0;
-    int nIndexRight = 0;
+    int nIndexLeft  = nIndexGrabbed - 1;
+    int nIndexRight = nIndexGrabbed + 1;
 
-    // look left
-    if ( nIndexGrabbed >= 3 ) nIndexLeft = nIndexGrabbed - 1;
-    if ( nIndexGrabbed <= vectorHandles.count() - 2 ) nIndexRight = nIndexGrabbed + 1;
-
-    if ( vectorHandles[nIndexLeft] ) vectorHandles[nIndexLeft]->setTransparent( false );
-    if ( vectorHandles[nIndexRight] ) vectorHandles[nIndexRight]->setTransparent( false );
+    if ( nIndexLeft > 0 && vectorHandles[nIndexLeft]->getType() == LHandle::TypeMovePoint )
+    {
+        vectorHandles[nIndexLeft]->setTransparent( false );
+        vectorHandles[nIndexLeft]->setType( LHandle::TypePointFactoryDelete );
+    }
+    if ( nIndexRight < vectorHandles.count() )
+    {
+        vectorHandles[nIndexRight]->setTransparent( false );
+        vectorHandles[nIndexRight]->setType( LHandle::TypePointFactoryDelete );
+    }
 }
 
 QPixmap DRPolyline::getIcon()
@@ -107,7 +137,23 @@ QImage DRPolyline::getImage()
     return QImage();
 }
 
-// NOTE: Assumes that the handle is going to be moved.
+/*!
+ * \brief Grab a handle.
+ * 
+ * For manipulating an existing object.
+ * 
+ * If the handle is a TypePointFactoryNew we will create a new point/handle and return the handle for the new point.
+ * 
+ * \sa doMove
+ * \sa doDrop
+ * 
+ * \author pharvey (2026-11-26)
+ * 
+ * \param pointPos 
+ * \param bSizing  
+ * 
+ * \return LHandle* 
+ */
 LHandle *DRPolyline::getGrab( const QPointF &pointPos, bool bSizing )
 {
     if ( bSizing ) 
@@ -121,7 +167,7 @@ LHandle *DRPolyline::getGrab( const QPointF &pointPos, bool bSizing )
     if ( !pHandle ) return nullptr;
 
     // is it a point factory?
-    if ( pHandle->getType() != LHandle::TypePointFactory ) return pHandle;
+    if ( pHandle->getType() != LHandle::TypePointFactoryNew ) return pHandle;
 
     // create a new point
     int nFirstMovePointHandle = polygon.count(); // would be count() - 1 except we also have the DragHandle at index 0
@@ -135,7 +181,7 @@ LHandle *DRPolyline::getGrab( const QPointF &pointPos, bool bSizing )
     polygon.insert( nPointNext, getView()->mapToScene( pHandle->getCenter().toPoint() ) );
 
     // insert another new point handle
-    pHandle = new LHandle( this, getView(), LHandle::TypePointFactory, point );
+    pHandle = new LHandle( this, getView(), LHandle::TypePointFactoryNew, point );
     vectorHandles.insert( nHandleNewPointNext, pHandle );
     pHandle->show();
     nHandlePointNext++; // we just shoved everything over by one
@@ -151,12 +197,17 @@ LHandle *DRPolyline::getGrab( const QPointF &pointPos, bool bSizing )
 }
 
 /*!
- * \brief Move current handle.
+ * \brief Move handle.
  *  
- * Only used during manipulation mode. 
- *  
+ * For manipulating an existing object.
+ * 
+ * The handle should have been retreived with \sa getGrab()
+ * 
  * The polygon will be moved if move handle otherwise we will move handle/point and 
- * adjust move handle so its center. 
+ * adjust move handle so its center of object. 
+ * 
+ * \sa getGrab
+ * \sa doDrop
  * 
  * \author pharvey (2/1/23)
  * 
@@ -188,7 +239,7 @@ void DRPolyline::doMove( LHandle *pHandle, const QPointF &pointPos )
         // just a single point handle
         polygon.replace( vectorHandles.indexOf( pHandle ) - nFirstMovePointHandle, pointPos );
     }
-    else if ( pHandle->getType() == LHandle::TypePointFactory )
+    else if ( pHandle->getType() == LHandle::TypePointFactoryNew )
     {
         // Should not happen.
         // see; getGrab()
@@ -198,12 +249,39 @@ void DRPolyline::doMove( LHandle *pHandle, const QPointF &pointPos )
     // update();
 }
 
+/*!
+ * \brief Drop handle.
+ * 
+ * For manipulating an existing object.
+ * 
+ * The handle should have been retreived with \sa getGrab()
+ * 
+ * The handle/point will be deleted if dropped on a TypePointFactoryDelete and still leaves at least 2 points.
+ * 
+ * \sa getGrab
+ * \sa doMove
+ * 
+ * \author pharvey (2026-11-26)
+ * 
+ * \param pHandle  
+ * \param pointPos 
+ */
 void DRPolyline::doDrop( LHandle *pHandle, const QPointF &pointPos )
 {
     if ( !pointPos.isNull() ) doMove( pHandle, pointPos );
-    if ( shouldRemovePoint( pHandle ) ) doRemovePoint( pHandle );
+    bool b = shouldRemovePoint( pHandle );
+
+    // switch TypePointFactoryDelete back to TypeMovePoint
+    for ( int n = 0; n < vectorHandles.count(); n++ )
+    {
+        LHandle *p = vectorHandles.at( n );
+        if ( p->getType() == LHandle::TypePointFactoryDelete ) p->setType( LHandle::TypeMovePoint );
+    }
+
+    if ( b ) doRemovePoint( pHandle );
 }
 
+// create a point
 void DRPolyline::doPress( const QPointF &point )
 {
     Q_ASSERT( bInit );
@@ -212,6 +290,7 @@ void DRPolyline::doPress( const QPointF &point )
     getGraphics()->update();
 }
 
+// move entire object
 void DRPolyline::doMoveBy( const QPointF &pointDelta )
 {
     DRObject::doMoveBy( pointDelta );
@@ -221,6 +300,18 @@ void DRPolyline::doMoveBy( const QPointF &pointDelta )
     }
 }
 
+/*!
+ * \brief Move proposed point.
+ * 
+ * For creating new object.
+ * 
+ * \sa doPress
+ * \sa doMove
+ * 
+ * \author pharvey (2026-11-26)
+ * 
+ * \param point  
+ */
 void DRPolyline::doMove( const QPointF &point )
 {
     Q_ASSERT( bInit );
@@ -229,6 +320,18 @@ void DRPolyline::doMove( const QPointF &point )
     // update();
 }
 
+/*!
+ * \brief Add final point.
+ * 
+ * For creating new object.
+ * 
+ * \sa doPress
+ * \sa doMove
+ * 
+ * \author pharvey (2026-11-26)
+ * 
+ * \param point  
+ */
 void DRPolyline::doDoubleClick( const QPointF &point /* could be null */ )
 {
     Q_UNUSED( point );  // no need for this as doPress would have been called already
@@ -236,11 +339,6 @@ void DRPolyline::doDoubleClick( const QPointF &point /* could be null */ )
 
     getGraphics()->setAcceptHoverEvents( false );
     bInit = false;
-
-    // we will add handles to vector using append (not index) so no need to have DRObject alloc
-    // nHandlesAlloc = polygon.count();        // for each point
-    // nHandlesAlloc += polygon.count() - 1;   // for each intermediate point
-    // nHandlesAlloc += 1;                     // for move handle
 }
 
 QDomElement DRPolyline::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent )
@@ -336,7 +434,7 @@ void DRPolyline::doCreateHandlesStandard()
     // add a handle between each point (moving it will create a new point)
     for ( int n = 1; n < polygonView.count(); n++ )
     {
-        pHandle = new LHandle( this, getView(), LHandle::TypePointFactory, QRectF( polygonView.at( n - 1 ), polygonView.at( n ) ).center() );
+        pHandle = new LHandle( this, getView(), LHandle::TypePointFactoryNew, QRectF( polygonView.at( n - 1 ), polygonView.at( n ) ).center() );
         pHandle->setToolTip( tr("factory") );
         vectorHandles.append( pHandle );
         pHandle->show();
@@ -358,18 +456,18 @@ void DRPolyline::doSyncHandlesStandard()
     Q_ASSERT( vectorHandles.count() > 0 );
 
     QPolygon polygonView = getView()->mapFromScene( polygon );
-    int nHandle = 0;
+    int nHandle = 0; // nIndexHandleMove
 
-    // move handle (always at index 0)
+    // FunctionMove (always at index 0)
     vectorHandles[nHandle]->setCenter( polygonView.boundingRect().center() );
 
-    // new point handles
+    // TypePointFactoryNew/TypePointFactoryDelete
     for ( int n = 1; n < polygonView.count(); n++ )
     {
         vectorHandles[++nHandle]->setCenter( QRectF( polygonView.at( n - 1 ), polygonView.at( n ) ).center() );
     }
 
-    // point handles
+    // TypeMovePoint
     for ( int n = 0; n < polygonView.count(); n++ )
     {
         vectorHandles[++nHandle]->setCenter( polygonView[n] );
@@ -400,18 +498,9 @@ void DRPolyline::doRemovePoint( LHandle *pHandle )
 
 bool DRPolyline::shouldRemovePoint( LHandle *pHandle )
 {
-    // we must be working with an existing polygon point
-    if ( !pHandle ) return false;
-    if ( pHandle->getType() != LHandle::TypeMovePoint ) return false;
-    // not enough points to consider removing one?
-    if ( polygon.count() <= 2 ) return false;
-    // on another point?
-    LHandle *p = getHandleUnder( pHandle, LHandle::TypeMovePoint );
-    if ( !p ) return false;
-    // must be an adjacent point to eliminate a line segment - adjacent?
-    if ( p != getHandlePrev( pHandle, LHandle::TypeMovePoint ) && p != getHandleNext( pHandle, LHandle::TypeMovePoint ) ) return false;
-
-    return true;
+    // no sanity checks here
+    if ( pHandle->getType() == LHandle::TypeMovePoint && getHandleUnder( pHandle, LHandle::TypePointFactoryDelete ) ) return true;
+    return false;
 }
 
 void DRPolyline::doDump()

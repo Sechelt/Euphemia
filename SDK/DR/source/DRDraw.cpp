@@ -616,6 +616,7 @@ void DRDraw::doMousePressEventIdle( QGraphicsSceneMouseEvent *pEvent )
         case ToolDrawPolygon:
         case ToolDrawPolyline:
             {
+                pSelectionManager->doSelectNone();
                 pObjectDrawing = getObject( nTool, pointPress );       // first point
                 // select when doubleclick because that is when we know what handles to create
                 setToolState( ToolStateDraw );
@@ -963,9 +964,11 @@ void DRDraw::doMouseDoubleClickEvent( QGraphicsSceneMouseEvent *pEvent )
         case ToolDrawPolyline:
             ((DRPolyline *)pObjectDrawing)->doDoubleClick( pEvent->scenePos() );
             pSelectionManager->setSelected( pObjectDrawing );
-            setToolState( ToolStateDrawManipulate );
             pHandleMoving = nullptr;
-            setModified();
+            if ( bAutoCommit )
+                doCommit( false );
+            else
+                setToolState( ToolStateDrawManipulate ); // manipulate without commit 
             break;
         case ToolManipulate:
         case ToolSelectRectangle:

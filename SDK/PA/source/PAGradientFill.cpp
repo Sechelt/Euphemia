@@ -534,7 +534,7 @@ void PAGradientFill::doCreateHandles()
 
     if ( nType == StandardGradientLinear )
     {
-        pHandle = new LHandle( this, pLayerView, LHandle::TypePointFactory, pLayerView->mapFromScene( pointFactory ) );
+        pHandle = new LHandle( this, pLayerView, LHandle::TypePointFactoryNew, pLayerView->mapFromScene( pointFactory ) );
         pHandle->setToolTip( tr("Drag to create a new point.") );
         vectorHandles.append( pHandle );
         pHandle->show();
@@ -553,7 +553,7 @@ void PAGradientFill::doCreateHandles()
 
     if ( nType == StandardGradientRadial )
     {
-        pHandle = new LHandle( this, pLayerView, LHandle::TypePointFactory, pLayerView->mapFromScene( pointFactory ) );
+        pHandle = new LHandle( this, pLayerView, LHandle::TypePointFactoryNew, pLayerView->mapFromScene( pointFactory ) );
         pHandle->setToolTip( tr("Center\nDouble-Click to set color.\nDrag to create a new point.\nDrop point here to remove.") );
         vectorHandles.append( pHandle );
         pHandle->show();
@@ -572,7 +572,7 @@ void PAGradientFill::doCreateHandles()
 
     if ( nType == StandardGradientConical )
     {
-        pHandle = new LHandle( this, pLayerView, LHandle::TypePointFactory, pLayerView->mapFromScene( conical.pointCenter ) );
+        pHandle = new LHandle( this, pLayerView, LHandle::TypePointFactoryNew, pLayerView->mapFromScene( conical.pointCenter ) );
         // pHandle->setToolTip( tr("Drag to create a new point.\nDrop point here to remove.") );
         vectorHandles.append( pHandle );
         pHandle->show();
@@ -881,7 +881,7 @@ bool PAGradientFill::shouldRemoveStop()
     if ( !pHandle ) return false;
     // we can only remove TypeGradientIntermediate handles
     if ( pHandle->getType() != LHandle::TypeGradientIntermediate ) return false;
-    // deleted by dropping handle on a TypePointFactory handle (same place it was created)
+    // deleted by dropping handle on a TypePointFactoryNew handle (same place it was created)
     if ( nType == StandardGradientLinear )
     {
         if ( getHandleUnder( pHandle, LHandle::TypeGradientStart ) ) return true;
@@ -890,12 +890,12 @@ bool PAGradientFill::shouldRemoveStop()
     else if ( nType == StandardGradientRadial )
     {
         if ( getHandleUnder( pHandle, LHandle::TypeGradientRadius ) ) return true;
-        if ( getHandleUnder( pHandle, LHandle::TypePointFactory ) ) return true;
+        if ( getHandleUnder( pHandle, LHandle::TypePointFactoryNew ) ) return true;
     }
     else if ( nType == StandardGradientConical )
     {
         if ( getHandleUnder( pHandle, LHandle::TypeGradientAngle ) ) return true;
-        if ( getHandleUnder( pHandle, LHandle::TypePointFactory ) ) return true;
+        if ( getHandleUnder( pHandle, LHandle::TypePointFactoryNew ) ) return true;
     }
 
     return false;

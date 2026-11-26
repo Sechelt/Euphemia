@@ -149,7 +149,13 @@ class DRSObject : public SSetting
     Q_OBJECT
 public:
     DRSObject();
-
+/*
+    ADObject::OID
+    ADObject::NAME
+    ADObject::CODE
+    ADObject::COMMENT
+    DISPLAY
+*/
     SPen *      pPen;
     SBrush *    pBrush;
     SText *     pFont;

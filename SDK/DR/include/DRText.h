@@ -38,8 +38,6 @@ public:
 protected:
     DRSText *pSettingText;
 
-    QString stringText;
-
     virtual void doDraw( QPainter * ) override;
     virtual void doConnectSettings() override;
     virtual void doDisconnectSettings() override;
@@ -74,11 +72,12 @@ public:
     QWidget *   getSwatch( QWidget *pParent ) override;
     QToolBox *  getToolBox( QWidget *pParent ) override;
 
+    virtual void doDialog( QWidget *pParent, bool bThis = false ) override;
     void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;
     void doLoad( QDomElement *pdomElem ) override;
 
 protected:
-    QString stringText;
+    QString stringText; // ADObject::COMMENT
 };
 
 class DRSTextToolBar : public QWidget
@@ -117,6 +116,18 @@ protected:
     DRSText *               pSetting;
 
     QLineEdit *             pLineEdit = nullptr;
+};
+
+class DRSTextDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    DRSTextDialog( QWidget *pParent );
+    ~DRSTextDialog();
+
+protected:
+    void doLoadState();
+    void doSaveState();
 };
 
 #endif

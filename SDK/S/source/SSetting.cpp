@@ -44,7 +44,7 @@ void SSetting::doDialog( QWidget *pParent, bool bThis )
     }
     else
     {
-        SDialog dialog( pParent, metaObject()->className());
+        SDialog dialog( pParent, metaObject()->className() );
         dialog.exec();
     }
 }

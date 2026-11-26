@@ -33,7 +33,7 @@ QDomElement DRText::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent )
 {
     QDomElement domElemThis = DRRectangleBase::doSave( pdomDoc, pdomElemParent );
 
-    domElemThis.setAttribute( "Text", stringText );
+//    domElemThis.setAttribute( "Text", stringText );
 
     return domElemThis;
 }
@@ -42,7 +42,7 @@ bool DRText::doLoad( QDomElement *pdomElemThis )
 {
     DRRectangleBase::doLoad( pdomElemThis );
 
-    stringText  = pdomElemThis->attribute( "Text" ); 
+//    stringText  = pdomElemThis->attribute( "Text" ); 
 
     return true;
 }
@@ -60,12 +60,17 @@ void DRText::doDraw( QPainter *pPainter )
     }
 
     // apply context
-    pPainter->setPen( pen );
-    pPainter->setBrush( brush );
+    pPainter->setPen( font.color );
+    pPainter->setBrush( font.brush );
     pPainter->setFont( font.font );
 
+    // fill background
+//    pPainter->setPen( Qt::NoPen );
+    QRectF rectBackground = pPainter->boundingRect( r, font.nHAlign | font.nVAlign, getComment() );
+    pPainter->fillRect( rectBackground, font.brush );
+
     // draw shape
-    pPainter->drawText( r, font.nHAlign | font.nVAlign, stringText );
+    pPainter->drawText( r, font.nHAlign | font.nVAlign, getComment() );
 
     // draw outline as selected
     if ( nSelectionState == SelectionStateMinimal )
@@ -83,7 +88,7 @@ void DRText::doConnectSettings()
 {
     // skip DRRectangleBase
     DRObject::doConnectSettings();
-    pSettingText->setSelected( stringText );
+    pSettingText->setSelected( getComment() );
     connect( pSettingText, SIGNAL(signalChanged()), this, SLOT(slotRefreshText()) );
 }
 
@@ -96,7 +101,7 @@ void DRText::doDisconnectSettings()
 
 void DRText::slotRefreshText()
 {
-    stringText = pSettingText->getText();
+    setComment( pSettingText->getText() );
     if ( getGraphics() ) getGraphics()->update();
 }
 
@@ -145,6 +150,13 @@ QToolBox *DRSText::getToolBox( QWidget *pParent )
     p->addItem( getPanel( p ), QIcon(), "Text" );
     p->addItem( pFont->getPanel( p ), QIcon(), "Font" );
     return p;
+}
+
+void DRSText::doDialog( QWidget *pParent, bool bThis )
+{
+    Q_UNUSED( bThis );
+    DRSTextDialog dialog( pParent );
+    dialog.exec();
 }
 
 void DRSText::doSave( QDomDocument *pdomDoc, QDomElement *pdomElem )
@@ -207,10 +219,11 @@ void DRSTextToolBar::slotText( const QString &t )
 
 void DRSTextToolBar::slotMore()
 {
-    //    pSetting->doDialog( this );
+    pSetting->doDialog( this );
+    return;
+
+    // Popup
     auto *popup = new QWidget( pMore, Qt::Popup );
-//    auto *popup = new QWidget( pMore, Qt::Tool | Qt::FramelessWindowHint );
-//    auto *popup = new QWidget( pMore, Qt::Drawer );
     popup->setAttribute(Qt::WA_DeleteOnClose);
 
     QToolBox *pToolBox = pSetting->getToolBox( popup );
@@ -257,4 +270,44 @@ void DRSTextPanel::slotText( const QString &t )
     pSetting->setText( t );
 }
 
+DRSTextDialog::DRSTextDialog( QWidget *pParent )
+    : QDialog( pParent )
+{
+    setWindowTitle( tr("Text") );
+
+    DRSText *   pSettingText = (DRSText*)g_SSettings->getSetting( "DRSText" ); Q_ASSERT( pSettingText );
+    SText*      pSettingFont = (SText*)g_SSettings->getSetting( "SText" ); Q_ASSERT( pSettingFont );
+
+    QVBoxLayout *pLayoutTop = new QVBoxLayout( this );
+    pLayoutTop->addWidget( pSettingText->getPanel( this ) );
+    pLayoutTop->addWidget( pSettingFont->getPanel( this ), 10 );
+//    pLayoutTop->addStretch( 10 );
+
+    QDialogButtonBox *pButtonBox = new QDialogButtonBox( QDialogButtonBox::Ok, this );
+    pLayoutTop->addWidget( pButtonBox ); 
+
+    connect( pButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
+
+    doLoadState();
+}
+
+DRSTextDialog::~DRSTextDialog()
+{
+    doSaveState();
+}
+
+void DRSTextDialog::doSaveState()
+{
+    QSettings settings;
+    settings.setValue( metaObject()->className() + QString("/width"), width() );
+    settings.setValue( metaObject()->className() + QString("/height"), height() );
+}
+
+void DRSTextDialog::doLoadState()
+{
+    QSettings settings;
+    int nWidth = settings.value( metaObject()->className() + QString("/width"), width() ).toInt();
+    int nHeight= settings.value( metaObject()->className() + QString("/height"), height() ).toInt();
+    resize( nWidth, nHeight );
+}
 

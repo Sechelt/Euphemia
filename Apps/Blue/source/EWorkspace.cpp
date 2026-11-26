@@ -92,7 +92,10 @@ AWObject::SaveResults EWorkspace::doCloseChildren( bool /* bRequest */ )
     foreach( p, listChildren )                                                                                                                          
     {                                                                                                                                                   
         Q_ASSERT( p->inherits( "EFile" ) );                                                                                                             
-        EFile *pFile = (EFile*)p;      
+        EFile *pFile = (EFile*)p;
+        // need to get rid of selections before we start deleting objects
+        // this can result in layer becoming modified (via doCommit) so take care of it here      
+        pFile->doSelectNone(); 
         AWFile::SaveResults nSaved = pFile->slotClose();
 
         switch ( nSaved )

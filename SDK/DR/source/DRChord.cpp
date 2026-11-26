@@ -50,6 +50,8 @@ void DRChord::doDraw( QPainter *pPainter )
     // draw manipulation indicators
     if ( nSelectionState == SelectionStateStandard )
     {
+        // removing the artifacts is not worth the effort - just do not draw them
+        /*
         QPen pen( Qt::white );
         pPainter->setPen( pen );
         pPainter->drawLine( r.center(), pointStart );
@@ -60,6 +62,7 @@ void DRChord::doDraw( QPainter *pPainter )
         pPainter->setPen( pen );
         pPainter->drawLine( r.center(), pointStart );
         pPainter->drawLine( r.center(), pointStop );
+        */
     }
     // draw outline as selected
     else if ( nSelectionState == SelectionStateMinimal )

@@ -63,6 +63,20 @@ void LHandle::paintEvent( QPaintEvent *pEvent )
 
     switch ( nType )
     {
+        case TypeStartAngle:
+            {
+                painter.setPen( QPen( Qt::black ) );
+                painter.setBrush( QBrush( Qt::red ) );
+                painter.drawPie( rect(), 30 * 16, 120 * 16 );
+            }
+            break;
+        case TypeSpanAngle:
+            {
+                painter.setPen( QPen( Qt::black ) );
+                painter.setBrush( QBrush( Qt::green ) );
+                painter.drawPie( rect(), 30 * 16, 120 * 16 );
+            }
+            break;
         case TypeHRound:
         case TypeVRound:
         case TypeMovePoint:
@@ -472,6 +486,8 @@ void LHandle::doInit()
     {
         case TypeHRound:
         case TypeVRound:
+        case TypeStartAngle:
+        case TypeSpanAngle:
         case TypeMovePoint:
         case TypeGradientIntermediate:
         case TypeGradientRadius:

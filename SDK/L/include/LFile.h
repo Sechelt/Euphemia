@@ -93,6 +93,7 @@ public:
     virtual QVector<LGraphicsLine*> getGuidesX() { return vectorGuidesX; }
     virtual QVector<LGraphicsLine*> getGuidesY() { return vectorGuidesY; }
 
+    virtual void doSelectNone();
     virtual void doCrop();
     virtual void doResize( qreal nX, qreal nY );
     virtual void doResize( const QSizeF & );

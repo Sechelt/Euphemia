@@ -44,10 +44,10 @@ DRArc::DRArc( DRDraw *pLayer, const QPointF &pointPos )
 {
     // juggle around handles
     nHandlesAlloc           = 5;
-    nIndexHandleStartAngle  = 0;
-    nIndexHandleSpanAngle   = 1;
-    nIndexHandleMove        = 2;
-    nIndexHandleTopLeft     = 3;
+    nIndexHandleTopLeft     = 0;
+    nIndexHandleMove        = 1;
+    nIndexHandleStartAngle  = 2;
+    nIndexHandleSpanAngle   = 3;
     nIndexHandleBottomRight = 4;
 
     pointStart = r.center();
@@ -183,6 +183,8 @@ void DRArc::doDraw( QPainter *pPainter )
     // draw manipulation indicators
     if ( nSelectionState == SelectionStateStandard )
     {
+        // removing the artifacts is not worth the effort - just do not draw them
+        /*
         QPen pen( Qt::white );
         pPainter->setPen( pen );
         pPainter->drawLine( r.center(), pointStart );
@@ -193,6 +195,7 @@ void DRArc::doDraw( QPainter *pPainter )
         pPainter->setPen( pen );
         pPainter->drawLine( r.center(), pointStart );
         pPainter->drawLine( r.center(), pointStop );
+        */
     }
     // draw outline as selected
     else if ( nSelectionState == SelectionStateMinimal )
@@ -214,8 +217,8 @@ void DRArc::doCreateHandlesStandard()
 
     DRRectangleBase::doCreateHandlesStandard();
 
-    vectorHandles[nIndexHandleStartAngle] = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStart ) );
-    vectorHandles[nIndexHandleSpanAngle] = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStop ) );
+    vectorHandles[nIndexHandleStartAngle] = new LHandle( this, getView(), LHandle::TypeStartAngle, getView()->mapFromScene( pointStart ) );
+    vectorHandles[nIndexHandleSpanAngle] = new LHandle( this, getView(), LHandle::TypeSpanAngle, getView()->mapFromScene( pointStop ) );
 
     vectorHandles[nIndexHandleStartAngle]->setToolTip( tr("start angle") );
     vectorHandles[nIndexHandleSpanAngle]->setToolTip( tr("stop angle") );

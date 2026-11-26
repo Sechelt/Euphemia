@@ -96,14 +96,9 @@ bool EMainWindow::doOpen( const QString &s )
     return true;
 }
 
+// close app
 void EMainWindow::closeEvent( QCloseEvent *pEvent )
 {
-    // reset state of current layer
-    if ( pLayer )
-    {
-        pLayer->doSelectNone();
-    }
-
     // save/discard/cancel
     AWObject::SaveResults n = pWorkspace->doCloseChildren();
     if ( n == AWObject::SaveCancel ) 
@@ -1315,6 +1310,7 @@ bool EMainWindow::slotPrint()
     return pFile->doPrint();
 }
 
+// close current editor
 bool EMainWindow::slotClose()
 {
     Q_ASSERT(pEditorWidget);
@@ -1322,6 +1318,10 @@ bool EMainWindow::slotClose()
     Q_ASSERT( n >= 0 );
 
     EFile *pFile = (EFile*)pEditorWidget->getObject();                
+    // need to get rid of selections before we start deleting objects
+    // this can result in layer becoming modified (via doCommit) so take care of it here      
+    pFile->doSelectNone(); 
+
     AWFile::SaveResults nSaved = pFile->slotClose();
 
     switch ( nSaved )

@@ -17,11 +17,6 @@
 
 #include "DRDraw.h"
 
-#define DRRectangleBegin 0
-#define DRRectangleMove 1
-#define DRRectangleEnd 2
-#define DRPieStartAngle 3
-#define DRPieSpanAngle 4
 /*
     if ( bBind )                                                                       
     {                                                                                  
@@ -48,10 +43,10 @@ DRPie::DRPie( DRDraw *pLayer, const QPointF &pointPos )
 {
     // juggle around handles
     nHandlesAlloc           = 5;
-    nIndexHandleStartAngle  = 0;
-    nIndexHandleSpanAngle   = 1;
-    nIndexHandleMove        = 2;
-    nIndexHandleTopLeft     = 3;
+    nIndexHandleTopLeft     = 0;
+    nIndexHandleMove        = 1;
+    nIndexHandleStartAngle  = 2;
+    nIndexHandleSpanAngle   = 3;
     nIndexHandleBottomRight = 4;
 
     r = QRectF( pointPos.isNull() ? QPointF( 0, 0 ) : pointPos, QSize( 1, 1 ) );
@@ -72,7 +67,7 @@ LHandle *DRPie::getGrab( const QPointF &pointPos, bool bSizing )
     if ( bSizing ) 
     {
         if ( nSelectionState != SelectionStateStandard ) return nullptr;
-        return vectorHandles.at( DRRectangleEnd );
+        return vectorHandles.at( nIndexHandleBottomRight );
     }
 
     return DRObject::getGrab( pointPos ); 
@@ -87,7 +82,7 @@ void DRPie::doMove( LHandle *pHandle, const QPointF &pointPos )
     QPointF  pointView   = getView()->mapFromScene( pointPos );
 
     // adjusting angles?
-    if ( pHandle == vectorHandles[DRPieStartAngle] )
+    if ( pHandle == vectorHandles[nIndexHandleStartAngle] )
     {
         pHandle->setCenter( pointView );
         pointStart = pointPos;
@@ -100,7 +95,7 @@ void DRPie::doMove( LHandle *pHandle, const QPointF &pointPos )
         return;
     }
 
-    if ( pHandle == vectorHandles[DRPieSpanAngle] )
+    if ( pHandle == vectorHandles[nIndexHandleSpanAngle] )
     {
         pHandle->setCenter( pointView );
         pointStop = pointPos;
@@ -119,7 +114,7 @@ void DRPie::doMove( LHandle *pHandle, const QPointF &pointPos )
     //
 
     // adjust our geometry
-    if ( pHandle == vectorHandles[DRRectangleBegin] )
+    if ( pHandle == vectorHandles[nIndexHandleTopLeft] )
     {
         // todo
 #ifdef CBD_TODO
@@ -127,7 +122,7 @@ printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
 #endif
 
     }
-    else if ( pHandle == vectorHandles[DRRectangleMove] )
+    else if ( pHandle == vectorHandles[nIndexHandleMove] )
     {
         QPointF pointDiff = pointPos - r.center();
         r.setTopLeft( r.topLeft() + pointDiff );
@@ -136,7 +131,7 @@ printf( "[PAH][%s][%s][%d] ToDo\n", __FILE__, __FUNCTION__, __LINE__ );
         pointStart += pointDiff;
         pointStop += pointDiff;
     }
-    else if ( pHandle == vectorHandles[DRRectangleEnd] )
+    else if ( pHandle == vectorHandles[nIndexHandleBottomRight] )
     {
         // todo
 #ifdef CBD_TODO
@@ -206,6 +201,8 @@ void DRPie::doDraw( QPainter *pPainter )
     // draw manipulation indicators
     if ( nSelectionState == SelectionStateStandard )
     {
+        // removing the artifacts is not worth the effort - just do not draw them
+        /*
         QPen pen( Qt::white );
         pPainter->setPen( pen );
         pPainter->drawLine( r.center(), pointStart );
@@ -214,8 +211,11 @@ void DRPie::doDraw( QPainter *pPainter )
         pen.setColor( Qt::darkGray );
         pen.setStyle( Qt::DashLine );
         pPainter->setPen( pen );
-        pPainter->drawLine( r.center(), pointStart );
-        pPainter->drawLine( r.center(), pointStop );
+        if ( !(vectorHandles[nIndexHandleStartAngle]->isTransparent()) )
+            pPainter->drawLine( r.center(), pointStart );
+        if ( !(vectorHandles[nIndexHandleSpanAngle]->isTransparent()) )
+            pPainter->drawLine( r.center(), pointStop );
+        */
     }
     // draw outline as selected
     else if ( nSelectionState == SelectionStateMinimal )
@@ -237,8 +237,8 @@ void DRPie::doCreateHandlesStandard()
 
     DRRectangleBase::doCreateHandlesStandard();
 
-    vectorHandles[nIndexHandleStartAngle] = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStart ) );
-    vectorHandles[nIndexHandleSpanAngle] = new LHandle( this, getView(), LHandle::TypeMovePoint, getView()->mapFromScene( pointStop ) );
+    vectorHandles[nIndexHandleStartAngle] = new LHandle( this, getView(), LHandle::TypeStartAngle, getView()->mapFromScene( pointStart ) );
+    vectorHandles[nIndexHandleSpanAngle] = new LHandle( this, getView(), LHandle::TypeSpanAngle, getView()->mapFromScene( pointStop ) );
 
     vectorHandles[nIndexHandleStartAngle]->setToolTip( tr("start angle") );
     vectorHandles[nIndexHandleSpanAngle]->setToolTip( tr("stop angle") );

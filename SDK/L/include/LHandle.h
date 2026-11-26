@@ -60,6 +60,8 @@ public:
         TypeSizeBottomLeft,
         TypeHRound,                 // to round corners of a rect
         TypeVRound,                 // to round corners of a rect
+        TypeStartAngle,
+        TypeSpanAngle,
         TypeFillSeed,
         TypeGradientStart,
         TypeGradientStop,
@@ -123,6 +125,8 @@ public:
 
     void doMoveBy( qreal nX, qreal nY );
     void doMoveBy( const QPointF & );
+
+    bool isTransparent() { return bTransparent; }
 
 protected:
     QGraphicsView *     pView;                      /*!< view - we are child of its viewport                                    */

@@ -500,6 +500,15 @@ void LFile::setImage( const QImage &image )
     }
 }
 
+void LFile::doSelectNone()
+{
+    QList<LLayer*> l = findChildren<LLayer*>( QString(), Qt::FindDirectChildrenOnly );                                                   
+    foreach( LLayer *p, l )
+    {
+        p->doSelectNone();
+    }
+}
+
 void LFile::doCrop()
 {
     if ( !pLayer ) return;

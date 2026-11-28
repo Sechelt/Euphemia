@@ -67,6 +67,7 @@
             <F N="source/SSetting.cpp"/>
             <F N="source/SSettings.cpp"/>
             <F N="source/SText.cpp"/>
+            <F N="source/STextContent.cpp"/>
         </Folder>
         <Folder
             Name="Header Files"
@@ -85,6 +86,7 @@
             <F N="include/SSetting.h"/>
             <F N="include/SSettings.h"/>
             <F N="include/SText.h"/>
+            <F N="include/STextContent.h"/>
         </Folder>
         <Folder
             Name="Resource Files"

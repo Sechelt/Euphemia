@@ -13,6 +13,7 @@ INCLUDEPATH	+= ./include
 INCLUDEPATH	+= ../include
 INCLUDEPATH	+= ../CBD/include
 INCLUDEPATH	+= ../W/include
+INCLUDEPATH	+= ../AD/include
 
 # #########################################################
 # FILES
@@ -31,7 +32,8 @@ HEADERS	+= \
         include/SRuler.h \
         include/SSetting.h \
         include/SSettings.h \
-        include/SText.h
+        include/SText.h \
+        include/STextContent.h
 
 SOURCES	+= \
         source/SBrush.cpp \
@@ -45,5 +47,6 @@ SOURCES	+= \
         source/SRuler.cpp \
         source/SSetting.cpp \
         source/SSettings.cpp \
-        source/SText.cpp
+        source/SText.cpp \
+        source/STextContent.cpp
 

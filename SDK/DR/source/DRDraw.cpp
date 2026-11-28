@@ -247,16 +247,16 @@ QWidget *DRDraw::getToolBoxStack( QWidget *pParent )
     pWidget->insertWidget( ToolSelectRectangle, new QWidget( pParent ) );
     pWidget->insertWidget( ToolSelectPolygon, new QWidget( pParent ) );
     pWidget->insertWidget( ToolManipulate, new QWidget( pParent ) );
-    pWidget->insertWidget( ToolDrawArc, new QWidget( pParent ) );
-    pWidget->insertWidget( ToolDrawChord, new QWidget( pParent ) );
-    pWidget->insertWidget( ToolDrawImage, ( g_SSettings->getSetting( "DRSImage" ) ? g_SSettings->getSetting( "DRSImage" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
-    pWidget->insertWidget( ToolDrawPie, new QWidget( pParent ) );
-    pWidget->insertWidget( ToolDrawLine, ( g_SSettings->getSetting( "DRSLine" ) ? g_SSettings->getSetting( "DRSLine" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
-    pWidget->insertWidget( ToolDrawRectangle, ( g_SSettings->getSetting( "DRSRectangleBase" ) ? g_SSettings->getSetting( "DRSRectangleBase" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
-    pWidget->insertWidget( ToolDrawEllipse, new QWidget( pParent ) );
-    pWidget->insertWidget( ToolDrawPolygon, new QWidget( pParent ) );
-    pWidget->insertWidget( ToolDrawPolyline, new QWidget( pParent ) );
-    pWidget->insertWidget( ToolDrawText, ( g_SSettings->getSetting( "DRSText" ) ? g_SSettings->getSetting( "DRSText" )->getToolBox( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawArc, ( g_SSettings->getSetting( "DRSObject" ) ? g_SSettings->getSetting( "DRSObject" )->getPanelMax( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawChord, ( g_SSettings->getSetting( "DRSObject" ) ? g_SSettings->getSetting( "DRSObject" )->getPanelMax( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawImage, ( g_SSettings->getSetting( "DRSImage" ) ? g_SSettings->getSetting( "DRSImage" )->getPanelMax( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawPie, ( g_SSettings->getSetting( "DRSObject" ) ? g_SSettings->getSetting( "DRSObject" )->getPanelMax( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawLine, ( g_SSettings->getSetting( "DRSLine" ) ? g_SSettings->getSetting( "DRSLine" )->getPanelMax( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawRectangle, ( g_SSettings->getSetting( "DRSRectangleBase" ) ? g_SSettings->getSetting( "DRSRectangleBase" )->getPanelMax( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawEllipse, ( g_SSettings->getSetting( "DRSObject" ) ? g_SSettings->getSetting( "DRSObject" )->getPanelMax( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawPolygon, ( g_SSettings->getSetting( "DRSObject" ) ? g_SSettings->getSetting( "DRSObject" )->getPanelMax( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawPolyline, ( g_SSettings->getSetting( "DRSObject" ) ? g_SSettings->getSetting( "DRSObject" )->getPanelMax( pParent ) : new QWidget( pParent ) ) );
+    pWidget->insertWidget( ToolDrawText, ( g_SSettings->getSetting( "DRSText" ) ? g_SSettings->getSetting( "DRSText" )->getPanelMax( pParent ) : new QWidget( pParent ) ) );
     return pWidget;
 }
 
@@ -1904,23 +1904,20 @@ QWidget *DRDraw::getToolBox( QWidget *p, Tools n )
             break;
         case ToolDrawArc:
         case ToolDrawChord:
-            break;
-        case ToolDrawImage:
-            return g_SSettings->getSetting( "DRSImage" )->getToolBox( p );
         case ToolDrawPie:
-            break;
-        case ToolDrawLine:
-            return g_SSettings->getSetting( "DRSLine" )->getToolBox( p );
-        case ToolDrawRectangle:
-            return g_SSettings->getSetting( "DRSRectangleBase" )->getToolBox( p );
-        case ToolDrawEllipse:
-            return g_SSettings->getSetting( "LSEllipse" )->getToolBox( p );
         case ToolDrawPolygon:
-            break;
         case ToolDrawPolyline:
-            break;
+            return g_SSettings->getSetting( "DRSObject" )->getPanelMax( p );
+        case ToolDrawImage:
+            return g_SSettings->getSetting( "DRSImage" )->getPanelMax( p );
+        case ToolDrawLine:
+            return g_SSettings->getSetting( "DRSLine" )->getPanelMax( p );
+        case ToolDrawRectangle:
+            return g_SSettings->getSetting( "DRSRectangleBase" )->getPanelMax( p );
+        case ToolDrawEllipse:
+            return g_SSettings->getSetting( "LSEllipse" )->getPanelMax( p );
         case ToolDrawText:
-            return g_SSettings->getSetting( "DRSText" )->getToolBox( p );
+            return g_SSettings->getSetting( "DRSText" )->getPanelMax( p );
     }
     return nullptr;
 }

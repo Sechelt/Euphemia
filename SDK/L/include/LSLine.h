@@ -9,7 +9,8 @@
 #ifndef H_LSLine
 #define H_LSLine
 
-#include <SSetting.h>
+#include <SPen.h>
+#include <SBrush.h>
 
 /*!
  * \brief Setting for \sa PLine
@@ -165,9 +166,18 @@ public slots:
 
 protected:
     LSLine *pSetting;
+    SPen *  pPen;
+    SBrush *pBrush;
+
+    QPointF pointBegin;
+    QPointF pointEnd;
 
     void paintEvent( QPaintEvent *pEvent );
     QSize sizeHint() const;
+
+    virtual void doDrawLineEnd( QPainter *pPainter, LSLine::LineEndStyles nStyle, const QLineF &line );
+    virtual void doDrawLineEndArrow( QPainter *pPainter, const QLineF &line );
+    virtual void doDrawLineEndBall( QPainter *pPainter, const QLineF &line );
 };
 
 #endif

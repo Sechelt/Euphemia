@@ -93,6 +93,19 @@ namespace CBD
         Qt::AlignmentFlag   nVAlign;
         Qt::AlignmentFlag   nHAlign;
     } CBDText;
+
+    [[maybe_unused]]
+    static QColor getContrastingColor( const QColor &c ) 
+    {
+        // Calculate relative luminance (perceived brightness)
+        double luminance = (0.299 * c.redF()) + 
+                           (0.587 * c.greenF()) + 
+                           (0.114 * c.blueF());
+
+        // Return black for bright backgrounds, white for dark backgrounds
+        return (luminance > 0.5) ? QColor(Qt::black) : QColor(Qt::white);
+    }
+
 };
 
 #endif

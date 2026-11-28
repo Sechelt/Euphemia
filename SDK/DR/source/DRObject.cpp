@@ -30,7 +30,8 @@ DRObject::DRObject( DRDraw *pLayer, const QPointF &pointPos, const QString &stri
     pSettingObject = (DRSObject*)g_SSettings->getSetting( "DRSObject" ); Q_ASSERT( pSettingObject );
     slotRefreshPen();
     slotRefreshBrush();
-    slotRefreshFont();
+    slotRefreshTextFormat();
+    slotRefreshTextContent();
 }
 
 DRObject::~DRObject()
@@ -166,9 +167,30 @@ void DRObject::setBrush( const QBrush &t )
     setModified();
 }
 
-void DRObject::setFont( const CBD::CBDText &t )
+void DRObject::setTextFormat( const CBD::CBDText &t )
 {
-    font = t; 
+    text = t; 
+    if ( pGraphics ) pGraphics->update();
+    setModified();
+}
+
+void DRObject::setTextDisplayCode( bool b )
+{
+    bDisplayCode = b; 
+    if ( pGraphics ) pGraphics->update();
+    setModified();
+}
+
+void DRObject::setTextDisplayName( bool b )
+{
+    bDisplayName = b; 
+    if ( pGraphics ) pGraphics->update();
+    setModified();
+}
+
+void DRObject::setTextDisplayComment( bool b )
+{
+    bDisplayComment = b; 
     if ( pGraphics ) pGraphics->update();
     setModified();
 }
@@ -283,6 +305,10 @@ QDomElement DRObject::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent
 {
     QDomElement domElemThis = LObject::doSave( pdomDoc, pdomElemParent );
 
+    if ( bDisplayCode ) domElemThis.setAttribute( "DisplayCode", QString::number( 1 ) );
+    if ( bDisplayName ) domElemThis.setAttribute( "DisplayName", QString::number( 1 ) );
+    if ( bDisplayComment ) domElemThis.setAttribute( "DisplayComment", QString::number( 1 ) );
+
     QTransform t = getGraphics()->transform();
     if ( t.m11() != 1 ) domElemThis.setAttribute( "m11", t.m11() );
     if ( t.m12() ) domElemThis.setAttribute( "m12", t.m12() );
@@ -296,7 +322,7 @@ QDomElement DRObject::doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent
     if ( t.dx() ) domElemThis.setAttribute( "dx", t.dx() );
     if ( t.dy() ) domElemThis.setAttribute( "dy", t.dy() );
 
-    domElemThis.appendChild( CBDPersistNative::doSaveText( font, pdomDoc ) );
+    domElemThis.appendChild( CBDPersistNative::doSaveText( text, pdomDoc ) );
     domElemThis.appendChild( CBDPersistNative::doSavePen( pen, pdomDoc ) );
     domElemThis.appendChild( CBDPersistNative::doSaveBrush( brush, pdomDoc ) );
 
@@ -307,6 +333,10 @@ bool DRObject::doLoad( QDomElement *pdomElemThis )
 {
     LObject::doLoad( pdomElemThis );
     if ( getGraphics() ) getGraphics()->doPrepareGeometryChange();
+
+    bDisplayCode = pdomElemThis->attribute( "DisplayCode", "0" ).toInt();
+    bDisplayName = pdomElemThis->attribute( "DisplayName", "0" ).toInt();
+    bDisplayComment = pdomElemThis->attribute( "DisplayComment", "0" ).toInt();
 
     // transformation
     {
@@ -343,7 +373,7 @@ bool DRObject::doLoad( QDomElement *pdomElemThis )
         else if ( domElem.tagName() == "Brush" )
             brush = CBDPersistNative::doLoadBrush( &domElem );
         else if ( domElem.tagName() == "Font" )
-            font = CBDPersistNative::doLoadText( &domElem );
+            text = CBDPersistNative::doLoadText( &domElem );
 
         domNode = domNode.nextSibling();
     }
@@ -488,17 +518,22 @@ void DRObject::doConnectSettings()
 {
     pSettingObject->pPen->setSelected( pen );
     pSettingObject->pBrush->setSelected( brush );
-    pSettingObject->pFont->setSelected( font );
+    pSettingObject->pText->setSelected( text );
+    pSettingObject->pTextContent->setSelectedCode( getCode() );
+    pSettingObject->pTextContent->setSelectedName( getName() );
+    pSettingObject->pTextContent->setSelectedComment( getComment() );
     connect( pSettingObject->pPen, SIGNAL(signalChanged()), this, SLOT(slotRefreshPen()) );
     connect( pSettingObject->pBrush, SIGNAL(signalChanged()), this, SLOT(slotRefreshBrush()) );
-    connect( pSettingObject->pFont, SIGNAL(signalChanged()), this, SLOT(slotRefreshFont()) );
+    connect( pSettingObject->pText, SIGNAL(signalChanged()), this, SLOT(slotRefreshTextFormat()) );
+    connect( pSettingObject->pTextContent, SIGNAL(signalChanged()), this, SLOT(slotRefreshTextContent()) );
 }
 
 void DRObject::doDisconnectSettings()
 {
     disconnect( pSettingObject->pPen, SIGNAL(signalChanged()), this, SLOT(slotRefreshPen()) );
     disconnect( pSettingObject->pBrush, SIGNAL(signalChanged()), this, SLOT(slotRefreshBrush()) );
-    disconnect( pSettingObject->pFont, SIGNAL(signalChanged()), this, SLOT(slotRefreshFont()) );
+    disconnect( pSettingObject->pText, SIGNAL(signalChanged()), this, SLOT(slotRefreshTextFormat()) );
+    disconnect( pSettingObject->pTextContent, SIGNAL(signalChanged()), this, SLOT(slotRefreshTextContent()) );
 }
 
 /*!
@@ -645,9 +680,20 @@ void DRObject::slotRefreshBrush()
     if ( pGraphics ) pGraphics->update();
 }
 
-void DRObject::slotRefreshFont()
+void DRObject::slotRefreshTextFormat()
 {
-    font = pSettingObject->pFont->getValue();
+    text = pSettingObject->pText->getValue();
+    if ( pGraphics ) pGraphics->update();
+}
+
+void DRObject::slotRefreshTextContent()
+{
+    setCode( pSettingObject->pTextContent->getCode() );
+    setName( pSettingObject->pTextContent->getName() );
+    setComment( pSettingObject->pTextContent->getComment() );
+    setTextDisplayCode( pSettingObject->pTextContent->getDisplayCode() );
+    setTextDisplayName( pSettingObject->pTextContent->getDisplayName() );
+    setTextDisplayComment( pSettingObject->pTextContent->getDisplayComment() );
     if ( pGraphics ) pGraphics->update();
 }
 
@@ -691,38 +737,27 @@ DRSObject::DRSObject()
 {
     pPen         = (SPen*)g_SSettings->getSetting( "SPen" ); Q_ASSERT( pPen );
     pBrush       = (SBrush*)g_SSettings->getSetting( "SBrush" ); Q_ASSERT( pBrush );
-    pFont        = (SText*)g_SSettings->getSetting( "SText" ); Q_ASSERT( pFont );
-}
-
-QWidget *DRSObject::getButton( QWidget *pParent )
-{
-    Q_UNUSED( pParent );
-    return nullptr;
+    pText        = (SText*)g_SSettings->getSetting( "SText" ); Q_ASSERT( pText );
+    pTextContent = (STextContent*)g_SSettings->getSetting( "STextContent" ); Q_ASSERT( pText );
 }
 
 QWidget *DRSObject::getToolBar( QWidget *pParent )
 {
-    Q_UNUSED( pParent );
-    return nullptr;
+    return pText->getToolBar( pParent );
 }
 
 QWidget *DRSObject::getPanel( QWidget *pParent )
 {
-    Q_UNUSED( pParent );
-    return nullptr;
+    return pText->getPanel( pParent );
 }
 
-QWidget *DRSObject::getSwatch( QWidget *pParent )
+QWidget *DRSObject::getPanelMax( QWidget *pParent )
 {
-    Q_UNUSED( pParent );
-    return nullptr;
-}
-
-QToolBox *DRSObject::getToolBox( QWidget *pParent )
-{
-    QToolBox *p = SSetting::getToolBox( pParent );
-    p->addItem( pPen->getPanel( p ), QIcon(), "Pen" );
+    QToolBox *p = new QToolBox( pParent );
     p->addItem( pBrush->getPanel( p ), QIcon(), "Brush" );
+    p->addItem( pPen->getPanel( p ), QIcon(), "Pen" );
+    p->addItem( pText->getPanel( p ), QIcon(), "Text Format" );
+    p->addItem( pTextContent->getPanel( p ), QIcon(), "Text Content" );
     return p;
 }
 

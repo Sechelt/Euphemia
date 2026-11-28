@@ -17,6 +17,8 @@
 #include <WColorButton.h>
 #include <WBrush.h>
 
+class STextSwatch;
+
 /*!
  * \brief Font combined with foreground color, background brush, etc 
  * 
@@ -43,30 +45,6 @@ public:
 
 protected:
     CBD::CBDText text;
-};
-
-/*!
- * \brief Swatch (example) for a SText.
- *  
- * \author pharvey (12/27/24)
- */
-class STextSwatch : public QWidget
-{
-    Q_OBJECT
-public:
-    STextSwatch( QWidget *pParent, const QString &stringText = QString( tr("AaBbYyZz") ) );
-
-    void setText( const QString & );
-
-public slots:
-    void slotRefresh();
-
-protected:
-    SText *         pSetting;
-    CBD::CBDText    text;
-    QString         stringText;
-
-    void paintEvent( QPaintEvent *pEvent ) override;
 };
 
 /*!
@@ -165,7 +143,6 @@ protected:
     WTextVAlignComboBox *   pAlignVTextWidget;
     WColorButton *          pColorButton;
     WBrushButton *          pBrushButton;
-    STextSwatch *           pSwatch;
 
     // writing system
     QComboBox *             pComboBoxWritingSystem;
@@ -195,6 +172,31 @@ protected slots:
     void slotColor( QColor ); 
     void slotBrush( QBrush ); 
 };
+
+/*!
+ * \brief Swatch (example) for a SText.
+ *  
+ * \author pharvey (12/27/24)
+ */
+class STextSwatch : public QWidget
+{
+    Q_OBJECT
+public:
+    STextSwatch( QWidget *pParent, const QString &stringText = QString( tr("AaBbYyZz") ) );
+
+    void setText( const QString & );
+
+public slots:
+    void slotRefresh();
+
+protected:
+    SText *         pSetting;
+    CBD::CBDText    text;
+    QString         stringText;
+
+    void paintEvent( QPaintEvent *pEvent ) override;
+};
+
 
 #endif
 

@@ -384,11 +384,14 @@ QWidget *DRSLine::getSwatch( QWidget *pParent )
     return pLine->getSwatch( pParent );
 }
 
-QToolBox *DRSLine::getToolBox( QWidget *pParent )
+QWidget *DRSLine::getPanelMax( QWidget *pParent )
 {
-    QToolBox *p = DRSObject::getToolBox( pParent );
-    p->insertItem( 0, pLine->getPanel( p ), QIcon(), "Line" );
-    return p;
+    QWidget *pWidget = DRSObject::getPanelMax( pParent );
+    Q_ASSERT( pWidget );
+    Q_ASSERT( pWidget->inherits( "QToolBox" ) );
+    QToolBox *pToolBox = (QToolBox*)pWidget;
+    pToolBox->insertItem( 0, pLine->getPanel( pToolBox ), QIcon(), "Line" );
+    return pWidget;
 }
 
 void DRSLine::doSave( QDomDocument *pdomDoc, QDomElement *pdomElem )

@@ -193,10 +193,11 @@ QWidget *DRSImage::getSwatch( QWidget *pParent )
     return new DRSImageSwatch( pParent );
 }
 
-QToolBox *DRSImage::getToolBox( QWidget *pParent )
+QWidget *DRSImage::getPanelMax( QWidget *pParent )
 {
-    QToolBox *pToolBox = SSetting::getToolBox( pParent );
-    pToolBox->insertItem( -1, getPanel( pToolBox ), QIcon(), "Image" );
+    // just rely on default?
+    QToolBox *pToolBox = new QToolBox( pParent );
+    pToolBox->addItem( getPanel( pToolBox ), QIcon(), "Image" );
     return pToolBox;
 }
 

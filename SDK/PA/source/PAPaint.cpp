@@ -204,33 +204,33 @@ QWidget *PAPaint::getToolBox( QWidget *pParent )
         case ToolDrawPie:      
             break;
         case ToolDrawFreeHand:               
-            return g_SSettings->getSetting( "PASFreeHand" )->getToolBox( pParent );
+            return g_SSettings->getSetting( "PASFreeHand" )->getPanelMax( pParent );
         case ToolDrawSpray:               
-            return g_SSettings->getSetting( "PASSpray" )->getToolBox( pParent );
+            return g_SSettings->getSetting( "PASSpray" )->getPanelMax( pParent );
         case ToolDrawErase:               
             break;
         case ToolDrawLine:
-            return g_SSettings->getSetting( "LSLine" )->getToolBox( pParent );
+            return g_SSettings->getSetting( "LSLine" )->getPanelMax( pParent );
         case ToolDrawRectangle:      
-            return g_SSettings->getSetting( "LSRectangle" )->getToolBox( pParent );
+            return g_SSettings->getSetting( "LSRectangle" )->getPanelMax( pParent );
         case ToolDrawEllipse:        
-            return g_SSettings->getSetting( "LSEllipse" )->getToolBox( pParent );
+            return g_SSettings->getSetting( "LSEllipse" )->getPanelMax( pParent );
         case ToolDrawPolygon:        
             break;
         case ToolDrawPolyline:        
             break;
         case ToolDrawRectangleFilled:
-            return g_SSettings->getSetting( "LSRectangle" )->getToolBox( pParent );
+            return g_SSettings->getSetting( "LSRectangle" )->getPanelMax( pParent );
         case ToolDrawEllipseFilled:  
-            return g_SSettings->getSetting( "LSEllipse" )->getToolBox( pParent );
+            return g_SSettings->getSetting( "LSEllipse" )->getPanelMax( pParent );
         case ToolDrawPolygonFilled:  
-            return g_SSettings->getSetting( "PASPolygonFilled" )->getToolBox( pParent );
+            return g_SSettings->getSetting( "PASPolygonFilled" )->getPanelMax( pParent );
         case ToolDrawText:
-            return g_SSettings->getSetting( "LSText" )->getToolBox( pParent );
+            return g_SSettings->getSetting( "LSText" )->getPanelMax( pParent );
         case ToolFillFlood:
             break;
         case ToolFillGradient:       
-            return g_SSettings->getSetting( "PASGradient" )->getToolBox( pParent );
+            return g_SSettings->getSetting( "PASGradient" )->getPanelMax( pParent );
         case ToolMagnifierSelection:
             break;
     }

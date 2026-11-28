@@ -195,11 +195,22 @@ LSLineToolBar::LSLineToolBar( QWidget *pParent )
     pLayout->addWidget( pEndSize );
     connect( pEndSize, SIGNAL(valueChanged(qreal)), SLOT(slotEndSize(qreal)) );
 
-    pMore = new QToolButton( this );
-    pMore->setToolTip( tr("more") );
-    pMore->setText( ":" );
-    pLayout->addWidget( pMore );
-    connect( pMore, SIGNAL(clicked()), SLOT(slotMore()) );
+    {
+        //
+        pMore = new QToolButton( this );
+        pMore->setToolTip( tr("more") );
+        pMore->setText( ":" );
+        connect( pMore, SIGNAL(clicked()), SLOT(slotMore()) );
+        // add popup arrow to invoke panel as a popup window
+        QMenu *pMenu = new QMenu( pMore );
+        QWidgetAction *pWidgetAction = new QWidgetAction( pMenu );
+        pWidgetAction->setDefaultWidget( pSetting->getPanel( pMenu ) );
+        pMenu->addAction( pWidgetAction );
+        pMore->setMenu( pMenu );
+        pMore->setPopupMode( QToolButton::MenuButtonPopup );
+
+        pLayout->addWidget( pMore );
+    }
 
     pLayout->addStretch( 11 );
 
@@ -336,12 +347,9 @@ void LSLinePanel::slotEndSize( qreal n )
 LSLineSwatch::LSLineSwatch( QWidget *pParent )
     : QWidget( pParent )
 {
-    pSetting = (LSLine*)g_SSettings->getSetting( "LSLine" );
-    if ( !pSetting )
-    {
-        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Could not find key [LSLine].";
-        return;
-    }
+    pSetting = (LSLine*)g_SSettings->getSetting( "LSLine" ); Q_ASSERT( pSetting );
+    pPen    = (SPen*)g_SSettings->getSetting( "SPen" ); Q_ASSERT( pPen );
+    pBrush  = (SBrush*)g_SSettings->getSetting( "SBrush" ); Q_ASSERT( pBrush );
 
     connect( pSetting, SIGNAL(signalChanged()), SLOT(slotRefresh()) );
     connect( pSetting, SIGNAL(signalSync()), SLOT(slotRefresh()) );
@@ -357,14 +365,22 @@ void LSLineSwatch::paintEvent( QPaintEvent *pEvent )
     Q_UNUSED(pEvent);
 
     // paint swatch here
-    /*
     QPainter painter( this );
-    painter.setRenderHint( QPainter::Antialiasing );
-    painter.setRenderHint( QPainter::SmoothPixmapTransform );
-    painter.setPen( pen );
-    painter.fillRect( 0, 0, width(), height(), pen.color().lighter() );
-    painter.drawLine( 0, height()/2, width(), height()/2 );
-    */
+    // apply context
+
+    painter.setPen( pPen->getValue() );
+    painter.setBrush( pBrush->getValue() );
+
+    painter.fillRect( rect(), QBrush( CBD::getContrastingColor( painter.pen().color() ) ) );
+
+    // draw shape (could be fat line)
+    pointBegin = QPointF( 0, height() / 2 );
+    pointEnd = QPointF( width(), height() / 2 );
+
+    painter.drawLine( pointBegin, pointEnd );                         
+
+    doDrawLineEnd( &painter, pSetting->getBegin(), QLineF( pointBegin, pointEnd ) );
+    doDrawLineEnd( &painter, pSetting->getEnd(), QLineF( pointEnd, pointBegin ) );
 }
 
 QSize LSLineSwatch::sizeHint() const
@@ -372,6 +388,57 @@ QSize LSLineSwatch::sizeHint() const
     return QSize( 48, 48 );
 }
 
+void LSLineSwatch::doDrawLineEnd( QPainter *pPainter, LSLine::LineEndStyles nStyle, const QLineF &line )
+{
+    switch ( nStyle )
+    {
+        case LSLine::LineEndArrow:
+            doDrawLineEndArrow( pPainter, line );
+            break;
+        case LSLine::LineEndBall:
+            doDrawLineEndBall( pPainter, line );
+            break;
+        case LSLine::LineEndNone:
+            break;
+    };
+}
+
+void LSLineSwatch::doDrawLineEndArrow( QPainter *pPainter, const QLineF &line )
+{
+    // draw at p1
+    const qreal Pi = 3.14;
+    double angle = ::acos( line.dx() / line.length() );
+
+    qreal nSize = 6;
+    if ( line.p1() == pointBegin )
+        nSize = pSetting->getBeginSize();
+    else
+        nSize = pSetting->getEndSize();
+
+    if ( line.dy() >= 0 )
+        angle = (Pi * 2) - angle;
+
+    QPointF arrowP1 = line.p1() + QPointF( sin( angle + Pi / 3 ) * nSize,
+                                           cos( angle + Pi / 3 ) * nSize );
+    QPointF arrowP2 = line.p1() + QPointF( sin( angle + Pi - Pi / 3 ) * nSize,
+                                           cos( angle + Pi - Pi / 3 ) * nSize );
+
+    QPolygonF polygonArrow;
+    polygonArrow << line.p1() << arrowP1 << arrowP2;
+    pPainter->drawPolygon( polygonArrow );
+}
+
+void LSLineSwatch::doDrawLineEndBall( QPainter *pPainter, const QLineF &line )
+{
+    // draw at p1
+    qreal nSize = 6;
+    if ( line.p1() == pointBegin )
+        nSize = pSetting->getBeginSize();
+    else
+        nSize = pSetting->getEndSize();
+
+    pPainter->drawEllipse( line.p1(), nSize, nSize );
+}
 
 
 

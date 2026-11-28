@@ -89,7 +89,7 @@ public:
     QWidget *   getToolBar( QWidget *pParent ) override;
     QWidget *   getPanel( QWidget *pParent ) override;
     QWidget *   getSwatch( QWidget *pParent ) override;
-    QToolBox *  getToolBox( QWidget *pParent ) override;    // return valid QToolBox
+    QWidget *   getPanelMax( QWidget *pParent ) override;    // return valid QToolBox
 
     void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;   // does nothing
     void doLoad( QDomElement *pdomElem ) override;                          // does nothing

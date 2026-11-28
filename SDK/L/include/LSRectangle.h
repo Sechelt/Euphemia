@@ -41,7 +41,7 @@ public:
     QWidget *   getButton( QWidget * /* pParent */ ) { return nullptr; }
     QWidget *   getToolBar( QWidget *pParent ) override;
     QWidget *   getPanel( QWidget *pParent ) override;
-    QToolBox *  getToolBox( QWidget *pParent ) override;
+    QWidget *   getPanelMax( QWidget *pParent ) override;
 
     void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;
     void doLoad( QDomElement *pdomElem ) override;

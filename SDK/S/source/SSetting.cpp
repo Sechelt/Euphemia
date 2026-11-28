@@ -17,15 +17,41 @@ SSetting::SSetting( QObject *pParent )
 {
 }
 
-QWidget *SSetting::getSwatch( QWidget *pParent )
+QWidget *SSetting::getButton( QWidget * )
 {
-    Q_UNUSED( pParent );
     return nullptr;
 }
 
-QToolBox *SSetting::getToolBox( QWidget *pParent )
+QWidget *SSetting::getToolBar( QWidget * )
 {
-    return new QToolBox( pParent ); // default is an empty one
+    return nullptr;
+}
+
+QWidget *SSetting::getPanel( QWidget * )
+{
+    return nullptr;
+}
+
+QWidget *SSetting::getPanelMax( QWidget *pParent )
+{
+    // default to panel + swatch but many may return a qtoolbox to handle a lot of settings
+    QWidget *p = new QWidget( pParent );
+    QWidget *pPanel = getPanel( p );
+    if ( !pPanel ) return p;
+    QVBoxLayout *pLayout = new QVBoxLayout( p );
+    pLayout->addWidget( pPanel );
+    QWidget *pSwatch = getSwatch( p );
+    if ( pSwatch )
+    {
+        pLayout->addWidget( pSwatch );
+//        pLayout->addStretch( 10 );
+    }
+    return p;
+}
+
+QWidget *SSetting::getSwatch( QWidget * )
+{
+    return nullptr;
 }
 
 void SSetting::doDialog( QWidget *pParent, bool bThis )
@@ -49,6 +75,12 @@ void SSetting::doDialog( QWidget *pParent, bool bThis )
     }
 }
 
+void SSetting::doDialog( QWidget *pParent, const QString &stringKey, const QString &stringTitle, QWidget *pPanel )
+{
+    SDialog dialog( pParent, stringKey, stringTitle, pPanel );
+    dialog.exec();
+}
+
 /****************************************************************
  * SDialog
  ****************************************************************/
@@ -60,38 +92,17 @@ SDialog::SDialog( QWidget *pParent, const QString &stringKey, const QString &str
     setWindowTitle( stringTitle.isEmpty() ? stringKey : stringTitle );
 
     QVBoxLayout *pLayoutTop = new QVBoxLayout( this );
-
-    SSetting *pSetting = g_SSettings->getSetting( stringKey );
-    if ( pSetting )
     {
-        pPanel = pSetting->getPanel( this );
-        QWidget *pSwatch    = pSetting->getSwatch( this );
-
-        // no panel? try tool bar widget
-        if ( !pPanel ) pPanel = pSetting->getToolBar( this );
-
-        QVBoxLayout *pLayout = new QVBoxLayout();
-
-        // panel
-        if ( pPanel ) pLayout->addWidget( pPanel );
-        // swatch
-        if ( pSwatch )
-        {
-            pLayout->addStretch( 10 );
-            pLayout->addWidget( pSwatch );
-        }
-
-        pLayoutTop->addLayout( pLayout );
-    }
-    else
-    {
-        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Setting not found [" << stringKey << "].";
+        SSetting *pSetting = g_SSettings->getSetting( stringKey ); Q_ASSERT( pSetting );
+        QWidget *pPanel = pSetting->getPanelMax( this );
+        pLayoutTop->addWidget( pPanel );
     }
 
-    QDialogButtonBox *pButtonBox = new QDialogButtonBox( QDialogButtonBox::Ok, this );
-    pLayoutTop->addWidget( pButtonBox ); 
-
-    connect( pButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
+    {
+        QDialogButtonBox *pButtonBox = new QDialogButtonBox( QDialogButtonBox::Ok, this );
+        pLayoutTop->addWidget( pButtonBox ); 
+        connect( pButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
+    }
 
     doLoadState();
 }
@@ -99,42 +110,43 @@ SDialog::SDialog( QWidget *pParent, const QString &stringKey, const QString &str
 SDialog::SDialog( QWidget *pParent, SSetting *pSetting, const QString &stringTitle )
     : QDialog( pParent )
 {
-    this->stringKey = stringKey;
+    Q_ASSERT( pSetting );
+
+    this->stringKey = pSetting->metaObject()->className();
 
     setWindowTitle( stringTitle.isEmpty() ? stringKey : stringTitle );
 
     QVBoxLayout *pLayoutTop = new QVBoxLayout( this );
-
-    if ( pSetting )
     {
-        pPanel = pSetting->getPanel( this );
-        QWidget *pSwatch    = pSetting->getSwatch( this );
-
-        // no panel? try tool bar widget
-        if ( !pPanel ) pPanel = pSetting->getToolBar( this );
-
-        QVBoxLayout *pLayout = new QVBoxLayout();
-
-        // panel
-        if ( pPanel ) pLayout->addWidget( pPanel );
-        // swatch
-        if ( pSwatch )
-        {
-            pLayout->addStretch( 10 );
-            pLayout->addWidget( pSwatch );
-        }
-
-        pLayoutTop->addLayout( pLayout );
-    }
-    else
-    {
-        qInfo() << "[" << __FILE__ << "][" << __FUNCTION__ << "][" << __LINE__ << "] Setting not found [" << stringKey << "].";
+        QWidget *pPanel = pSetting->getPanelMax( this );
+        pLayoutTop->addWidget( pPanel );
     }
 
-    QDialogButtonBox *pButtonBox = new QDialogButtonBox( QDialogButtonBox::Ok, this );
-    pLayoutTop->addWidget( pButtonBox ); 
+    {
+        QDialogButtonBox *pButtonBox = new QDialogButtonBox( QDialogButtonBox::Ok, this );
+        pLayoutTop->addWidget( pButtonBox ); 
+        connect( pButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
+    }
 
-    connect( pButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
+    doLoadState();
+}
+
+SDialog::SDialog( QWidget *pParent, const QString &stringKey, const QString &stringTitle, QWidget *pPanel )
+    : QDialog( pParent )
+{
+    Q_ASSERT( pPanel );
+
+    this->stringKey = stringKey;
+    setWindowTitle( stringTitle.isEmpty() ? stringKey : stringTitle );
+
+    QVBoxLayout *pLayoutTop = new QVBoxLayout( this );
+    pLayoutTop->addWidget( pPanel );
+
+    {
+        QDialogButtonBox *pButtonBox = new QDialogButtonBox( QDialogButtonBox::Ok, this );
+        pLayoutTop->addWidget( pButtonBox ); 
+        connect( pButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
+    }
 
     doLoadState();
 }
@@ -146,18 +158,16 @@ SDialog::~SDialog()
 
 void SDialog::doSaveState()
 {
-    if ( !pPanel ) return;
     QSettings settings;
-    settings.setValue( pPanel->metaObject()->className() + QString("/width"), width() );
-    settings.setValue( pPanel->metaObject()->className() + QString("/height"), height() );
+    settings.setValue( stringKey + "/Dialog" + QString("/width"), width() );
+    settings.setValue( stringKey + "/Dialog" + QString("/height"), height() );
 }
 
 void SDialog::doLoadState()
 {
-    if ( !pPanel ) return;
     QSettings settings;
-    int nWidth = settings.value( pPanel->metaObject()->className() + QString("/width"), width() ).toInt();
-    int nHeight= settings.value( pPanel->metaObject()->className() + QString("/height"), height() ).toInt();
+    int nWidth = settings.value( stringKey + "/Dialog" + QString("/width"), width() ).toInt();
+    int nHeight= settings.value( stringKey + "/Dialog" + QString("/height"), height() ).toInt();
     resize( nWidth, nHeight );
 }
 

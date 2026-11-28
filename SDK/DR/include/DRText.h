@@ -17,9 +17,7 @@
 class DRSText;
 
 /*!
- * \brief Text, which by default, lacks displaying rect.
- * 
- * The text does not allow for paragraphs - just a single line.
+ * \brief Text with the rectangle not displayed.
  * 
  * \author pharvey (2026-11-23)
  */
@@ -31,103 +29,53 @@ public:
 
     virtual QPixmap     getIcon() override;
 
-    // save/load
-    virtual QDomElement doSave( QDomDocument *pdomDoc, QDomElement *pdomElemParent ) override;
-    virtual bool        doLoad( QDomElement *pdomElem ) override;
-
 protected:
-    DRSText *pSettingText;
-
     virtual void doDraw( QPainter * ) override;
     virtual void doConnectSettings() override;
     virtual void doDisconnectSettings() override;
-
-protected slots:
-    void slotRefreshText();
 };
 
 /*!
  * \brief DRText settings.
  * 
- * This provides settings for DRText. This means the text itself.
- * Most of the settings come from DRSRectangleBase.
+ * This provides settings for DRText.
+ * We do not display a rect so we want to ignore pen and brush in our settings.
  * 
  * \author pharvey (2026-11-23)
  */
-class DRSText : public DRSRectangleBase 
+class DRSText : public SSetting 
 {
     Q_OBJECT
-    Q_PROPERTY(QString stringText READ getText WRITE setText NOTIFY signalChanged)
 public:
     DRSText();
 
-    void setText( const QString &stringText );
-    void setSelected( const QString &stringText );
-
-    QString getText() { return stringText; }
+    SText *         pText;
+    STextContent *  pTextContent;
 
     QWidget *   getButton( QWidget *pParent ) override;
     QWidget *   getToolBar( QWidget *pParent ) override;
     QWidget *   getPanel( QWidget *pParent ) override;
-    QWidget *   getSwatch( QWidget *pParent ) override;
-    QToolBox *  getToolBox( QWidget *pParent ) override;
+    QWidget *   getPanelMax( QWidget *pParent ) override;
 
-    virtual void doDialog( QWidget *pParent, bool bThis = false ) override;
-    void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;
-    void doLoad( QDomElement *pdomElem ) override;
-
-protected:
-    QString stringText; // ADObject::COMMENT
+    virtual void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;
+    virtual void doLoad( QDomElement *pdomElem ) override;                       
 };
 
-class DRSTextToolBar : public QWidget
+/*!
+ * \brief Tool bar widget for DRSText.
+ * 
+ * We have this because we need to invoke a dialog for DRSText not STextContent.
+ * 
+ * \author pharvey (2026-11-27)
+ */
+class DRSTextToolBar : public STextContentToolBar
 {
     Q_OBJECT
 public:
-    DRSTextToolBar( QWidget *p );
-
-public slots:
-    void slotRefresh();
+    DRSTextToolBar( QWidget *pParent );
 
 protected slots:
-    void slotText( const QString & );
-    void slotMore();
-
-protected:
-    DRSText *               pSetting;
-
-    QLineEdit *             pLineEdit = nullptr;
-    QToolButton *           pMore;
-};
-
-class DRSTextPanel : public QWidget
-{
-    Q_OBJECT
-public:
-    DRSTextPanel( QWidget *p );
-
-public slots:
-    void slotRefresh();
-
-protected slots:
-    void slotText( const QString & );
-
-protected:
-    DRSText *               pSetting;
-
-    QLineEdit *             pLineEdit = nullptr;
-};
-
-class DRSTextDialog : public QDialog
-{
-    Q_OBJECT
-public:
-    DRSTextDialog( QWidget *pParent );
-    ~DRSTextDialog();
-
-protected:
-    void doLoadState();
-    void doSaveState();
+    virtual void slotMore() override;
 };
 
 #endif

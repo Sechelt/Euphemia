@@ -71,20 +71,20 @@ QWidget *LSRectangle::getPanel( QWidget *pParent )
     return new LSRectanglePanel( pParent );
 }
 
-QToolBox *LSRectangle::getToolBox( QWidget *pParent )
+QWidget *LSRectangle::getPanelMax( QWidget *pParent )
 {
-    QToolBox *pToolBox = SSetting::getToolBox( pParent );
+    QToolBox *pToolBox = new QToolBox( pParent );
 
-    SSetting *pSettingPen       = g_SSettings->getSetting( "SPen" ); Q_ASSERT( pSettingPen );
-    SSetting *pSettingBrush     = g_SSettings->getSetting( "SBrush" ); Q_ASSERT( pSettingBrush );
-    SSetting *pSettingFont      = g_SSettings->getSetting( "SText" ); Q_ASSERT( pSettingFont );
-    SSetting *pSettingGeneral   = g_SSettings->getSetting( "LSGeneral" ); Q_ASSERT( pSettingGeneral );
+    SSetting *pSettingPen           = g_SSettings->getSetting( "SPen" ); Q_ASSERT( pSettingPen );
+    SSetting *pSettingBrush         = g_SSettings->getSetting( "SBrush" ); Q_ASSERT( pSettingBrush );
+    SSetting *pSettingTextFormat    = g_SSettings->getSetting( "SText" ); Q_ASSERT( pSettingTextFormat );
+    SSetting *pSettingTextContent   = g_SSettings->getSetting( "STextContent" ); Q_ASSERT( pSettingTextContent );
 
-    pToolBox->insertItem( -1, getPanel( pToolBox ), QIcon(), "Rectangle" );
-    pToolBox->insertItem( -1, pSettingPen->getPanel( pToolBox ), QIcon(), "Pen" );
-    pToolBox->insertItem( -1, pSettingBrush->getPanel( pToolBox ), QIcon(), "Brush" );
-    pToolBox->insertItem( -1, pSettingFont->getPanel( pToolBox ), QIcon(), "Font" );
-    pToolBox->insertItem( -1, pSettingGeneral->getPanel( pToolBox ), QIcon(), "General" );
+    pToolBox->addItem( pSettingBrush->getPanel( pToolBox ), QIcon(), "Brush" );
+    pToolBox->addItem( pSettingPen->getPanel( pToolBox ), QIcon(), "Pen" );
+    pToolBox->addItem( pSettingTextFormat->getPanel( pToolBox ), QIcon(), "Text Format" );
+    pToolBox->addItem( pSettingTextContent->getPanel( pToolBox ), QIcon(), "Text Content" );
+    pToolBox->addItem( getPanel( pToolBox ), QIcon(), "Rectangle" );
 
     return pToolBox;
 }

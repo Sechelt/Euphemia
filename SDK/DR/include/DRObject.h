@@ -16,6 +16,7 @@
 #include <SPen.h>
 #include <SBrush.h>
 #include <SText.h>
+#include <STextContent.h>
 #include <LObject.h>
 #include <LHandle.h>
 
@@ -49,13 +50,19 @@ public:
     virtual void setTransparentHandles( bool b = true, LHandle *pHandleGrabbed = nullptr );
     virtual void setPen( const QPen &pen );
     virtual void setBrush( const QBrush &brush );
-    virtual void setFont( const CBD::CBDText &font );
+    virtual void setTextFormat( const CBD::CBDText &text );
+    virtual void setTextDisplayCode( bool bCode );
+    virtual void setTextDisplayName( bool bName );
+    virtual void setTextDisplayComment( bool bComment );
      
     virtual SelectionStates getSelectionState()     { return nSelectionState;   }
     virtual QImage          getImage() = 0;
-    virtual QPen            getPen()            { return pen; }
-    virtual QBrush          getBrush()          { return brush; }
-    virtual CBD::CBDText    getFont()           { return font; }
+    virtual QPen            getPen()                { return pen; }
+    virtual QBrush          getBrush()              { return brush; }
+    virtual CBD::CBDText    getTextFormat()         { return text; }
+    virtual bool            getTextDisplayCode()    { return bDisplayCode; }
+    virtual bool            getTextDisplayName()    { return bDisplayName; }
+    virtual bool            getTextDisplayComment() { return bDisplayComment; }
     virtual QRectF          getRect() const = 0;
     virtual LHandle *       getGrab( const QPointF &pointPos, bool bSizing = false );
     virtual LHandle *       getHandle( const QPointF &pointPos );
@@ -91,7 +98,11 @@ protected:
     // local setting values
     QPen            pen;        // line (incl. color)
     QBrush          brush;      // fill (incl. color)
-    CBD::CBDText    font;       // font
+    CBD::CBDText    text;       // text format
+
+    bool bDisplayCode = false;
+    bool bDisplayName = false;
+    bool bDisplayComment = false;
 
     //
     SelectionStates     nSelectionState = SelectionStateNone;   /*!< this is independent of ADObject::bSelected but SelectionStateNone should be eq to false    */
@@ -133,7 +144,8 @@ protected:
 protected slots:
     virtual void slotRefreshPen();
     virtual void slotRefreshBrush();
-    virtual void slotRefreshFont();
+    virtual void slotRefreshTextFormat();
+    virtual void slotRefreshTextContent();
 };
 
 /*!
@@ -142,29 +154,22 @@ protected slots:
  * This does not contain its own settings - just brings in some useful settings from elsewhere.
  * Another notable thing this provides is a QToolBox with the widgets for the settings used - pre-loaded.
  * 
- * \author pharvey (2026-11-23)
+ * \author pharvey (2026-11-26)
  */
 class DRSObject : public SSetting 
 {
     Q_OBJECT
 public:
     DRSObject();
-/*
-    ADObject::OID
-    ADObject::NAME
-    ADObject::CODE
-    ADObject::COMMENT
-    DISPLAY
-*/
-    SPen *      pPen;
-    SBrush *    pBrush;
-    SText *     pFont;
 
-    QWidget *   getButton( QWidget *pParent ) override;     // return nullptr
-    QWidget *   getToolBar( QWidget *pParent ) override;    // return nullptr
-    QWidget *   getPanel( QWidget *pParent ) override;      // return nullptr
-    QWidget *   getSwatch( QWidget *pParent ) override;     // return nullptr
-    QToolBox *  getToolBox( QWidget *pParent ) override;    // return valid QToolBox
+    SPen *          pPen;
+    SBrush *        pBrush;
+    SText *         pText;
+    STextContent *  pTextContent;
+
+    QWidget *   getToolBar( QWidget *pParent ) override;
+    QWidget *   getPanel( QWidget *pParent ) override;
+    QWidget *   getPanelMax( QWidget *pParent ) override;
 
     void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) override;   // does nothing
     void doLoad( QDomElement *pdomElem ) override;                          // does nothing

@@ -157,11 +157,22 @@ SPenToolBar::SPenToolBar( QWidget *pParent )
         pLayout->addWidget( pWidth );
         connect( pWidth, SIGNAL(valueChanged(int)), SLOT(slotWidth(int)) );
 
-        pMore = new QToolButton( this );
-        pMore->setToolTip( tr("more") );
-        pMore->setText( ":" );
-        pLayout->addWidget( pMore );
-        connect( pMore, SIGNAL(clicked()), SLOT(slotMore()) );
+        {
+            pMore = new QToolButton( this );
+            pMore->setToolTip( tr("more") );
+            pMore->setText( ":" );
+            connect( pMore, SIGNAL(clicked()), SLOT(slotMore()) );
+
+            // add popup arrow to invoke panel as a popup window
+            QMenu *pMenu = new QMenu( pMore );
+            QWidgetAction *pWidgetAction = new QWidgetAction( pMenu );
+            pWidgetAction->setDefaultWidget( pPen->getPanel( pMenu ) );
+            pMenu->addAction( pWidgetAction );
+            pMore->setMenu( pMenu );
+            pMore->setPopupMode( QToolButton::MenuButtonPopup );
+
+            pLayout->addWidget( pMore );
+        }
 
         pLayout->addStretch( 11 );
 

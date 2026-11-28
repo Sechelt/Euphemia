@@ -42,18 +42,128 @@
 class SSetting : public QObject 
 {
     Q_OBJECT
+    /*
+     * Derived classes can add Q_PROPERTY macros here allowing access to properties with just a SSetting*.
+     */
 public:
     SSetting( QObject *pParent = nullptr );                                         /*!< SSettings will take ownership in SSettings::doInsert()                     */
 
-    /* void setSelected( ... ); */                                                  /*!< set values, emits signalSync but NOT signalChanged, see derived classes    */
+    /*
+     * Derived classes can add setters for their properties here.
+     * These are called by 'controls' to request a value change.
+     * They should do nothing (short circuit) if value is same.
+     * They emit signalChanged after value changed. This should be connected a slot in any interested objects - including 'controls' in thier ie slotRefresh().
+     * They should NEVER emit signalSync.
+     *
+     * void setxxx()            
+     */
 
-    virtual QWidget *   getButton( QWidget *pParent ) = 0;                             /*!< button to invoke dialog/panel for edit or nullptr                          */
-    virtual QWidget *   getToolBar( QWidget *pParent ) = 0;                            /*!< edit widget suitable for a tool bar or nullptr                             */
-    virtual QWidget *   getPanel( QWidget *pParent ) = 0;                              /*!< edit widget suitable for a dialog/dock or a nullptr                        */
-    virtual QWidget *   getSwatch( QWidget *pParent );                                 /*!< used to show example - not always needed - default is nullptr              */
-    virtual QToolBox *  getToolBox( QWidget *pParent );
+    /*
+     * Derived classes can add setters for their properties here.
+     * These set (not request) properties but only notify 'controls' - useful when an object has been 'selected' ie shape in a drawing
+     * They should do nothing (short circuit) if value is same.
+     * They emit signalSync after value changed. This should be connected to a slot in any interested 'controls' ie slotRefresh()
+     * They should NEVER emit signalChanged.
+     *
+     * void setSelectedxxx( ... );
+     */
 
-    virtual void doDialog( QWidget *pParent, bool bThis = false );                  /*!< edit dialog - default uses panel - may return nullptr                      */
+    /* 
+     * Derived classes can add getters.
+     * These are called by any connected objects/controls in thier ie slotRefresh()
+     * These simply return a property - either directly or indirectly via Q_PROPERTY.
+     *
+     * t getxxx()
+     */
+
+    /*!
+     * \brief Get a button that can be used, for example, to invoke a dialog from a tool bar.
+     * 
+     * \author pharvey (2026-11-27)
+     * 
+     * \param pParent 
+     * 
+     * \return QWidget* will be a nullptr if not supported
+     */
+    virtual QWidget *   getButton( QWidget *pParent );
+    /*!
+     * \brief Get a widget that can be used in a tool bar.
+     * 
+     * This widget should contain 1-3 most needed properties and a button to invoke a dialog as may be needed.
+     * The properties are usually just from this setting class.
+     * This should be suitable for a tool bar; tool bar height and horizontal layout.
+     * 
+     * \author pharvey (2026-11-27)
+     * 
+     * \param pParent 
+     * 
+     * \return QWidget* will be a nullptr if not supported
+     */
+    virtual QWidget *   getToolBar( QWidget *pParent );
+    /*!
+     * \brief Get a widget that can be used in, for example, a popup.
+     * 
+     * This typically contains the tool bar properties and more.
+     * The properties are usually just from this setting class.
+     * This should use a vertical layout - often a form.
+     * 
+     * \author pharvey (2026-11-27)
+     * 
+     * \param pParent 
+     * 
+     * \return QWidget* will be a nullptr if not supported
+     */
+    virtual QWidget *   getPanel( QWidget *pParent );
+    /*!
+     * \brief Get a widget that shows an example.
+     * 
+     * This is may be used as a compliment to the panel.
+     * The best example of this is example text when selecting a; font, font colors, etc.
+     * 
+     * \author pharvey (2026-11-27)
+     * 
+     * \param pParent 
+     * 
+     * \return QWidget* will be a nullptr if not supported
+     */
+    virtual QWidget *   getSwatch( QWidget *pParent );
+    /*!
+     * \brief Get a widget which shows the panel from this class but also panels from related setting objects.
+     * 
+     * This can be, but does not have to be, a QToolBox with panel widgets.
+     * 
+     * \author pharvey (2026-11-27)
+     * 
+     * \param pParent 
+     * 
+     * \return QWidget* will be a nullptr if not supported
+     */
+    virtual QWidget *   getPanelMax( QWidget *pParent );
+    /*!
+     * \brief Invoke a dialog.
+     * 
+     * The dialog will contain widget from getPanelMax or getPanel+getSwatch or specified panel.
+     * The panel widget will come from this (or derived) class or be provided.
+     * 
+     * \sa SDialog
+     * 
+     * \author pharvey (2026-11-27)
+     * 
+     * \param pParent 
+     * \param bThis   
+     */
+    virtual void doDialog( QWidget *pParent, bool bThis = false );
+    virtual void doDialog( QWidget *pParent, const QString &stringKey, const QString &stringTitle, QWidget *pPanel );
+    /*!
+     * \brief These are used to save/load the properties for this class.
+     * 
+     * The properties can be persisted to save current context (ie when app exits) and/or in a preferences editor. 
+     * 
+     * \author pharvey (2026-11-27)
+     * 
+     * \param pdomDoc  
+     * \param pdomElem 
+     */
     virtual void doSave( QDomDocument *pdomDoc, QDomElement *pdomElem ) = 0;                                                                                        
     virtual void doLoad( QDomElement *pdomElem ) = 0;                                                                                                               
 
@@ -65,15 +175,19 @@ signals:
 /*!
  * \brief Dialog for editing most SSetting objects..
  *  
- * Combines the panel and the swatch. Only really useful if 
- * SSetting::getPanel() returns a viable widget but it will 
- * try to use SSettings::getToolBar() as an alternative. 
+ * SDialog uses tool box.
+ * LToolsWidget uses panels.
+ * 
+ * Use case;
+ * 
+ * 1. LToolsWidget and panel combined with tool box dock
+ * 2. tool bar and more button invoking these dialogs
  *  
  *     SDialog dialog( pParent, "SBrush", "Brush" );
  *     dialog.exec();
  *  
  * \param pParent - parent widget
- * \param stringKey - key used for QSSettings::getSetting()
+ * \param stringKey - key used for QSSettings::getSetting() and saving dialog geometry.
  * \param stringTitle - window title
  *  
  * \author pharvey (3/14/23)
@@ -84,11 +198,11 @@ class SDialog : public QDialog
 public:
     SDialog( QWidget *pParent, const QString &stringKey, const QString &stringTitle = QString() );
     SDialog( QWidget *pParent, SSetting *pSetting, const QString &stringTitle = QString() );
+    SDialog( QWidget *pParent, const QString &stringKey, const QString &stringTitle, QWidget *pPanel );
     ~SDialog();
 
 protected:
-    QString stringKey;
-    QWidget *pPanel = nullptr;
+    QString stringKey;          /*!< usually setting class name - also used when saving/loading window geometry */
 
     void doLoadState();
     void doSaveState();

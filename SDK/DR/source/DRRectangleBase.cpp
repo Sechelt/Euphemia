@@ -290,11 +290,14 @@ QWidget *DRSRectangleBase::getSwatch( QWidget *pParent )
     return pRectangle->getSwatch( pParent );
 }
 
-QToolBox *DRSRectangleBase::getToolBox( QWidget *pParent )
+QWidget *DRSRectangleBase::getPanelMax( QWidget *pParent )
 {
-    QToolBox *p = DRSObject::getToolBox( pParent );
-    p->insertItem( 0, pRectangle->getPanel( p ), QIcon(), "Rectangle" );
-    return p;
+    QWidget *pWidget = DRSObject::getPanelMax( pParent );
+    Q_ASSERT( pWidget );
+    Q_ASSERT( pWidget->inherits( "QToolBox" ) );
+    QToolBox *pToolBox = (QToolBox*)pWidget;
+    pToolBox->insertItem( 0, pRectangle->getPanel( pToolBox ), QIcon(), "Rectangle" );
+    return pWidget;
 }
 
 void DRSRectangleBase::doSave( QDomDocument *pdomDoc, QDomElement *pdomElem )

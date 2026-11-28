@@ -343,13 +343,6 @@ STextPanel::STextPanel( QWidget *pParent )
         pLayoutRows->addLayout( pLayoutRow );
     }
 
-    // row 4
-    {
-        pSwatch = new STextSwatch( this );
-        pSwatch->setMinimumSize( 100, 100 );
-        pLayoutRows->addWidget( pSwatch, 20 );
-    }
-
     // init data
     doInitWritingSystems();
 
@@ -434,9 +427,6 @@ void STextPanel::doInitWritingSystems()
     pComboBoxWritingSystem->setCurrentIndex( pComboBoxWritingSystem->findData( nDefault ) );
 
     doInitFonts();
-
-    // provide some sample text (appropriate for writing system) to the swatch 
-    pSwatch->setText( QFontDatabase::writingSystemSample( nDefault ) );
 }
 
 void STextPanel::doInitFonts()
@@ -663,6 +653,12 @@ void STextSwatch::setText( const QString &s )
 void STextSwatch::slotRefresh()
 {
     text = pSetting->getValue();
+    // provide some sample text (appropriate for writing system) to the swatch 
+    const QString stringFamily = QFontInfo( text.font ).family();
+    const QList<QFontDatabase::WritingSystem> listSystems = QFontDatabase::writingSystems( stringFamily );
+    Q_ASSERT( listSystems.count() );
+    // the font can be in more than one family just take the first family
+    setText( QFontDatabase::writingSystemSample( listSystems.at( 0 ) ) );
     update();
 }
 
